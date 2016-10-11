@@ -9,8 +9,7 @@ public class Word {
 
     private boolean isVowel(char c) {
         c = Character.toLowerCase(c);
-        if (c == 'e'  || c == 'y' || c == 'u' || c == 'i' || c == 'o' || c == 'a') return true;
-        else return false;
+        return c == 'e' || c == 'y' || c == 'u' || c == 'i' || c == 'o' || c == 'a';
     }
 
     public boolean check() {
@@ -23,11 +22,6 @@ public class Word {
                 ++consonant;
             }
         }
-        if (vowel > consonant) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return vowel > consonant;
     }
 }

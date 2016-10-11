@@ -2,25 +2,24 @@ package com.company;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ReaderFromFile {
-    private File file;
     private ArrayList<String> wordsList;
-
-    private Charset encoding = Charset.defaultCharset();
-
-    private InputStream in;
-    private Reader buffer;
     private Reader reader;
     private boolean isEndOfFile;
 
     public ReaderFromFile(String fileName) throws IOException {
-        file = new File(fileName);
-        in = new FileInputStream(file);
-        reader = new InputStreamReader(in, encoding);
-        buffer = new BufferedReader(reader);
+        Charset encoding = Charset.defaultCharset();
+        try {
+            File file = new File(fileName);
+            InputStream in = new FileInputStream(file);
+            reader = new InputStreamReader(in, encoding);
+        }
+        catch(FileNotFoundException ex) {
+            throw new FileNotFoundException("Unable to open file '" + fileName + "'");
+        }
         wordsList = new ArrayList<String>();
         isEndOfFile = false;
     }
@@ -37,19 +36,18 @@ public class ReaderFromFile {
             if (Character.isLetter((char) intCharacter)) {
                 currentWord.append((char) intCharacter);
             } else if (!currentWord.equals("")) break;
-            else continue;
         }
         return currentWord.toString();
     }
 
     public void readWords()
             throws IOException {
-        String currentWord;
+        AtomicReference<String> currentWord = new AtomicReference<String>();
 
         do {
-            currentWord = getWord();
-            if (!wordsList.contains(currentWord)) {
-                wordsList.add(currentWord);
+            currentWord.set(getWord());
+            if (!wordsList.contains(currentWord.get())) {
+                wordsList.add(currentWord.get());
             }
         } while (!isEndOfFile);
     }
