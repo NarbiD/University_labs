@@ -1,5 +1,7 @@
 package Linear_systems;
 
+import java.util.Arrays;
+
 /**
  * Created by ignas on 17.12.2016.
  */
@@ -12,6 +14,15 @@ public class Matrix {
         this.rows = rows;
         this.cols = cols;
         matrix = new double[rows][cols];
+    }
+
+    public Matrix(Matrix m) {
+        rows = m.getNumberOfRows();
+        cols = m.getNumberOfCols();
+        matrix = new double[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            matrix[i] = Arrays.copyOf(m.matrix[i], cols);
+        }
     }
 
     public int getNumberOfRows() {
