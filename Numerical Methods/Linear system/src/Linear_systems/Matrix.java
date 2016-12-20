@@ -1,5 +1,6 @@
-package Linear_systems;
+package Linear_Systems;
 
+import java.util.InputMismatchException;
 import java.util.Arrays;
 
 /**
@@ -7,8 +8,21 @@ import java.util.Arrays;
  */
 public class Matrix {
     private double[][] matrix; //matrix
-    private int rows;
-    private int cols;
+    private int rows = 0;
+    private int cols = 0;
+
+    public Matrix(){
+        matrix = null;
+    }
+
+    public void setSize(int rows,int cols) {
+        this.rows = rows;
+        this.cols = cols;
+    }
+
+    public void initMatrix() {
+        matrix = new double[rows][cols];
+    }
 
     public Matrix(int rows, int cols) {
         this.rows = rows;
@@ -38,8 +52,15 @@ public class Matrix {
         //TODO: throw exception
     }
 
-    public void set(int i, int j, double value) {
-        matrix[i][j] = value;
+
+
+    public void setElem (int i, int j, double value) {
+        try {
+            matrix[i][j] = value;
+        }
+        catch (InputMismatchException e) {
+            e.printStackTrace();
+        }
         //TODO: throw exception
     }
 
@@ -63,12 +84,12 @@ public class Matrix {
         Matrix newMatrix = new Matrix(rows, cols + addingMatrix.getNumberOfCols());
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                newMatrix.set(i, j, matrix[i][j]);
+                newMatrix.setElem(i, j, matrix[i][j]);
             }
         }
         for (int i = 0; i < addingMatrix.getNumberOfRows(); i++) {
             for (int j = 0; j < addingMatrix.getNumberOfCols(); j++) {
-                newMatrix.set(i, cols + j, addingMatrix.getElem(i, j));
+                newMatrix.setElem(i, cols + j, addingMatrix.getElem(i, j));
             }
         }
         return newMatrix;
@@ -78,9 +99,11 @@ public class Matrix {
         Matrix transposedMatrix = new Matrix(cols, rows);
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
-                transposedMatrix.set(i, j, matrix[j][i]);
+                transposedMatrix.setElem(i, j, matrix[j][i]);
             }
         }
         return transposedMatrix;
     }
+
+
 }
