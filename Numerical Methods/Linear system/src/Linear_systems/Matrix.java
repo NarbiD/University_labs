@@ -24,12 +24,6 @@ public class Matrix {
         matrix = new double[rows][cols];
     }
 
-    public Matrix(int rows, int cols) {
-        this.rows = rows;
-        this.cols = cols;
-        matrix = new double[rows][cols];
-    }
-
     public Matrix(Matrix m) {
         rows = m.getNumberOfRows();
         cols = m.getNumberOfCols();
@@ -48,11 +42,11 @@ public class Matrix {
     }
 
     public double getElem(int i, int j) {
-        return matrix[i][j];
-        //TODO: throw exception
+        if (i < rows && j < cols) {
+            return matrix[i][j];
+        }
+        else return Double.NaN;
     }
-
-
 
     public void setElem (int i, int j, double value) {
         try {
@@ -61,7 +55,6 @@ public class Matrix {
         catch (InputMismatchException e) {
             e.printStackTrace();
         }
-        //TODO: throw exception
     }
 
     public void swapRows(int row1, int row2) {
@@ -79,31 +72,4 @@ public class Matrix {
             System.out.println();
         }
     }
-
-    public Matrix addColumn(Matrix addingMatrix) {
-        Matrix newMatrix = new Matrix(rows, cols + addingMatrix.getNumberOfCols());
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                newMatrix.setElem(i, j, matrix[i][j]);
-            }
-        }
-        for (int i = 0; i < addingMatrix.getNumberOfRows(); i++) {
-            for (int j = 0; j < addingMatrix.getNumberOfCols(); j++) {
-                newMatrix.setElem(i, cols + j, addingMatrix.getElem(i, j));
-            }
-        }
-        return newMatrix;
-    }
-
-    public Matrix getTransposed() {
-        Matrix transposedMatrix = new Matrix(cols, rows);
-        for (int i = 0; i < cols; i++) {
-            for (int j = 0; j < rows; j++) {
-                transposedMatrix.setElem(i, j, matrix[j][i]);
-            }
-        }
-        return transposedMatrix;
-    }
-
-
 }
