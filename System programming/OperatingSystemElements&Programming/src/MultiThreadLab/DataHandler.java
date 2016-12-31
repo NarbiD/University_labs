@@ -1,7 +1,9 @@
 package MultiThreadLab;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Created by ignas on 30.12.2016.
@@ -10,31 +12,43 @@ import java.util.Scanner;
 public class DataHandler {
     private static volatile Double variableX = null;
     public static volatile ArrayList<Double> interimResults = new ArrayList<>(2);
-    private static Double result = null;
+    private static Double ultimateResult = null;
+    private static BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 
-    public static void getResult(Thread f, Thread g) {
+    public static void getResult(ArrayList<Thread> functions) {
         long _timeStart = System.currentTimeMillis();
         byte needToContinue = 0;
-        do {
+        boolean allFunctionsAreDied = false;
+        while (!allFunctionsAreDied) {
             if (resultIsReady()) {
-                result = multInterimResults();
+                ultimateResult  = multInterimResults();
                 break;
             }
             else if (!shouldContinue(_timeStart, needToContinue)) {
-                f.interrupt(); // .stop()
-                g.interrupt(); // .stop()
+                functions.forEach(Thread::interrupt); //.stop
                 break;
             }
             else if (System.currentTimeMillis() - _timeStart > Server.TIME_TO_ASK) {
                 _timeStart = System.currentTimeMillis();
             }
-        } while (f.isAlive() || g.isAlive());
+            allFunctionsAreDied = true;
+            for (Thread func : functions) {
+                if (func.isAlive()) {
+                    allFunctionsAreDied = false;
+                }
+            }
+        }
     }
 
-    public static double readVar() {
-        Scanner scanner = new Scanner(System.in);
-        Double _x = scanner.nextDouble();
-        scanner.close();
+    public static double readVariable() {
+        Double _x = null;
+        try {
+            _x  = Double.parseDouble(keyboard.readLine());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            _x = Double.NaN;
+        }
         return _x;
     }
 
@@ -65,17 +79,32 @@ public class DataHandler {
             System.out.println("Якщо ви бажаєте продовжувати, натисніть 1.");
             System.out.println("Якщо ви бажаєте закінчити, натисніть 2.");
             System.out.println("Якщо ви бажаєте продовжувати до кінця (більше не питати), натисніть 3.");
-            needToContinue = (byte)readVar();
+            System.out.println("Якщо ви бажаєте побачити проміжні результати і продовжити, натисніть 4.");
+            needToContinue = (byte) readVariable();
         }
-        return needToContinue != 2;
+        switch (needToContinue) {
+            case 2:
+                return false;
+            case 4:
+                printInterimResults();
+            case 1:
+            case 3:
+            default: return true;
+        }
     }
 
     public static void printResult() {
-        if (result == null) {
-            System.out.println("Обчислення не були виконані.");
+        if (ultimateResult == null) {
+            System.out.println("Не всі обчислення були виконані.");
+            System.exit(0);
+            printInterimResults();
         } else {
-            System.out.println("Результат: " + result + ".");
+            System.out.println("Результат: " + ultimateResult + ".");
         }
+    }
+
+    public static void printInterimResults() {
+        DataHandler.interimResults.forEach(System.out::println);
     }
 
     public static Double getX() {

@@ -11,6 +11,7 @@ public class FlowControler implements Runnable {
 
     private final int PORT;
     public Double result;
+    String ipAddress = "127.0.0.1";
 
     FlowControler(final int _PORT) {
         PORT = _PORT;
