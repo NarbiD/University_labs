@@ -1,4 +1,4 @@
-package MultiThreadLab;
+package MultiThreadServer;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package MultiThreadLab;
+package MultiThreadServer;
 
 /**
  * Created by ignas on 27.12.2016.

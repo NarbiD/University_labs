@@ -1,4 +1,4 @@
-package MultiThreadLab;
+package MultiThreadServer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
