@@ -1,3 +1,5 @@
+package ClientFunctions;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -5,9 +7,9 @@ import java.net.Socket;
 /**
  * Created by ignas on 31.12.2016.
  */
-public class FunctionG {
+public class FunctionF {
     public static void main(String[] arg) {
-        int serverPort = 54321;
+        int serverPort = 12345;
         String address = "127.0.0.1";
 
         try {
@@ -16,18 +18,18 @@ public class FunctionG {
             Socket socket = new Socket(ipAddress, serverPort);
             System.out.println("Yes! I just got hold of the program.");
 
-            InputStream sin = socket.getInputStream();
-            OutputStream sout = socket.getOutputStream();
+            InputStream in = socket.getInputStream();
+            OutputStream out = socket.getOutputStream();
 
-            DataInputStream in = new DataInputStream(sin);
-            DataOutputStream out = new DataOutputStream(sout);
+            DataInputStream DataIn = new DataInputStream(in);
+            DataOutputStream DataOut = new DataOutputStream(out);
 
-            Double x = in.readDouble();
-            Double result = G(x);
+            Double x = DataIn.readDouble();
+            Double result = F(x);
 
 
             System.out.println("Sending this line to the server...");
-            out.writeDouble(result);
+            DataOut.writeDouble(result);
             out.flush();
 
             System.out.println("Done.");
@@ -37,17 +39,13 @@ public class FunctionG {
         }
     }
 
-    private static double G(double x) {
-        if (x < 0) {
-            return 0;
+    private static double F(double x) {
+        int a;
+        while (true) {
+            a = 5;
+            if(a==6) break;
         }
-        else if (x < 2) {
-            return 1;
-        }
-        double resultG = 1;
-        for(int i = 2; i <= x; i++) {
-            resultG *= i;
-        }
-        return resultG;
+        return a+1;
+
     }
 }

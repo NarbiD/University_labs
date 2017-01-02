@@ -73,7 +73,7 @@ public class Method {
                         currentValues.set(i, currentValues.get(i) - A.getElem(i, j) * previousValues.get(j));
                     }
                 }
-                currentValues.set(i, currentValues.get(i) / A.getElem(i, i) );
+                currentValues.set(i, currentValues.get(i) / A.getElem(i, i));
             }
 
             double error = 0.0;

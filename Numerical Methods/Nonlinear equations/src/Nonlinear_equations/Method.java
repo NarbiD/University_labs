@@ -18,14 +18,14 @@ public class Method {
     public static double Dichotomy(double left, double right) {
         System.out.println("Метод дихотомії(бінарний пошук):");
 
-        if (Math.signum(equation(left)) == Math.signum(equation(right))) {
+        if (Math.signum(Math.signum(equation(left))) == Math.signum(equation(right))) {
             System.out.println("Немає розв'язків");
         }
 
         double mid = (left + right) / 2.0;
         for(int i = 1; Math.abs(right - left) > eps; ++i) {
             System.out.println("Ітерація " + i + ", " + mid);
-            if (equation(mid)*equation(left) < 0.0) {
+            if (Math.signum(equation(left)) != Math.signum(equation(mid))) {
                 right = mid;
             } else {
                 left = mid;
