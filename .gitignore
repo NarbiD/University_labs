@@ -13,8 +13,6 @@
 
 *.iws
 
-CMakeLists.txt
-
 
 # IntelliJ
 
@@ -24,7 +22,9 @@ CMakeLists.txt
 
 # CLion
 
-/cmake-build-debug/
+cmake-build-debug/
+
+CMakeLists.txt
 
 
 # Mobile Tools for Java (J2ME)
