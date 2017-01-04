@@ -1,4 +1,4 @@
-# Covers JetBrains IntelliJ
+# Covers JetBrains IDEs: IntelliJ, CLion
 *.iml
 
 
@@ -13,12 +13,19 @@
 
 *.iws
 
+CMakeLists.txt
+
 
 # IntelliJ
 
 /out/
 
 *.class
+
+# CLion
+
+/cmake-build-debug/
+
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
