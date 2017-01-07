@@ -90,6 +90,10 @@ void keyboardInput(int array[], int &size){
         cin >> currentElement;
         cin.clear();
         cin.ignore();
+        if (currentElement == -1) {
+            cout << "You entered " << currentSize - 1 << " elements." << endl;
+            break;
+        }
         if (currentElement < 0 || currentElement > 99) {
             cout << "An element number " << i << " is not correct!" << endl;
         }
