@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 
 #define EPS 1.0e-8
 #define MIN_TAB_STEP 1.0e-6
@@ -81,31 +82,18 @@ double f_lib(double x){
 }
 
 void printHeadLine(){
-	cout << "          x     f_lib(x)    f_sum(x)  difference    N_adds" << endl;
+	cout << "|            x |     f_lib(x) |    f_sum(x) |  difference |   N_adds |" << endl;
 }
 
 void printResults(double x, double f_lib, double f_sum, double difference, unsigned N_adds){
     cout << fixed;
-	if (x < 0) {
-		cout.precision(8);
-		cout << x << "  ";
-		cout.precision(9);
-	}
-	else {
-		cout.precision(9);
-		cout << x << "  ";
-	}
-	cout<< f_lib << ' ' << f_sum << ' ' << difference;
-	if (N_adds<10)
-        cout << "         " << N_adds << endl;
-	else if (N_adds<100)
-        cout << "        " << N_adds << endl;
-	else if (N_adds<1000)
-        cout << "       " << N_adds << endl;
-	else if (N_adds<10000)
-        cout << "      " << N_adds << endl;
+    cout.precision(9);
+	if (x < 0)
+		cout <<"| " << x << " |  ";
 	else
-        cout << "     " << N_adds << endl;
+		cout << "|  " << x << " |  ";
+	cout<< f_lib << " | " << f_sum << " | " << difference << " |";
+    cout << setw(9) << N_adds << " |" << endl;
 }
 
 double f_sum(double x, unsigned &N_adds){
