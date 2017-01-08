@@ -13,25 +13,24 @@ int getSize();
 
 int main() {
     ArrayHolder* array;
-    ofstream fout;
-    ifstream fin;
-    string fileName = "";
 
     switch (selectInputMethod()){
-        case 1:
+        case 1: {
             array = new ArrayHolder();
             array->keyboardInput();
             break;
-        case 2:
+        }
+        case 2: {
             array = new ArrayHolder(getSize());
             break;
-        case 3:
+        }
+        case 3: {
             array = new ArrayHolder();
             string filePath;
             ifstream fin;
             do {
                 filePath = getFilePath();
-                if (filePath[filePath.size()-1] == '\\') {
+                if (filePath[filePath.size() - 1] == '\\') {
                     filePath.append("input.txt");
                 }
                 fin.open(filePath);
@@ -39,6 +38,15 @@ int main() {
             array->inputFromFile(fin);
             fin.close();
             break;
+        }
+        case 9: {
+            cout << "Good luck!" << endl;
+            return 0;
+        }
+        default: {
+            cout << "<<<WRONG PARAMETER>>>" << endl;
+            return 1;
+        }
     }
 
     if (array->getCurrentSize() > 0) {
@@ -46,20 +54,25 @@ int main() {
         array->printToScreen();
 
         switch (selectOutputMethod()) {
-            case 1:
-            ArrayHolder::printToScreen(array->interchange(), array->getCurrentSize());
+            case 1: {
+                ArrayHolder::printToScreen(array->interchange(), array->getCurrentSize());
                 break;
-            case 2:
+            }
+            case 2: {
+                ofstream fout;
                 string filePath;
                 do {
                     filePath = getFilePath();
-                    if (filePath[filePath.size()-1] == '\\') {
+                    if (filePath[filePath.size() - 1] == '\\') {
                         filePath.append("output.txt");
                     }
                     fout.open(filePath);
                 } while (!fout.is_open());
                 ArrayHolder::printToFile(array->interchange(), array->getCurrentSize(), fout);
                 fout.close();
+                break;
+            }
+            default:
                 break;
         }
     }
