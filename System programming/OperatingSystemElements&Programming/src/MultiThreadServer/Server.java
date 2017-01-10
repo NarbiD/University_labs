@@ -19,7 +19,7 @@ public class Server {
         return instance;
     }
 
-    public void initPorts() {
+    private void initPorts() {
         ports.add(12345);
         ports.add(54321);
     }
@@ -27,7 +27,7 @@ public class Server {
     private Server() {
         initPorts();
         for (int i = 0; i < MainServer.NUMBER_OF_FUNCTION; i++) {
-            functions.add(new Thread(new FlowControler(ports.get(i))));
+            functions.add(new Thread(new FlowController(ports.get(i))));
         }
     }
 
@@ -42,5 +42,12 @@ public class Server {
         DataHandler.readVariable();
 
         DataHandler.getResult(functions);
+    }
+
+    public void suspendAllFunctoins() {
+        functions.forEach(Thread::suspend);
+    }
+    public void resumeAllFunctoins() {
+        functions.forEach(Thread::resume);
     }
 }

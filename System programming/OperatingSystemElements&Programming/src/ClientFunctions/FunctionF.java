@@ -1,41 +1,35 @@
 package ClientFunctions;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
 
 /**
  * Created by ignas on 31.12.2016.
  */
-public class FunctionF {
+public class FunctionF extends Client{
+
     public static void main(String[] arg) {
-        int serverPort = 12345;
-        String address = "127.0.0.1";
+        serverPort = 12345;
 
-        try {
-            InetAddress ipAddress = InetAddress.getByName(address);
-            System.out.println("IP address " + address + " and port " + serverPort + "was opened");
-            Socket socket = new Socket(ipAddress, serverPort);
-            System.out.println("Yes! I just got hold of the program.");
+        if (connectToServer()) {
+            dataProcessing();
+        }
 
-            InputStream in = socket.getInputStream();
-            OutputStream out = socket.getOutputStream();
+        System.out.println("<<<END OF WORK>>>");
+    }
 
-            DataInputStream DataIn = new DataInputStream(in);
-            DataOutputStream DataOut = new DataOutputStream(out);
+    protected static void dataProcessing() {
+        try (InputStream in = socket.getInputStream();
+             OutputStream out = socket.getOutputStream();
+             DataInputStream DataIn = new DataInputStream(in);
+             DataOutputStream DataOut = new DataOutputStream(out)) {
 
-            Double x = DataIn.readDouble();
-            Double result = F(x);
-
-
-            System.out.println("Sending this line to the server...");
+            double x = DataIn.readDouble();
+            double result = F(x);
             DataOut.writeDouble(result);
-            out.flush();
 
             System.out.println("Done.");
-            System.out.println();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Could not write or read the data from server");
         }
     }
 

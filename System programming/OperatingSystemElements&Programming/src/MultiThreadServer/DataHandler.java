@@ -24,7 +24,7 @@ public class DataHandler {
                 ultimateResult  = multInterimResults();
                 break;
             }
-            else if (!shouldContinue(_timeStart, needToContinue)) {
+            else if (!shouldContinue(_timeStart, needToContinue, functions)) {
                 functions.forEach(Thread::interrupt); //.stop
                 break;
             }
@@ -40,14 +40,14 @@ public class DataHandler {
         }
     }
 
-    public static double readVariable() {
+    public static double readVariable() throws IllegalArgumentException{
         Double _x = null;
         try {
             _x  = Double.parseDouble(keyboard.readLine());
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            _x = Double.NaN;
+            System.err.println("Input failed!");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException();
         }
         return _x;
     }
@@ -72,15 +72,23 @@ public class DataHandler {
         return _resultOfMult;
     }
 
-    private static boolean shouldContinue(long timeBefore, byte needToContinue) {
+    private static boolean shouldContinue(long timeBefore, byte needToContinue, ArrayList<Thread> functions) {
         if (needToContinue != 3 && System.currentTimeMillis() - timeBefore > Server.TIME_TO_ASK) {
+
+            functions.forEach(Thread::suspend);
+
             System.out.println("Увага!");
             System.out.println("Обчислення тривають більше " + Server.TIME_TO_ASK / 1000 + " секунд.");
             System.out.println("Якщо ви бажаєте продовжувати, натисніть 1.");
             System.out.println("Якщо ви бажаєте закінчити, натисніть 2.");
             System.out.println("Якщо ви бажаєте продовжувати до кінця (більше не питати), натисніть 3.");
             System.out.println("Якщо ви бажаєте побачити проміжні результати і продовжити, натисніть 4.");
-            needToContinue = (byte) readVariable();
+            try {
+                needToContinue = (byte) readVariable();
+            } catch (IllegalArgumentException e) {
+                System.err.println("Некоректний ввід! Обчислення будуть припинені.");
+                needToContinue = 2;
+            }
         }
         switch (needToContinue) {
             case 2:
@@ -89,14 +97,15 @@ public class DataHandler {
                 printInterimResults();
             case 1:
             case 3:
-            default: return true;
+                functions.forEach(Thread::resume);
+            default:
+                return true;
         }
     }
 
     public static void printResult() {
         if (ultimateResult == null) {
             System.out.println("Не всі обчислення були виконані.");
-            System.exit(0);
             printInterimResults();
         } else {
             System.out.println("Результат: " + ultimateResult + ".");
