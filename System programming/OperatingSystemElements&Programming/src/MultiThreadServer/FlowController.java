@@ -27,6 +27,7 @@ public class FlowController implements Runnable {
             DataOut.writeDouble(DataHandler.getX());
             DataHandler.interimResults.add(DataIn.readDouble());
 
+            DataOut.flush();
         } catch (IOException e) {
             System.err.println("Could not write or read the data from client");
         }

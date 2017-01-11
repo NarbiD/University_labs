@@ -13,7 +13,9 @@ abstract class Client {
     protected static Integer serverPort = null;
     protected static Socket socket = null;
 
-    protected static boolean connectToServer() {
+    public abstract double function(double x);
+
+    protected boolean connectToServer() {
         try {
             InetAddress ipAddress = InetAddress.getByName(address);
             socket = new Socket(ipAddress, serverPort);
@@ -25,6 +27,20 @@ abstract class Client {
         return true;
     }
 
-    protected static void dataProcessing(){
+    public void dataProcessing(){
+        try (InputStream in = socket.getInputStream();
+             OutputStream out = socket.getOutputStream();
+             DataInputStream DataIn = new DataInputStream(in);
+             DataOutputStream DataOut = new DataOutputStream(out)) {
+
+            double x = DataIn.readDouble();
+            double result = function(x);
+            DataOut.writeDouble(result);
+
+            DataOut.flush();
+            System.out.println("Done.");
+        } catch (IOException e) {
+            System.err.println("Could not write or read the data from server");
+        }
     }
 }
