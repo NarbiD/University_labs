@@ -40,14 +40,15 @@ public class DataHandler {
         }
     }
 
-    public static double readVariable() throws IllegalArgumentException{
-        Double _x = null;
+    public static double readVariable() {
+        double _x;
         try {
             _x  = Double.parseDouble(keyboard.readLine());
         } catch (IOException e) {
-            System.err.println("Input failed!");
+            System.err.println("Помилка вводу!");
+            _x = Double.NaN;
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException();
+            _x = Double.NaN;
         }
         return _x;
     }
@@ -64,8 +65,8 @@ public class DataHandler {
         return true;
     }
 
-    private static Double multInterimResults() {
-        Double _resultOfMult = 1.0;
+    private static double multInterimResults() {
+        double _resultOfMult = 1.0;
         for (Double result : interimResults) {
             _resultOfMult *= result;
         }
@@ -79,15 +80,17 @@ public class DataHandler {
 
             System.out.println("Увага!");
             System.out.println("Обчислення тривають більше " + Server.TIME_TO_ASK / 1000 + " секунд.");
-            System.out.println("Якщо ви бажаєте продовжувати, натисніть 1.");
+            System.out.println("Якщо ви бажаєте продовжувати (варіант по замовчуванню), натисніть 1.");
             System.out.println("Якщо ви бажаєте закінчити, натисніть 2.");
             System.out.println("Якщо ви бажаєте продовжувати до кінця (більше не питати), натисніть 3.");
             System.out.println("Якщо ви бажаєте побачити проміжні результати і продовжити, натисніть 4.");
-            try {
-                needToContinue = (byte) readVariable();
-            } catch (IllegalArgumentException e) {
+            double inputFromKeyboard = readVariable();
+            if (Double.isNaN(inputFromKeyboard)) {
                 System.err.println("Некоректний ввід! Обчислення будуть припинені.");
                 needToContinue = 2;
+            }
+            else {
+                needToContinue = (byte)inputFromKeyboard;
             }
         }
         switch (needToContinue) {
@@ -116,11 +119,11 @@ public class DataHandler {
         DataHandler.interimResults.forEach(System.out::println);
     }
 
-    public static Double getX() {
+    public static double getX() {
         return variableX;
     }
 
-    public static void setX(Double x) {
+    public static void setX(double x) {
         variableX = x;
     }
 

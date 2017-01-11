@@ -43,11 +43,4 @@ public class Server {
 
         DataHandler.getResult(functions);
     }
-
-    public void suspendAllFunctoins() {
-        functions.forEach(Thread::suspend);
-    }
-    public void resumeAllFunctoins() {
-        functions.forEach(Thread::resume);
-    }
 }
