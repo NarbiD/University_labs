@@ -1,28 +1,25 @@
 package ClientFunctions;
 
+import java.io.*;
+
 /**
  * Created by ignas on 31.12.2016.
  */
-
 public class FunctionG extends Client {
 
-    private FunctionG() {
-        super();
-        serverPort = 54321;
-    }
-
     public static void main(String[] arg) {
+        serverPort = 54321;
 
-        FunctionG clientG = new FunctionG();
+        FunctionG client = new FunctionG();
 
-        if (clientG.connectToServer()) {
-            clientG.dataProcessing();
+        if (client.connectToServer()) {
+            client.dataProcessing();
         }
 
         System.out.println("<<<END OF WORK>>>");
     }
 
-    protected double function(double x) {
+    public double function(double x) {
         if (x < 0) {
             return 0;
         }

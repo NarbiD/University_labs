@@ -25,7 +25,6 @@ public class DataHandler {
                 break;
             }
             else if (!shouldContinue(_timeStart, needToContinue, functions)) {
-                FlowController.dontContinue();
                 functions.forEach(Thread::interrupt); //.stop
                 break;
             }
@@ -77,7 +76,6 @@ public class DataHandler {
     private static boolean shouldContinue(long timeBefore, byte needToContinue, ArrayList<Thread> functions) {
         if (needToContinue != 3 && System.currentTimeMillis() - timeBefore > Server.TIME_TO_ASK) {
 
-            FlowController.pause();
             functions.forEach(Thread::suspend);
 
             System.out.println("Увага!");
@@ -86,7 +84,6 @@ public class DataHandler {
             System.out.println("Якщо ви бажаєте закінчити, натисніть 2.");
             System.out.println("Якщо ви бажаєте продовжувати до кінця (більше не питати), натисніть 3.");
             System.out.println("Якщо ви бажаєте побачити проміжні результати і продовжити, натисніть 4.");
-
             double inputFromKeyboard = readVariable();
             if (Double.isNaN(inputFromKeyboard)) {
                 System.err.println("Некоректний ввід! Обчислення будуть припинені.");
@@ -103,7 +100,6 @@ public class DataHandler {
                 printInterimResults();
             case 1:
             case 3:
-                FlowController.resume();
                 functions.forEach(Thread::resume);
             default:
                 return true;
@@ -127,12 +123,8 @@ public class DataHandler {
         return variableX;
     }
 
-    public static void setX(double x) throws IllegalArgumentException{
-        if (Double.isNaN(x) || Double.isInfinite(x)) {
-            throw new IllegalArgumentException();
-        }
-        else
-            variableX = x;
+    public static void setX(double x) {
+        variableX = x;
     }
 
 }
