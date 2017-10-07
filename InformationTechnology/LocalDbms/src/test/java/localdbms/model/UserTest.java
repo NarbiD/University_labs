@@ -72,4 +72,27 @@ public class UserTest {
         User user = new User("Ivan", "123456aA", "email@rozklad.tk");
         user.setLogin("Elena");
     }
+
+    @Test
+    public void createValidUser() {
+        User user1 = userFactory.getUser();
+        user1.setLogin("Igor");
+        user1.setPassword("N1kolaeV");
+        user1.setEmail("igor@nikolaev.com");
+    }
+
+    @Test
+    public void createSeveralDifferentInstances() {
+        User user1 = userFactory.getUser();
+        User user2 = userFactory.getUser();
+
+        user1.setLogin("Andrew");
+        user1.setPassword("tEst12345");
+        user1.setEmail("andrew@rozklad.tk");
+        user2.setLogin("Anna");
+        user2.setPassword("tEst12345");
+        user2.setEmail("anna@rozklad.tk");
+
+        Assert.assertNotEquals(user1, user2);
+    }
 }
