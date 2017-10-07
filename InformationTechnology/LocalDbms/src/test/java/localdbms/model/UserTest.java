@@ -95,4 +95,34 @@ public class UserTest {
 
         Assert.assertNotEquals(user1, user2);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setTooSmallAverageScore() {
+        User user = userFactory.getUser();
+        user.setAverageScore(User.MIN_SCORE-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setTooHighAverageScore() {
+        User user = userFactory.getUser();
+        user.setAverageScore(User.MAX_SCORE+1);
+    }
+
+    @Test
+    public void setCorrectAverageScore() {
+        User user = userFactory.getUser();
+        user.setAverageScore((User.MAX_SCORE + User.MIN_SCORE)/2);
+    }
+
+    @Test
+    public void setAverageScoreEqualsMaxScore() {
+        User user = userFactory.getUser();
+        user.setAverageScore(User.MAX_SCORE);
+    }
+
+    @Test
+    public void setAverageScoreEqualsMinScore() {
+        User user = userFactory.getUser();
+        user.setAverageScore(User.MIN_SCORE);
+    }
 }
