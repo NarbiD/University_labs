@@ -1,13 +1,35 @@
 package localdbms.database;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Iterator;
+import java.util.Random;
+import java.util.stream.Stream;
 
 public class DatabaseTest {
 
+    private final int nameLength = 8;
+    private Iterator<String> namesIterator;
+
+    @Before
+    public void init() {
+        Stream<String> names = Stream.generate(() -> {
+            Random random = new Random(System.nanoTime());
+            StringBuilder name = new StringBuilder(nameLength);
+            for (int i = 0; i < nameLength; i++) {
+                name.append((char)('a' + Math.abs(random.nextInt()%26)));
+            }
+            return name.toString();
+        });
+        namesIterator = names.distinct().iterator();
+    }
+
+
     @Test
     public void createDatabase() {
-        String dbName = "1687zw4Lksc";
+        String dbName = namesIterator.next();
         Database db = new Database(dbName);
         try {
             db.delete();
@@ -21,11 +43,11 @@ public class DatabaseTest {
 
     @Test
     public void createTable() {
-        String dbName = "1587zw4Lksc";
+        String dbName = namesIterator.next();
         Database db = new Database(dbName);
-        if (Table.isTableExists("table1", db))
+        if (Table.isTableExists("table1", db.getLocation()))
             try {
-                Table.delete("table1", db);
+                Table.delete("table1", db.getLocation());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -37,17 +59,17 @@ public class DatabaseTest {
 
     @Test
     public void createFewTables() {
-        String dbName = "HK4f5MXl895";
+        String dbName = namesIterator.next();
         Database db = new Database(dbName);
-        if (Table.isTableExists("table1", db))
+        if (Table.isTableExists("table1", db.getLocation()))
             try {
-                Table.delete("table1", db);
+                Table.delete("table1", db.getLocation());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        if (Table.isTableExists("table2", db))
+        if (Table.isTableExists("table2", db.getLocation()))
             try {
-                Table.delete("table2", db);
+                Table.delete("table2", db.getLocation());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -62,7 +84,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteTable() {
-        String dbName = "2E2N87lm3o3";
+        String dbName = namesIterator.next();
         Database db = new Database(dbName);
         db.createTable("table1");
         db.save();
@@ -77,7 +99,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteDatabaseWithTables() {
-        String dbName = "d43c9Y73UK7";
+        String dbName = namesIterator.next();
         Database db = new Database(dbName);
         db.createTable("table1");
         db.createTable("table2");
@@ -93,7 +115,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteDatabaseWithoutTables() {
-        String dbName = "8w8TQfbU401";
+        String dbName = namesIterator.next();
         Database db = new Database(dbName);
         db.save();
         Assert.assertTrue(Database.isDatabaseExists(dbName));

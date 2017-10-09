@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Table {
-    private Database parentDatabase;
+    private String dbLocation;
     private String name;
     private JSONObject data;
 
@@ -21,24 +21,19 @@ public class Table {
         this.name = name;
     }
 
-    Table(String name, Database parentDatabase, DataType... columnType) {
-        this.parentDatabase = parentDatabase;
+    Table(String name, String dbLocation, DataType... columnType) {
+        this.dbLocation = dbLocation;
         this.name = name;
         data = new JSONObject();
     }
 
-    public static boolean isTableExists(String name, Database database) {
-        String path = new File("").getAbsolutePath();
-        File table  =
-                new File(path + "/src/main/resources/databases/" + database.getName() + "/" + name);
+    public static boolean isTableExists(String name, String dbLocation) {
+        File table = new File(dbLocation + "/" + name);
         return table.isFile();
     }
 
     void writeToFile() {
-        String path = new File("").getAbsolutePath();
-        String pathToDatabases = "/src/main/resources/databases/";
-        File pathToCurrentDatabase = new File(path + pathToDatabases + parentDatabase.getName());
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathToCurrentDatabase + "/" + name))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dbLocation + "/" + name))) {
             writer.write(getData().toString());
             writer.flush();
             writer.close();
@@ -47,11 +42,9 @@ public class Table {
         }
     }
 
-    public static void delete(String name, Database parentDatabase) throws Exception {
-        if (isTableExists(name, parentDatabase)) {
-            String path = new File("").getAbsolutePath();
-            File table  =
-                    new File(path + "/src/main/resources/databases/" + parentDatabase.getName() + "/" + name);
+    public static void delete(String name, String dbLocation) throws Exception {
+        if (isTableExists(name, dbLocation)) {
+            File table  = new File(dbLocation + "/" + name);
             if(!table.delete()) {
                 throw new Exception();
             }
