@@ -5,7 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Database {
-    private final static String DEFAULT_LOCATION = new File("").getAbsolutePath() + "/src/main/resources/databases/";
+    public static String getDefaultLocation() {
+        return DEFAULT_LOCATION;
+    }
+
+    private final static String DEFAULT_LOCATION =
+            new File("").getAbsolutePath() + "/src/main/resources/databases/";
     private String name;
     private Set<Table> tables;
 
@@ -34,9 +39,10 @@ public class Database {
         return "Database " + name;
     }
 
-    public void createTable(String name, DataType... columnType) {
+    public Table createTable(String name, DataType... columnType) {
         Table table = new Table(name, this.location + "/" + this.name + "/", columnType);
         tables.add(table);
+        return table;
     }
 
     public void deleteTable(String name) throws Exception {
@@ -59,9 +65,7 @@ public class Database {
     public void save() {
         File path = new File(this.location  + "/" + this.name);
         if (!isDatabaseExists(name)) {
-            if (path.mkdir()) {
-                System.out.println("Database " + name + " was created.");
-            } else {
+            if (!path.mkdir()) {
                 throw new RuntimeException();
             }
         }

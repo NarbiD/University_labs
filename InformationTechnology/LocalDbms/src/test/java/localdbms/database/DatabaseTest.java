@@ -1,5 +1,6 @@
 package localdbms.database;
 
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,11 +32,6 @@ public class DatabaseTest {
     public void createDatabase() {
         String dbName = namesIterator.next();
         Database db = new Database(dbName);
-        try {
-            db.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         Assert.assertFalse(Database.isDatabaseExists(dbName));
         db.save();
         Assert.assertTrue(Database.isDatabaseExists(dbName));
@@ -126,5 +122,4 @@ public class DatabaseTest {
         }
         Assert.assertFalse(Database.isDatabaseExists(dbName));
     }
-
 }

@@ -1,17 +1,23 @@
 package localdbms.database;
 
-import org.json.JSONObject;
+import org.json.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Table {
     private String dbLocation;
     private String name;
-    private JSONObject data;
 
+    public List<DataType> getTypes() {
+        return types;
+    }
+
+    private List<DataType> types;
+    private JSONArray data;
+    private List<Entry> entries;
 
     String getName() {
         return name;
@@ -21,10 +27,23 @@ public class Table {
         this.name = name;
     }
 
-    Table(String name, String dbLocation, DataType... columnType) {
+    public Table(String name, String dbLocation, DataType... columnType) {
         this.dbLocation = dbLocation;
+        String fileLocation = dbLocation + "/" + name;
         this.name = name;
-        data = new JSONObject();
+        this.types = Arrays.asList(columnType);
+        if (new File(fileLocation).isFile()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileLocation))) {
+                data = new JSONArray(reader.readLine());
+                entries = getEntries(types);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            data = new JSONArray();
+            entries = getEntries(types);
+        }
     }
 
     public static boolean isTableExists(String name, String dbLocation) {
@@ -51,9 +70,29 @@ public class Table {
         }
     }
 
-    JSONObject getData() {
-        data.put("Denis", "Ignashov");
-        data.put("Arthur", "King");
+    public List<Entry> getEntries(List<DataType> types){
+        List<Entry> entries = new ArrayList<>();
+        for (Object json : data) {
+            JSONObject h = (JSONObject)json;
+            entries.add(new Entry(types, Arrays.asList(h.toMap().values().toArray())));
+        }
+        return entries;
+    }
+
+    public void addRow(Entry row) {
+        data.put(row.getJson());
+        entries = getEntries(types);
+    }
+
+    public void sort(int fieldNumber) {
+        entries.sort(new EntryComparator(fieldNumber));
+    }
+
+    public List<Entry> getEntries() {
+        return entries;
+    }
+
+    public JSONArray getData() {
         return data;
     }
 }
