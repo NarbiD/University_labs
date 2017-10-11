@@ -1,5 +1,7 @@
 package localdbms.database;
 
+import localdbms.database.exception.DatabaseException;
+import localdbms.database.exception.EntryException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +30,7 @@ public class DatabaseTest {
 
 
     @Test
-    public void createDatabase() {
+    public void createDatabase() throws DatabaseException, EntryException {
         String dbName = namesIterator.next();
         Database db = new Database(dbName);
         Assert.assertFalse(Database.isDatabaseExists(dbName));
@@ -37,7 +39,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void createTable() {
+    public void createTable() throws DatabaseException, EntryException {
         String dbName = namesIterator.next();
         String tableName = namesIterator.next();
         Database db = new Database(dbName);
@@ -54,7 +56,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void createFewTables() {
+    public void createFewTables() throws DatabaseException, EntryException {
         String dbName = namesIterator.next();
         String tableName1 = namesIterator.next();
         String tableName2 = namesIterator.next();
@@ -72,7 +74,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void deleteTable() {
+    public void deleteTable() throws DatabaseException, EntryException {
         String dbName = namesIterator.next();
         String tableName = namesIterator.next();
         Database db = new Database(dbName);
@@ -88,7 +90,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void deleteDatabaseWithTables() {
+    public void deleteDatabaseWithTables() throws DatabaseException, EntryException {
         String dbName = namesIterator.next();
         String tableName1 = namesIterator.next();
         String tableName2 = namesIterator.next();
@@ -106,7 +108,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void deleteDatabaseWithoutTables() {
+    public void deleteDatabaseWithoutTables() throws DatabaseException, EntryException {
         String dbName = namesIterator.next();
         Database db = new Database(dbName);
         db.save();

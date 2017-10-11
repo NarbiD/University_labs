@@ -1,5 +1,6 @@
 package localdbms.database;
 
+import localdbms.database.exception.EntryException;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -18,13 +19,14 @@ public class Entry {
         this.values = new ArrayList<>();
     }
 
-    public JSONObject getJson() {
+    public JSONObject getJson() throws EntryException {
         JSONObject json = new JSONObject();
         for (Integer columnNumber=0; columnNumber < this.values.size(); columnNumber++) {
             if (TypeChecker.instanceOf(this.values.get(columnNumber), this.types.get(columnNumber))) {
                 json.put(columnNumber.toString(), this.values.get(columnNumber));
             } else {
-                throw new RuntimeException();
+                throw new EntryException("Invalid type in table cell: expected type " + this.types.get(columnNumber) +
+                   " but value " + this.values.get(columnNumber) + " found");
             }
         }
         return json;

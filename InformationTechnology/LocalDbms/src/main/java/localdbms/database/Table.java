@@ -1,5 +1,7 @@
 package localdbms.database;
 
+import localdbms.database.exception.EntryException;
+import localdbms.database.exception.TableException;
 import org.json.*;
 
 import java.io.*;
@@ -8,80 +10,84 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Table {
-    private String dbLocation;
+    private String location;
     private String name;
-
-    public List<DataType> getTypes() {
-        return types;
-    }
-
     private List<DataType> types;
-    private JSONArray data;
     private List<Entry> entries;
 
+    public List<DataType> getTypes() {
+        return this.types;
+    }
+
     String getName() {
-        return name;
+        return this.name;
     }
 
-    void setName(String name) {
-        this.name = name;
-    }
-
-    public Table(String name, String dbLocation, DataType... columnType) {
-        this.dbLocation = dbLocation;
-        String fileLocation = dbLocation + "/" + name;
+    public Table(String name, String location, DataType... columnType) {
+        this.location = location;
         this.name = name;
         this.types = Arrays.asList(columnType);
-        if (new File(fileLocation).isFile()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(fileLocation))) {
-                data = new JSONArray(reader.readLine());
-                entries = getEntries(types);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        String readData = new JSONArray().toString();
+        if (isTableExists(name, location)) {
+            readData = readTableFromStorage(location + name);
         }
-        else {
-            data = new JSONArray();
-            entries = getEntries(types);
+        this.entries = getEntries(this.types, new JSONArray(readData));
+    }
+
+    private String readTableFromStorage(String storageLocation){
+        try (BufferedReader reader = new BufferedReader(new FileReader(storageLocation))) {
+            return reader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException("Can not read table from storage", e);
         }
     }
 
-    public static boolean isTableExists(String name, String dbLocation) {
-        File table = new File(dbLocation + "/" + name);
+    public static boolean isTableExists(String name, String location) {
+        File table = new File(location + name);
         return table.isFile();
     }
 
-    void writeToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dbLocation + "/" + name))) {
-            writer.write(getData().toString());
+    public boolean isEmpty() {
+        return this.entries.isEmpty();
+    }
+
+    void writeToFile() throws EntryException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
+            writer.write(this.getJsonArray().toString());
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can not write table to storage", e);
         }
     }
+    private JSONArray getJsonArray() throws EntryException {
+        JSONArray jsonArray = new JSONArray();
+        for (Entry entry : this.entries) {
+            jsonArray.put(entry.getJson());
+        }
+        return jsonArray;
+    }
 
-    public static void delete(String name, String dbLocation) throws Exception {
-        if (isTableExists(name, dbLocation)) {
-            File table  = new File(dbLocation + "/" + name);
+    public static void delete(String name, String location) throws TableException {
+        if (isTableExists(name, location)) {
+            File table  = new File(location + name);
             if(!table.delete()) {
-                throw new Exception();
+                throw new TableException("Can not delete table from storage");
             }
         }
     }
 
-    public List<Entry> getEntries(List<DataType> types){
+    public List<Entry> getEntries(List<DataType> types, JSONArray jsonArray){
         List<Entry> entries = new ArrayList<>();
-        for (Object json : data) {
+        for (Object json : jsonArray) {
             JSONObject h = (JSONObject)json;
             entries.add(new Entry(types, Arrays.asList(h.toMap().values().toArray())));
         }
         return entries;
     }
 
-    public void addRow(Entry row) {
-        data.put(row.getJson());
-        entries = getEntries(types);
+    public void addRows(Entry... rows) {
+        entries.addAll(Arrays.asList(rows));
     }
 
     public void sort(int fieldNumber) {
@@ -90,9 +96,5 @@ public class Table {
 
     public List<Entry> getEntries() {
         return entries;
-    }
-
-    public JSONArray getData() {
-        return data;
     }
 }

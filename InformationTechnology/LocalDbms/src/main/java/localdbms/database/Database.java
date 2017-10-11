@@ -1,5 +1,9 @@
 package localdbms.database;
 
+import localdbms.database.exception.DatabaseException;
+import localdbms.database.exception.EntryException;
+import localdbms.database.exception.TableException;
+
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,7 +49,7 @@ public class Database {
         return table;
     }
 
-    public void deleteTable(String name) throws Exception {
+    public void deleteTable(String name) throws TableException {
         String tableLocation = this.location + this.name + File.separator;
         Table.delete(name, tableLocation);
     }
@@ -64,17 +68,17 @@ public class Database {
         return Table.isTableExists(tableName, tableLocation);
     }
 
-    public void save() {
+    public void save() throws DatabaseException, EntryException {
         File path = new File(this.location + this.name);
-        if (!isDatabaseExists(name)) {
-            if (!path.mkdir()) {
-                throw new RuntimeException();
-            }
+        if (!isDatabaseExists(name) && !path.mkdir()) {
+            throw new DatabaseException("Can not create database on storage");
         }
-        tables.forEach(Table::writeToFile);
+        for (Table table : tables) {
+            table.writeToFile();
+        }
     }
 
-    public void delete() throws Exception {
+    public void delete() throws DatabaseException {
         if (isDatabaseExists(name, location)) {
             File path = new File(this.location + this.name);
             tables.forEach(table -> {
@@ -84,11 +88,11 @@ public class Database {
                     e.printStackTrace();
                 }
             });
-            if (!path.delete()){
-                throw new Exception();
+            if (!path.delete()) {
+                throw new DatabaseException("Can not delete database from storage");
             }
         } else {
-            throw new Exception();
+            throw new DatabaseException("Database does not exist on storage");
         }
     }
 }
