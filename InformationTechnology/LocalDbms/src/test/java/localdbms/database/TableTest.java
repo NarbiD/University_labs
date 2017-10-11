@@ -1,59 +1,85 @@
 package localdbms.database;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 public class TableTest {
 
-    private Database db;
-
-    @Before
-    public void init(){
-        db = new Database("TestDB");
-    }
+    private final String LOCATION = "/test/";
 
     @Test
     public void createTable() {
-        Table table = new Table("testTable", db.getLocation());
-        Assert.assertTrue(table.getData().length()==0);
+        Table table = new Table("testTable", LOCATION);
+        Assert.assertTrue(table.isEmpty());
     }
 
     @Test
     public void addEmptyRow() {
-        Table table = new Table("testTable1", db.getLocation());
-        table.addRow(new Entry());
-        Assert.assertTrue(table.getData().length()==1);
+        Table table = new Table("testTable", LOCATION);
+        Assert.assertTrue(table.isEmpty());
+        table.addRows(new Entry());
+        Assert.assertFalse(table.isEmpty());
+    }
+
+    @Test
+    public void addRow() {
+        DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
+        Table table = new Table("testTable", LOCATION, dataTypes);
+        Entry entry = new Entry(table.getTypes(), Arrays.asList(12, 'c'));
+        table.addRows(entry);
+        Assert.assertFalse(table.isEmpty());
+        Assert.assertTrue(entry.equals(table.getEntries().get(0)));
     }
 
     @Test
     public void sortIntTest() {
-        Table table = new Table("testTable1", db.getLocation(), DataType.INTEGER, DataType.CHAR);
-        table.addRow(new Entry(table.getTypes(), Arrays.asList(12, 'c')));
-        table.addRow(new Entry(table.getTypes(), Arrays.asList(2, 'd')));
-        table.addRow(new Entry(table.getTypes(), Arrays.asList(4, 'a')));
-        Table table2 = new Table("testTable2", db.getLocation(), DataType.INTEGER, DataType.CHAR);
-        table2.addRow(new Entry(table.getTypes(), Arrays.asList(2, 'd')));
-        table2.addRow(new Entry(table.getTypes(), Arrays.asList(4, 'a')));
-        table2.addRow(new Entry(table.getTypes(), Arrays.asList(12, 'c')));
-
-        table.sort(0);
-        Assert.assertTrue(table.getEntries().equals(table2.getEntries()));
+        DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
+        Table table1 = new Table("testTable1", LOCATION, dataTypes);
+        table1.addRows(new Entry(table1.getTypes(), Arrays.asList(12, 'c')),
+            new Entry(table1.getTypes(), Arrays.asList(2, 'd')),
+            new Entry(table1.getTypes(), Arrays.asList(4, 'a')));
+        Table table2 = new Table("testTable2", LOCATION, dataTypes);
+        table2.addRows(new Entry(table2.getTypes(), Arrays.asList(2, 'd')),
+            new Entry(table2.getTypes(), Arrays.asList(4, 'a')),
+            new Entry(table2.getTypes(), Arrays.asList(12, 'c')));
+        Assert.assertFalse(table1.getEntries().equals(table2.getEntries()));
+        table1.sort(0);
+        Assert.assertTrue(table1.getEntries().equals(table2.getEntries()));
     }
 
     @Test
     public void sortCharTest() {
-        Table table = new Table("testTable1", db.getLocation(), DataType.INTEGER, DataType.CHAR);
-        table.addRow(new Entry(table.getTypes(), Arrays.asList(12, 'c')));
-        table.addRow(new Entry(table.getTypes(), Arrays.asList(2, 'd')));
-        table.addRow(new Entry(table.getTypes(), Arrays.asList(4, 'a')));
-        Table table2 = new Table("testTable2", db.getLocation(), DataType.INTEGER, DataType.CHAR);
-        table2.addRow(new Entry(table.getTypes(), Arrays.asList(4, 'a')));
-        table2.addRow(new Entry(table.getTypes(), Arrays.asList(12, 'c')));
-        table2.addRow(new Entry(table.getTypes(), Arrays.asList(2, 'd')));
-        table.sort(1);
-        Assert.assertTrue(table.getEntries().equals(table2.getEntries()));
+        DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
+        Table table1 = new Table("testTable1", LOCATION, dataTypes);
+        table1.addRows(new Entry(table1.getTypes(), Arrays.asList(12, 'c')),
+            new Entry(table1.getTypes(), Arrays.asList(2, 'D')),
+            new Entry(table1.getTypes(), Arrays.asList(4, 'A')));
+        Table table2 = new Table("testTable2", LOCATION, dataTypes);
+        table2.addRows(new Entry(table2.getTypes(), Arrays.asList(4, 'A')),
+            new Entry(table2.getTypes(), Arrays.asList(12, 'c')),
+            new Entry(table2.getTypes(), Arrays.asList(2, 'D')));
+        Assert.assertFalse(table1.getEntries().equals(table2.getEntries()));
+        table1.sort(1);
+        Assert.assertTrue(table1.getEntries().equals(table2.getEntries()));
     }
+
+    @Test
+    public void sortRealTest() {
+        DataType[] dataTypes = {DataType.CHAR, DataType.REAL};
+        Table table1 = new Table("testTable1", LOCATION, dataTypes);
+        table1.addRows(new Entry(table1.getTypes(), Arrays.asList('c', 12.7545)),
+            new Entry(table1.getTypes(), Arrays.asList('d', 34.45)),
+            new Entry(table1.getTypes(), Arrays.asList('a', 24.1)));
+        Table table2 = new Table("testTable2", LOCATION, dataTypes);
+        table2.addRows(new Entry(table1.getTypes(), Arrays.asList('c', 12.7545)),
+            new Entry(table1.getTypes(), Arrays.asList('a', 24.1)),
+            new Entry(table1.getTypes(), Arrays.asList('d', 34.45)));
+        Assert.assertFalse(table1.getEntries().equals(table2.getEntries()));
+        table1.sort(1);
+        Assert.assertTrue(table1.getEntries().equals(table2.getEntries()));
+    }
+
+
 }

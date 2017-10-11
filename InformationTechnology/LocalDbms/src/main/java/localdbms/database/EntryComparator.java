@@ -11,13 +11,15 @@ public class EntryComparator implements Comparator<Entry> {
     }
 
     @Override
-    public int compare(Entry o1, Entry o2) {
-        Comparable cmp1 = o1.getValues().get(fieldNumber) instanceof Character ||
-                o1.getValues().get(fieldNumber) instanceof String ? o1.getValues().get(fieldNumber).toString().toLowerCase() :
-                (Comparable)o1.getValues().get(fieldNumber);
-        Comparable cmp2 = o2.getValues().get(fieldNumber) instanceof Character ||
-                o1.getValues().get(fieldNumber) instanceof String ? o2.getValues().get(fieldNumber).toString().toLowerCase() :
-                (Comparable)o2.getValues().get(fieldNumber);
+    @SuppressWarnings("unchecked")
+    public int compare(Entry entry1, Entry entry2) {
+        Comparable cmp1 = getComparableElement(entry1);
+        Comparable cmp2 = getComparableElement(entry2);
         return cmp1.compareTo(cmp2);
+    }
+
+    private Comparable<? extends Comparable> getComparableElement(Entry entry) {
+        Comparable field = (Comparable)entry.getValues().get(fieldNumber);
+        return (field instanceof Character || field instanceof String) ? field.toString().toLowerCase() : field;
     }
 }

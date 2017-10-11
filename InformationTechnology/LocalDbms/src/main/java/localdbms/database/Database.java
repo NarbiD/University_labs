@@ -5,23 +5,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Database {
-    public static String getDefaultLocation() {
-        return DEFAULT_LOCATION;
-    }
-
-    private final static String DEFAULT_LOCATION =
-            new File("").getAbsolutePath() + "/src/main/resources/databases/";
+    private final static String REL_DEFAULT_LOCATION = "/src/main/resources/databases/";
+    private final static String ABS_DEFAULT_LOCATION = new File("").getAbsolutePath() + REL_DEFAULT_LOCATION;
     private String name;
     private Set<Table> tables;
-
-    public String getLocation() {
-        return location;
-    }
-
     private String location;
 
     public Database(String name) {
-        this(name, DEFAULT_LOCATION);
+        this(name, ABS_DEFAULT_LOCATION);
     }
 
     public Database(String name, String location) {
@@ -34,23 +25,33 @@ public class Database {
         return name;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public static String getDefaultLocation() {
+        return ABS_DEFAULT_LOCATION;
+    }
+
     @Override
     public String toString() {
         return "Database " + name;
     }
 
     public Table createTable(String name, DataType... columnType) {
-        Table table = new Table(name, this.location + "/" + this.name + "/", columnType);
+        String tableLocation = this.location + this.name + File.separator;
+        Table table = new Table(name, tableLocation, columnType);
         tables.add(table);
         return table;
     }
 
     public void deleteTable(String name) throws Exception {
-        Table.delete(name, this.location + "/" + this.name + "/");
+        String tableLocation = this.location + this.name + File.separator;
+        Table.delete(name, tableLocation);
     }
 
     public static boolean isDatabaseExists(String name) {
-        return isDatabaseExists(name, DEFAULT_LOCATION);
+        return isDatabaseExists(name, ABS_DEFAULT_LOCATION);
     }
 
     public static boolean isDatabaseExists(String name, String location) {
@@ -59,26 +60,26 @@ public class Database {
     }
 
     public boolean isTableExists(String tableName) {
-        return Table.isTableExists(tableName, this.location  + "/" + this.name);
+        String tableLocation = this.location + this.name + File.separator;
+        return Table.isTableExists(tableName, tableLocation);
     }
 
     public void save() {
-        File path = new File(this.location  + "/" + this.name);
+        File path = new File(this.location + this.name);
         if (!isDatabaseExists(name)) {
             if (!path.mkdir()) {
                 throw new RuntimeException();
             }
         }
         tables.forEach(Table::writeToFile);
-
     }
 
     public void delete() throws Exception {
-        if (isDatabaseExists(name)) {
-            File path = new File(this.location  + "/" + this.name);
+        if (isDatabaseExists(name, location)) {
+            File path = new File(this.location + this.name);
             tables.forEach(table -> {
                 try {
-                    Table.delete(table.getName(), this.location  + "/" + this.name);
+                    Table.delete(table.getName(), this.location + this.name + File.separator);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -89,6 +90,5 @@ public class Database {
         } else {
             throw new Exception();
         }
-
     }
 }
