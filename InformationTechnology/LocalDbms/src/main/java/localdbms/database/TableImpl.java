@@ -7,6 +7,7 @@ import org.json.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class TableImpl implements Table {
@@ -48,10 +49,12 @@ public class TableImpl implements Table {
         return entries;
     }
 
+    @Override
     public boolean isEmpty() {
         return this.entries.isEmpty();
     }
 
+    @Override
     public void writeToFile() throws EntryException, TableException {
         if (this.name.equals("") || this.location.equals("") || this.types.isEmpty()) {
             throw new TableException("Expected defined name, location and types");
@@ -72,22 +75,39 @@ public class TableImpl implements Table {
         return jsonArray;
     }
 
+    @Override
     public void addRows(EntryImpl... rows) {
         entries.addAll(Arrays.asList(rows));
     }
 
+    @Override
     public void sort(int fieldNumber) {
-        entries.sort(new EntryComparator(fieldNumber));
+        entries.sort(new Comparator<Entry>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public int compare(Entry entry1, Entry entry2) {
+                Comparable cmp1 = getComparableElement(entry1);
+                Comparable cmp2 = getComparableElement(entry2);
+                return cmp1.compareTo(cmp2);
+            }
+            private Comparable getComparableElement(Entry entry) {
+                Comparable field = (Comparable)entry.getValues().get(fieldNumber);
+                return (field instanceof Character || field instanceof String) ? field.toString().toLowerCase() : field;
+            }
+        });
     }
 
+    @Override
     public List<Entry> getEntries() {
         return entries;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
 
+    @Override
     public List<DataType> getTypes() {
         return this.types;
     }
@@ -96,6 +116,7 @@ public class TableImpl implements Table {
         return location;
     }
 
+    @Override
     public void setLocation(String location) {
         this.location = location;
     }
@@ -105,6 +126,7 @@ public class TableImpl implements Table {
         this.types = Arrays.asList(types);
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

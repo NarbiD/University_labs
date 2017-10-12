@@ -40,6 +40,7 @@ public class EntryImpl implements Entry {
         return localValues;
     }
 
+    @Override
     public JSONObject getJson() {
         JSONObject json = new JSONObject();
         for (Integer column = 0; column < this.values.size(); column++) {
@@ -48,6 +49,7 @@ public class EntryImpl implements Entry {
         return json;
     }
 
+    @Override
     public List<Object> getValues() {
         return this.values;
     }

@@ -14,7 +14,7 @@ public class DatabaseImpl implements Database {
     private String name;
     private Set<Table> tables;
     private String location;
-    TableFactory tableFactory = TableImpl::new;
+    private TableFactory tableFactory = TableImpl::new;
 
     public DatabaseImpl() {
         this("");
@@ -30,6 +30,7 @@ public class DatabaseImpl implements Database {
         this.tables = new HashSet<>();
     }
 
+    @Override
     public void setName(String name) throws DatabaseException {
         if (this.name == null || this.name.equals("")) {
             this.name = name;
@@ -38,10 +39,12 @@ public class DatabaseImpl implements Database {
         }
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getLocation() {
         return location;
     }
@@ -51,6 +54,7 @@ public class DatabaseImpl implements Database {
         return "Database " + name;
     }
 
+    @Override
     public Table createTable(String name, DataType... columnTypes) throws EntryException {
         Table table = tableFactory.getTable();
         table.setName(name);
@@ -60,16 +64,19 @@ public class DatabaseImpl implements Database {
         return table;
     }
 
+    @Override
     public void deleteTable(String name) throws TableException {
         String tableLocation = this.location + this.name + File.separator;
         Tables.delete(name, tableLocation);
     }
 
+    @Override
     public boolean doesTableExist(String tableName) {
         String tableLocation = this.location + this.name + File.separator;
         return Tables.isTableExists(tableName, tableLocation);
     }
 
+    @Override
     public void save() throws StorageException {
         if (name.equals("")) {
             throw new DatabaseException("No name is given for the database");
@@ -83,6 +90,7 @@ public class DatabaseImpl implements Database {
         }
     }
 
+    @Override
     public void delete() throws DatabaseException, TableException {
         if (Databases.doesDatabaseExist(name, location)) {
             File path = new File(this.location + this.name);
