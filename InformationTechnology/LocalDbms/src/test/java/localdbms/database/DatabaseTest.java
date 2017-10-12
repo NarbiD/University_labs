@@ -1,7 +1,6 @@
 package localdbms.database;
 
-import localdbms.database.exception.DatabaseException;
-import localdbms.database.exception.EntryException;
+import localdbms.database.exception.StorageException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +12,7 @@ import java.util.stream.Stream;
 public class DatabaseTest {
 
     private final int NAME_LENGTH = 8;
+    private DatabaseFactory databaseFactory;
     private Iterator<String> namesIterator;
 
     @Before
@@ -26,98 +26,84 @@ public class DatabaseTest {
             return name.toString();
         });
         namesIterator = names.distinct().iterator();
+        databaseFactory = DatabaseImpl::new;
     }
 
-
     @Test
-    public void createDatabase() throws DatabaseException, EntryException {
+    public void createDatabase() throws StorageException {
         String dbName = namesIterator.next();
-        Database db = new Database(dbName);
-        Assert.assertFalse(Database.isDatabaseExists(dbName));
+        Database db = databaseFactory.getDatabase();
+        db.setName(dbName);
+        Assert.assertFalse(Databases.doesDatabaseExist(dbName));
         db.save();
-        Assert.assertTrue(Database.isDatabaseExists(dbName));
+        Assert.assertTrue(Databases.doesDatabaseExist(dbName));
     }
 
     @Test
-    public void createTable() throws DatabaseException, EntryException {
-        String dbName = namesIterator.next();
+    public void createTable() throws StorageException {
+        Database db = databaseFactory.getDatabase();
+        db.setName(namesIterator.next());
         String tableName = namesIterator.next();
-        Database db = new Database(dbName);
-        if (Table.isTableExists(tableName, db.getLocation()))
-            try {
-                Table.delete(tableName, db.getLocation());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        Assert.assertFalse(db.isTableExists(tableName));
-        db.createTable(tableName);
+
+        Assert.assertFalse(db.doesTableExist(tableName));
+        db.createTable(tableName, DataType.INTEGER);
         db.save();
-        Assert.assertTrue(db.isTableExists(tableName));
+        Assert.assertTrue(db.doesTableExist(tableName));
     }
 
     @Test
-    public void createFewTables() throws DatabaseException, EntryException {
+    public void createFewTables() throws StorageException {
+        Database db = databaseFactory.getDatabase();
+        db.setName(namesIterator.next());
+        String tableName1 = namesIterator.next();
+        String tableName2 = namesIterator.next();
+
+        Assert.assertFalse(db.doesTableExist(tableName1));
+        Assert.assertFalse(db.doesTableExist(tableName2));
+
+        db.createTable(tableName1, DataType.CHAR);
+        db.createTable(tableName2, DataType.CHAR);
+        db.save();
+
+        Assert.assertTrue(db.doesTableExist(tableName1));
+        Assert.assertTrue(db.doesTableExist(tableName2));
+    }
+
+    @Test
+    public void deleteTable() throws StorageException {
+        Database db = databaseFactory.getDatabase();
+        db.setName(namesIterator.next());
+        String tableName = namesIterator.next();
+        db.createTable(tableName, DataType.REAL);
+        db.save();
+        Assert.assertTrue(db.doesTableExist(tableName));
+        db.deleteTable(tableName);
+        Assert.assertFalse(db.doesTableExist(tableName));
+    }
+
+    @Test
+    public void deleteDatabaseWithTables() throws StorageException {
         String dbName = namesIterator.next();
         String tableName1 = namesIterator.next();
         String tableName2 = namesIterator.next();
-        Database db = new Database(dbName);
-
-        Assert.assertFalse(db.isTableExists(tableName1));
-        Assert.assertFalse(db.isTableExists(tableName2));
-
-        db.createTable(tableName1);
-        db.createTable(tableName2);
+        Database db = databaseFactory.getDatabase();
+        db.setName(dbName);
+        db.createTable(tableName1, DataType.REAL);
+        db.createTable(tableName2, DataType.REAL);
         db.save();
-
-        Assert.assertTrue(db.isTableExists(tableName1));
-        Assert.assertTrue(db.isTableExists(tableName2));
+        Assert.assertTrue(Databases.doesDatabaseExist(dbName));
+        db.delete();
+        Assert.assertFalse(Databases.doesDatabaseExist(dbName));
     }
 
     @Test
-    public void deleteTable() throws DatabaseException, EntryException {
+    public void deleteDatabaseWithoutTables() throws StorageException {
         String dbName = namesIterator.next();
-        String tableName = namesIterator.next();
-        Database db = new Database(dbName);
-        db.createTable(tableName);
+        Database db = databaseFactory.getDatabase();
+        db.setName(dbName);
         db.save();
-        Assert.assertTrue(db.isTableExists(tableName));
-        try {
-            db.deleteTable(tableName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertFalse(db.isTableExists(tableName));
-    }
-
-    @Test
-    public void deleteDatabaseWithTables() throws DatabaseException, EntryException {
-        String dbName = namesIterator.next();
-        String tableName1 = namesIterator.next();
-        String tableName2 = namesIterator.next();
-        Database db = new Database(dbName);
-        db.createTable(tableName1);
-        db.createTable(tableName2);
-        db.save();
-        Assert.assertTrue(Database.isDatabaseExists(dbName));
-        try {
-            db.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertFalse(Database.isDatabaseExists(dbName));
-    }
-
-    @Test
-    public void deleteDatabaseWithoutTables() throws DatabaseException, EntryException {
-        String dbName = namesIterator.next();
-        Database db = new Database(dbName);
-        db.save();
-        Assert.assertTrue(Database.isDatabaseExists(dbName));
-        try {
-            db.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertFalse(Database.isDatabaseExists(dbName));
+        Assert.assertTrue(Databases.doesDatabaseExist(dbName));
+        db.delete();
+        Assert.assertFalse(Databases.doesDatabaseExist(dbName));
     }
 }

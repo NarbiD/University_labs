@@ -1,85 +1,97 @@
 package localdbms.database;
 
+import localdbms.database.exception.EntryException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 public class TableTest {
 
-    private final String LOCATION = "/test/";
+    private TableFactory tableFactory;
+
+    @Before
+    public void init() {
+        tableFactory = TableImpl::new;
+    }
 
     @Test
-    public void createTable() {
-        Table table = new Table("testTable", LOCATION);
+    public void createTable() throws EntryException {
+        Table table = tableFactory.getTable();
         Assert.assertTrue(table.isEmpty());
     }
 
     @Test
-    public void addEmptyRow() {
-        Table table = new Table("testTable", LOCATION);
+    public void addEmptyRow() throws EntryException {
+        Table table = tableFactory.getTable();
         Assert.assertTrue(table.isEmpty());
-        table.addRows(new Entry());
+        table.addRows(new EntryImpl());
         Assert.assertFalse(table.isEmpty());
     }
 
     @Test
-    public void addRow() {
+    public void addRow() throws EntryException {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
-        Table table = new Table("testTable", LOCATION, dataTypes);
-        Entry entry = new Entry(table.getTypes(), Arrays.asList(12, 'c'));
+        Table table = tableFactory.getTable();
+        table.setTypes(dataTypes);
+        EntryImpl entry = new EntryImpl(Arrays.asList(12, 'c'), table.getTypes());
         table.addRows(entry);
         Assert.assertFalse(table.isEmpty());
         Assert.assertTrue(entry.equals(table.getEntries().get(0)));
     }
 
     @Test
-    public void sortIntTest() {
+    public void sortIntTest() throws EntryException {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
-        Table table1 = new Table("testTable1", LOCATION, dataTypes);
-        table1.addRows(new Entry(table1.getTypes(), Arrays.asList(12, 'c')),
-            new Entry(table1.getTypes(), Arrays.asList(2, 'd')),
-            new Entry(table1.getTypes(), Arrays.asList(4, 'a')));
-        Table table2 = new Table("testTable2", LOCATION, dataTypes);
-        table2.addRows(new Entry(table2.getTypes(), Arrays.asList(2, 'd')),
-            new Entry(table2.getTypes(), Arrays.asList(4, 'a')),
-            new Entry(table2.getTypes(), Arrays.asList(12, 'c')));
-        Assert.assertFalse(table1.getEntries().equals(table2.getEntries()));
-        table1.sort(0);
-        Assert.assertTrue(table1.getEntries().equals(table2.getEntries()));
+        Table unsortedTable = tableFactory.getTable();
+        unsortedTable.setTypes(dataTypes);
+        unsortedTable.addRows(new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList(2, 'd'), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList(4, 'a'), unsortedTable.getTypes()));
+        Table sortedTable = tableFactory.getTable();
+        sortedTable.setTypes(dataTypes);
+        sortedTable.addRows(new EntryImpl(Arrays.asList(2, 'd'), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList(4, 'a'), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes()));
+        Assert.assertFalse(unsortedTable.getEntries().equals(sortedTable.getEntries()));
+        unsortedTable.sort(0);
+        Assert.assertTrue(unsortedTable.getEntries().equals(sortedTable.getEntries()));
     }
 
     @Test
-    public void sortCharTest() {
+    public void sortCharTest() throws EntryException {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
-        Table table1 = new Table("testTable1", LOCATION, dataTypes);
-        table1.addRows(new Entry(table1.getTypes(), Arrays.asList(12, 'c')),
-            new Entry(table1.getTypes(), Arrays.asList(2, 'D')),
-            new Entry(table1.getTypes(), Arrays.asList(4, 'A')));
-        Table table2 = new Table("testTable2", LOCATION, dataTypes);
-        table2.addRows(new Entry(table2.getTypes(), Arrays.asList(4, 'A')),
-            new Entry(table2.getTypes(), Arrays.asList(12, 'c')),
-            new Entry(table2.getTypes(), Arrays.asList(2, 'D')));
-        Assert.assertFalse(table1.getEntries().equals(table2.getEntries()));
-        table1.sort(1);
-        Assert.assertTrue(table1.getEntries().equals(table2.getEntries()));
+        Table unsortedTable = tableFactory.getTable();
+        unsortedTable.setTypes(dataTypes);
+        unsortedTable.addRows(new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes()),
+                new EntryImpl(Arrays.asList(2, 'D'), unsortedTable.getTypes()),
+                new EntryImpl(Arrays.asList(4, 'A'), unsortedTable.getTypes()));
+        Table sortedTable = tableFactory.getTable();
+        sortedTable.setTypes(dataTypes);
+        sortedTable.addRows(new EntryImpl(Arrays.asList(4, 'A'), sortedTable.getTypes()),
+            new EntryImpl(Arrays.asList(12, 'c'), sortedTable.getTypes()),
+            new EntryImpl(Arrays.asList(2, 'D'), sortedTable.getTypes()));
+        Assert.assertFalse(unsortedTable.getEntries().equals(sortedTable.getEntries()));
+        unsortedTable.sort(1);
+        Assert.assertTrue(unsortedTable.getEntries().equals(sortedTable.getEntries()));
     }
 
     @Test
-    public void sortRealTest() {
+    public void sortRealTest() throws EntryException {
         DataType[] dataTypes = {DataType.CHAR, DataType.REAL};
-        Table table1 = new Table("testTable1", LOCATION, dataTypes);
-        table1.addRows(new Entry(table1.getTypes(), Arrays.asList('c', 12.7545)),
-            new Entry(table1.getTypes(), Arrays.asList('d', 34.45)),
-            new Entry(table1.getTypes(), Arrays.asList('a', 24.1)));
-        Table table2 = new Table("testTable2", LOCATION, dataTypes);
-        table2.addRows(new Entry(table1.getTypes(), Arrays.asList('c', 12.7545)),
-            new Entry(table1.getTypes(), Arrays.asList('a', 24.1)),
-            new Entry(table1.getTypes(), Arrays.asList('d', 34.45)));
-        Assert.assertFalse(table1.getEntries().equals(table2.getEntries()));
-        table1.sort(1);
-        Assert.assertTrue(table1.getEntries().equals(table2.getEntries()));
+        Table unsortedTable = tableFactory.getTable();
+        unsortedTable.setTypes(dataTypes);
+        unsortedTable.addRows(new EntryImpl(Arrays.asList('c', 12.7545), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList('d', 34.45), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList('a', 24.1), unsortedTable.getTypes()));
+        Table sortedTable = tableFactory.getTable();
+        sortedTable.setTypes(dataTypes);
+        sortedTable.addRows(new EntryImpl(Arrays.asList('c', 12.7545), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList('a', 24.1), unsortedTable.getTypes()),
+            new EntryImpl(Arrays.asList('d', 34.45), unsortedTable.getTypes()));
+        Assert.assertFalse(unsortedTable.getEntries().equals(sortedTable.getEntries()));
+        unsortedTable.sort(1);
+        Assert.assertTrue(unsortedTable.getEntries().equals(sortedTable.getEntries()));
     }
-
-
 }

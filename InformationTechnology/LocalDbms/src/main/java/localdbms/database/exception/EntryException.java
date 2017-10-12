@@ -1,6 +1,6 @@
 package localdbms.database.exception;
 
-public class EntryException extends Exception {
+public class EntryException extends StorageException {
     public EntryException() {
     }
 

@@ -28,18 +28,4 @@ public class TypeChecker {
     public static boolean checkRealInterval(Double value, Double minValue, Double maxValue) {
         return minValue <= value && maxValue >= value;
     }
-
-    public static Class classByType(DataType type) {
-        switch (type) {
-            case INTEGER:
-                return Integer.class;
-            case CHAR:
-                return Character.class;
-            case REAL:
-            case REAL_INTERVAL:
-                return Double.class;
-            default:
-                throw new RuntimeException();
-        }
-    }
 }

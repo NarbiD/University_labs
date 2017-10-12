@@ -1,6 +1,6 @@
 package localdbms.database.exception;
 
-public class DatabaseException extends Exception {
+public class DatabaseException extends StorageException {
     public DatabaseException() {
     }
 
