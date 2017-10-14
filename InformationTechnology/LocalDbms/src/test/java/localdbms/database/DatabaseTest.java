@@ -11,21 +11,13 @@ import java.util.stream.Stream;
 
 public class DatabaseTest {
 
-    private final int NAME_LENGTH = 8;
     private DatabaseFactory databaseFactory;
     private Iterator<String> namesIterator;
 
     @Before
     public void init() {
-        Stream<String> names = Stream.generate(() -> {
-            Random random = new Random(System.nanoTime());
-            StringBuilder name = new StringBuilder(NAME_LENGTH);
-            for (int i = 0; i < NAME_LENGTH; i++) {
-                name.append((char)('a' + Math.abs(random.nextInt()%26)));
-            }
-            return name.toString();
-        });
-        namesIterator = names.distinct().iterator();
+        final int NAME_LENGTH = 8;
+        namesIterator = SequenceGenerator.getStringGenerator(NAME_LENGTH).distinct().iterator();
         databaseFactory = DatabaseImpl::new;
     }
 

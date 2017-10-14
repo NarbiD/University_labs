@@ -12,6 +12,7 @@ import java.util.Set;
 public class DatabaseImpl implements Database {
 
     private String name;
+
     private Set<Table> tables;
     private String location;
     private TableFactory tableFactory = TableImpl::new;
@@ -40,18 +41,42 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
+    public Set<Table> getTables() {
+        return tables;
+    }
+
+    @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
     public String getLocation() {
-        return location;
+        return this.location;
     }
 
     @Override
     public String toString() {
-        return "Database " + name;
+        return "Database " + this.name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DatabaseImpl)) return false;
+
+        DatabaseImpl database = (DatabaseImpl) o;
+
+        boolean isNamesEquals = name != null ? name.equals(database.name) : database.name == null;
+        boolean isLocationsEquals = location != null ? location.equals(database.location) : database.location == null;
+        return isNamesEquals && isLocationsEquals;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (location != null ? location.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -62,6 +87,7 @@ public class DatabaseImpl implements Database {
         table.setTypes(columnTypes);
         tables.add(table);
         return table;
+
     }
 
     @Override
@@ -92,9 +118,9 @@ public class DatabaseImpl implements Database {
 
     @Override
     public void delete() throws DatabaseException, TableException {
-        if (Databases.doesDatabaseExist(name, location)) {
+        if (Databases.doesDatabaseExist(this.name, this.location)) {
             File path = new File(this.location + this.name);
-            for (Table table : tables) {
+            for (Table table : this.tables) {
                 Tables.delete(table.getName(), this.location + this.name + File.separator);
             }
             if (!path.delete()) {
