@@ -27,6 +27,10 @@ cmake-build-debug/
 
 CMakeLists.txt
 
+# PyCharm
+
+__pycache__/
+
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -245,3 +249,4 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+Numerical Methods/differential_equations/__pycache__/Solver.cpython-35.pyc
