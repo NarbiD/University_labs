@@ -23,7 +23,7 @@ public class DbmsTest {
 
     @Test
     public void createEmptyDbms() throws StorageException {
-        new DbmsImpl();
+        createDatabase();
     }
 
     @Test

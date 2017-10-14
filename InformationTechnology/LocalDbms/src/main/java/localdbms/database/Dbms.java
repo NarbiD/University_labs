@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface Dbms {
-    void createDatabase(String name) throws StorageException;
+    Database createDatabase(String name) throws StorageException;
     void deleteDatabase(String name) throws StorageException;
     Optional<Database> getDatabase(String name);
     Set<Database> getAllDatabases();
