@@ -1,5 +1,3 @@
-package Linear_Systems;
-
 import java.io.*;
 import java.util.Locale;
 import java.util.Scanner;
@@ -9,10 +7,10 @@ import java.lang.String;
  * Created by ignas on 20.12.2016.
  */
 
-public class FileReader {
-    Scanner scanner = null;
+class FileReader {
+    private Scanner scanner = null;
 
-    public FileReader(String fileName){
+    FileReader(String fileName){
         try {
             scanner = new Scanner(new InputStreamReader(new FileInputStream(new File(fileName)))).useLocale(Locale.US);
         } catch (FileNotFoundException e) {
@@ -20,7 +18,7 @@ public class FileReader {
         }
     }
 
-    public void readValues(Matrix inputMatrix){
+    private void readValues(Matrix inputMatrix){
         for (int i = 0; i < inputMatrix.getNumberOfRows(); i++) {
             for (int j = 0; j < inputMatrix.getNumberOfCols(); j++) {
                 double value = scanner.nextDouble();
@@ -29,7 +27,7 @@ public class FileReader {
         }
     }
     
-    public void readMatrix(Matrix A, Matrix b) {
+    void readMatrix(Matrix A, Matrix b) {
         int size = scanner.nextInt();
         A.setSize(size,size);
         A.initMatrix();

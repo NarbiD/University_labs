@@ -1,15 +1,12 @@
-package Linear_Systems;
-
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by ignas on 17.12.2016.
  */
-public class Method {
-    public static final double EPS = 1e-9;
+class Solver {
+    private static final double EPS = 1e-9;
 
-    public static ArrayList<Double> Gauss(Matrix A, Matrix b) throws IllegalArgumentException {
+    static ArrayList<Double> Gauss(Matrix A, Matrix b) throws IllegalArgumentException {
         A = new Matrix(A);
         b = new Matrix(b);
         final int NUM_ROWS = A.getNumberOfRows();
@@ -38,7 +35,6 @@ public class Method {
                 }
             }
         }
-
         ArrayList<Double> result = new ArrayList<>();
         for (int i = 0; i < NUM_ROWS; i++) {
             result.add(0.0);
@@ -54,20 +50,18 @@ public class Method {
         return result;
     }
 
-    public static ArrayList<Double> Jacobi(Matrix A, Matrix b) {
+    static ArrayList<Double> Jacobi(Matrix A, Matrix b) {
         int size = A.getNumberOfRows();
         ArrayList<Double> previousValues = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             previousValues.add(0.0);
         }
-
         while (true) {
             ArrayList<Double> currentValues = new ArrayList<>();
 
             for (int i = 0; i < size; i++) {
                 currentValues.add(b.getElem(i, 0));
-
                 for (int j = 0; j < size; j++) {
                     if (i != j) {
                         currentValues.set(i, currentValues.get(i) - A.getElem(i, j) * previousValues.get(j));
@@ -75,7 +69,6 @@ public class Method {
                 }
                 currentValues.set(i, currentValues.get(i) / A.getElem(i, i));
             }
-
             double error = 0.0;
             for (int i = 0; i < size; i++) {
                 error += Math.abs(currentValues.get(i) - previousValues.get(i));
@@ -83,14 +76,13 @@ public class Method {
             if (error < EPS) {
                 break;
             }
-
             previousValues = currentValues;
         }
 
         return previousValues;
     }
 
-    public static ArrayList<Double> Seidel(Matrix A, Matrix b) {
+    static ArrayList<Double> Seidel(Matrix A, Matrix b) {
         int size = A.getNumberOfRows();
 
         ArrayList<Double> previousValues = new ArrayList<>();
@@ -98,10 +90,8 @@ public class Method {
         for (int i = 0; i < size; i++) {
             previousValues.add(0.0);
         }
-
         while (true) {
             ArrayList<Double> currentValues = new ArrayList<>();
-
             for (int i = 0; i < size; i++) {
                 currentValues.add(b.getElem(i, 0));
 
@@ -113,10 +103,8 @@ public class Method {
                         currentValues.set(i, currentValues.get(i) - A.getElem(i, j) * previousValues.get(j));
                     }
                 }
-
                 currentValues.set(i, currentValues.get(i) / A.getElem(i, i) );
             }
-
             double error = 0.0;
             for (int i = 0; i < size; i++) {
                 error += Math.abs(currentValues.get(i) - previousValues.get(i));
@@ -124,10 +112,8 @@ public class Method {
             if (error < EPS) {
                 break;
             }
-
             previousValues = currentValues;
         }
-
         return previousValues;
     }
 }
