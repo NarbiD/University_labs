@@ -16,25 +16,35 @@ public class TableImpl implements Table {
     private List<DataType> types;
     private List<Entry> entries;
     private EntryFactory entryFactory = EntryImpl::new;
+    private List<String> columnNames;
 
-    public TableImpl() throws EntryException {
+    public TableImpl() throws EntryException, TableException {
         this("", "");
     }
 
-    public TableImpl(String name, String location, DataType... columnTypes) throws EntryException {
+    public TableImpl(String name, String location, DataType... columnTypes) throws EntryException, TableException {
         this.location = location;
         this.name = name;
         this.types = Arrays.asList(columnTypes);
-        String readData = new JSONArray().toString();
+        String rowInFile = new JSONArray().toString();
+        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile;
         if (Tables.isTableExists(name, location)) {
             readData = readTableFromStorage(location + name);
         }
-        this.entries = getEntriesFromJson(new JSONArray(readData), this.types);
+        String[] s = readData.split("\n");
+        List<DataType> readTypes = new ArrayList<>();
+        new JSONArray(s[0]).toList().forEach(title -> columnNames.add(title.toString()));
+        new JSONArray(s[1]).toList().forEach(type -> readTypes.add((DataType) type));
+        if (this.types.equals(readTypes)) {
+            this.entries = getEntriesFromJson(new JSONArray(s[2]), this.types);
+        } else {
+            throw new TableException("Expected types " + readData + " but " + this.types + " found");
+        }
     }
 
     private String readTableFromStorage(String storageLocation) {
         try (BufferedReader reader = new BufferedReader(new FileReader(storageLocation))) {
-            return reader.readLine();
+            return reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine();
         } catch (IOException e) {
             throw new RuntimeException("Can not read table from storage", e);
         }
@@ -60,6 +70,8 @@ public class TableImpl implements Table {
             throw new TableException("Expected defined name, location and types");
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
+            writer.write(new JSONArray(this.columnNames).toString() + "\n");
+            writer.write(new JSONArray(this.types).toString() + "\n");
             writer.write(this.getJsonArray().toString());
             writer.flush();
         } catch (IOException e) {
@@ -136,12 +148,18 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public void setColumnNames(List<String> names) {
+        this.columnNames = names;
     }
 
+    @Override
     public void setTypes(List<DataType> types) {
         this.types = types;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setEntries(List<Entry> entries) {

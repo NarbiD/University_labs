@@ -18,7 +18,11 @@ public interface Table {
     void writeToFile() throws StorageException;
     boolean isEmpty();
 
+    void setTypes(List<DataType> types);
+
     void setName(String name);
     void setLocation(String location);
     void setTypes(DataType... types);
+
+    void setColumnNames(List<String> names);
 }

@@ -1,6 +1,6 @@
 package localdbms.database;
 
-import localdbms.database.exception.EntryException;
+import localdbms.database.exception.StorageException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,13 +17,13 @@ public class TableTest {
     }
 
     @Test
-    public void createTable() throws EntryException {
+    public void createTable() throws StorageException {
         Table table = tableFactory.getTable();
         Assert.assertTrue(table.isEmpty());
     }
 
     @Test
-    public void addEmptyRow() throws EntryException {
+    public void addEmptyRow() throws StorageException {
         Table table = tableFactory.getTable();
         Assert.assertTrue(table.isEmpty());
         table.addRows(new EntryImpl());
@@ -31,7 +31,7 @@ public class TableTest {
     }
 
     @Test
-    public void addRow() throws EntryException {
+    public void addRow() throws StorageException {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
         Table table = tableFactory.getTable();
         table.setTypes(dataTypes);
@@ -42,7 +42,7 @@ public class TableTest {
     }
 
     @Test
-    public void sortIntTest() throws EntryException {
+    public void sortIntTest() throws StorageException {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
         Table unsortedTable = tableFactory.getTable();
         unsortedTable.setTypes(dataTypes);
@@ -60,7 +60,7 @@ public class TableTest {
     }
 
     @Test
-    public void sortCharTest() throws EntryException {
+    public void sortCharTest() throws StorageException {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
         Table unsortedTable = tableFactory.getTable();
         unsortedTable.setTypes(dataTypes);
@@ -78,7 +78,7 @@ public class TableTest {
     }
 
     @Test
-    public void sortRealTest() throws EntryException {
+    public void sortRealTest() throws StorageException {
         DataType[] dataTypes = {DataType.CHAR, DataType.REAL};
         Table unsortedTable = tableFactory.getTable();
         unsortedTable.setTypes(dataTypes);

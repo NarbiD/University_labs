@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class EntryImpl implements Entry {
+
     private List<DataType> types;
     private List<Object> values;
 
@@ -54,6 +55,11 @@ public class EntryImpl implements Entry {
     @Override
     public List<Object> getValues() {
         return this.values;
+    }
+
+    @Override
+    public List<DataType> getTypes() {
+        return types;
     }
 
     @Override

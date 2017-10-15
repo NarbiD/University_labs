@@ -9,6 +9,7 @@ import localdbms.controller.TableOverviewController;
 import localdbms.database.*;
 import localdbms.database.exception.EntryException;
 import localdbms.database.exception.StorageException;
+import localdbms.database.exception.TableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,7 +84,7 @@ public class AppConfig {
     public Table table() {
         try {
             return new TableImpl();
-        } catch (EntryException e) {
+        } catch (EntryException | TableException e) {
             throw new RuntimeException(e);
         }
     }
