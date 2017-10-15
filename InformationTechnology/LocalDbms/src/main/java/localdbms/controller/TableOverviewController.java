@@ -15,15 +15,18 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import localdbms.SpringFxmlLoader;
-import localdbms.database.Database;
-import localdbms.database.Table;
-import localdbms.database.Tables;
+import localdbms.database.*;
 import localdbms.database.exception.StorageException;
 import localdbms.database.exception.TableException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 public class TableOverviewController extends AbstractController {
-
+    @FXML
+    public TableView<Object> EntryOverview;
     private ObservableList<Table> tables;
     private ObservableList<Database> databases;
     private IntegerProperty dbIndex;
@@ -47,6 +50,7 @@ public class TableOverviewController extends AbstractController {
         tables.clear();
         tables.addAll(databases.get(dbIndex.getValue()).getTables());
         TableSelection.setItems(tables);
+//        setColumns(new EntryImpl(Arrays.asList("e",1,12.3), Arrays.asList(DataType.CHAR, DataType.INTEGER, DataType.REAL_INTERVAL)));
     }
 
     public void createTable_onClick(MouseEvent mouseEvent) {
@@ -81,6 +85,13 @@ public class TableOverviewController extends AbstractController {
         alert.setHeaderText("No table selected");
         alert.setContentText("Please select a table in the list.");
         alert.showAndWait();
+    }
+
+    void setColumns(String... names) {
+        EntryOverview.setEditable(true);
+        for (String name : names) {
+            EntryOverview.getColumns().add(new TableColumn<Object, String>(name));
+        }
     }
 
     public ObservableList<Table> getTables() {

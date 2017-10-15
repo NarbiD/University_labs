@@ -4,6 +4,7 @@ import localdbms.database.exception.EntryException;
 import org.json.JSONObject;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class EntryImpl implements Entry {
     private List<DataType> types;
@@ -35,7 +36,8 @@ public class EntryImpl implements Entry {
 
     private static List<Object> getValuesFromJson(JSONObject json) {
         List<Object> localValues = new ArrayList<>();
-        TreeMap<String, Object> jsonMap = new TreeMap<>(json.toMap());
+        TreeMap<String, Object> jsonMap = new TreeMap<>(Comparator.comparing(Integer::valueOf));
+        jsonMap.putAll(json.toMap());
         jsonMap.forEach((key, value) -> localValues.add(value));
         return localValues;
     }
