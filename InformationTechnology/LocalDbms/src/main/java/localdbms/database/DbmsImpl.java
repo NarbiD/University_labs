@@ -13,26 +13,28 @@ public class DbmsImpl implements Dbms {
     public DbmsImpl() throws StorageException {
         databases = new HashSet<>();
         databaseFactory = DatabaseImpl::new;
-        loadDatabasesFromStorage();
+        loadDatabaseFromStorage();
     }
 
-    private void loadDatabasesFromStorage() throws StorageException {
+    private void loadDatabaseFromStorage() throws StorageException {
         File[] dirs = new File(Databases.ABS_DEFAULT_LOCATION).listFiles();
         for (File entry : dirs != null ? dirs : new File[0]) {
             if (entry.isDirectory()) {
                 Database database = databaseFactory.getDatabase();
                 database.setName(entry.getName());
+                database.loadTablesFromStorage();
                 databases.add(database);
             }
         }
     }
 
     @Override
-    public void createDatabase(String name) throws StorageException {
+    public Database createDatabase(String name) throws StorageException {
         Database database = databaseFactory.getDatabase();
         database.setName(name);
         database.save();
         databases.add(database);
+        return database;
     }
 
     @Override

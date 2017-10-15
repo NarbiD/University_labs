@@ -6,29 +6,43 @@ import localdbms.database.exception.StorageException;
 import localdbms.database.exception.TableException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DatabaseImpl implements Database {
 
     private String name;
 
-    private Set<Table> tables;
+    private List<Table> tables;
     private String location;
     private TableFactory tableFactory = TableImpl::new;
 
-    public DatabaseImpl() {
+    public DatabaseImpl() throws StorageException {
         this("");
     }
 
-    public DatabaseImpl(String name) {
+    public DatabaseImpl(String name) throws StorageException {
         this(name, Databases.ABS_DEFAULT_LOCATION);
     }
 
-    public DatabaseImpl(String name, String location) {
+    public DatabaseImpl(String name, String location) throws StorageException {
         this.name = name;
         this.location = location;
-        this.tables = new HashSet<>();
+        this.tables = new ArrayList<>();
+    }
+
+    public void loadTablesFromStorage() throws StorageException {
+        File[] files = new File(this.location + this.name).listFiles();
+        for (File entry : files != null ? files : new File[0]) {
+            if (entry.isFile()) {
+                Table table = tableFactory.getTable();
+                table.setName(entry.getName());
+                table.setLocation(this.location + this.name + File.separator);
+                tables.add(table);
+            }
+        }
     }
 
     @Override
@@ -41,7 +55,7 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public Set<Table> getTables() {
+    public List<Table> getTables() {
         return tables;
     }
 
@@ -80,10 +94,13 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public Table createTable(String name, DataType... columnTypes) throws EntryException {
+    public Table createTable(String name, DataType... columnTypes) throws EntryException, TableException {
         Table table = tableFactory.getTable();
         table.setName(name);
         table.setLocation(this.location + this.name + File.separator);
+        if (tables.contains(table)) {
+            throw new TableException("Table with the same name already exists");
+        }
         table.setTypes(columnTypes);
         tables.add(table);
         return table;

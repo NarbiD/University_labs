@@ -56,7 +56,7 @@ public class TableImpl implements Table {
 
     @Override
     public void writeToFile() throws EntryException, TableException {
-        if (this.name.equals("") || this.location.equals("") || this.types.isEmpty()) {
+        if (this.name.equals("") || this.location.equals("") ) {
             throw new TableException("Expected defined name, location and types");
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
@@ -76,8 +76,17 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRows(EntryImpl... rows) {
+    public void addRows(Entry... rows) {
         entries.addAll(Arrays.asList(rows));
+    }
+
+    @Override
+    public void addRow(List<Object> values) throws TableException, EntryException {
+        if (values.size() != types.size()) {
+            throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
+        }
+        Entry entry = new EntryImpl(values, types);
+        entries.add(entry);
     }
 
     @Override

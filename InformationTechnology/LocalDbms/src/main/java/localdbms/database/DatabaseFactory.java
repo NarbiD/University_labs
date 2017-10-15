@@ -1,6 +1,8 @@
 package localdbms.database;
 
+import localdbms.database.exception.StorageException;
+
 @FunctionalInterface
 public interface DatabaseFactory {
-    Database getDatabase();
+    Database getDatabase() throws StorageException;
 }

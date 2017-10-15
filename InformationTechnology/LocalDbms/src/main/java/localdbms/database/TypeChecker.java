@@ -2,11 +2,11 @@ package localdbms.database;
 
 import java.util.regex.Pattern;
 
-public class TypeChecker {
+class TypeChecker {
     private static final double DEFAULT_REAL_INTERVAL_MIN_VALUE = 10.0;
     private static final double DEFAULT_REAL_INTERVAL_MAX_VALUE = 100.0;
 
-    public static boolean instanceOf(Object object, DataType dataType) {
+    static boolean instanceOf(Object object, DataType dataType) {
         switch (dataType) {
             case INTEGER:
                 return object instanceof Integer;
@@ -21,11 +21,11 @@ public class TypeChecker {
         }
     }
 
-    public static boolean checkRealInterval(Double value) {
+    private static boolean checkRealInterval(Double value) {
         return checkRealInterval(value, DEFAULT_REAL_INTERVAL_MIN_VALUE, DEFAULT_REAL_INTERVAL_MAX_VALUE);
     }
 
-    public static boolean checkRealInterval(Double value, Double minValue, Double maxValue) {
+    private static boolean checkRealInterval(Double value, Double minValue, Double maxValue) {
         return minValue <= value && maxValue >= value;
     }
 }

@@ -9,8 +9,10 @@ public interface Table {
     String getName();
     List<DataType> getTypes();
     List<Entry> getEntries();
+    String getLocation();
 
-    void addRows(EntryImpl... rows);
+    void addRows(Entry... rows);
+    void addRow(List<Object> values) throws StorageException;
     void sort(int fieldNumber);
 
     void writeToFile() throws StorageException;

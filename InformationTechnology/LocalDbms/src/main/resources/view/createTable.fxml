@@ -16,6 +16,6 @@
          <Button fx:id="btnCancel" cancelButton="true" layoutX="175.0" layoutY="71.0" mnemonicParsing="false"
                  prefHeight="25.0" prefWidth="100.0" text="Cancel" onMouseClicked="#close"/>
       </HBox>
-      <Label layoutX="15.0" layoutY="15.0" prefHeight="15.0" prefWidth="160.0" text="Enter database name:"/>
+      <Label layoutX="15.0" layoutY="15.0" prefHeight="15.0" prefWidth="160.0" text="Enter table name:"/>
    </AnchorPane>
 </AnchorPane>
