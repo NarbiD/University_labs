@@ -53,6 +53,7 @@ public class AppConfig {
         controller.setTables(FXCollections.observableArrayList());
         controller.setDatabases(dsController.getDatabases());
         controller.setDbIndex(dsController.getSelectedIndex());
+        controller.setTableSelectedIndex(new SimpleIntegerProperty());
         return controller;
     }
 
