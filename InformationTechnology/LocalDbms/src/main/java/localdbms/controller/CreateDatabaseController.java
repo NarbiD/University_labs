@@ -24,11 +24,6 @@ public class CreateDatabaseController extends AbstractController {
     public TextField textField;
 
     @FXML
-    public void initialize() throws StorageException {
-        this.databases = DatabaseSelectionController.databases;
-    }
-
-    @FXML
     public void submit(MouseEvent mouseEvent) throws StorageException {
         databases.add(dbms.createDatabase(textField.getCharacters().toString()));
         close(mouseEvent);
@@ -37,6 +32,10 @@ public class CreateDatabaseController extends AbstractController {
     @FXML
     public void close(MouseEvent mouseEvent) {
         hide(mouseEvent);
+    }
+
+    public void setDatabases(ObservableList<Database> databases) {
+        this.databases = databases;
     }
 
     public void setDbms(Dbms dbms) {

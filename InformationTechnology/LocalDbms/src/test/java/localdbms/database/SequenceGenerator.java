@@ -3,8 +3,9 @@ package localdbms.database;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public class SequenceGenerator {
-    public static Stream<String> getStringGenerator(int length) {
+class SequenceGenerator {
+
+    static Stream<String> getStringGenerator(int length) {
         return Stream.generate(() -> {
             Random random = new Random(System.nanoTime());
             StringBuilder name = new StringBuilder(length);
