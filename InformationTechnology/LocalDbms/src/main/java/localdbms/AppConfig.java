@@ -3,6 +3,7 @@ package localdbms;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import localdbms.controller.CreateDatabaseController;
+import localdbms.controller.CreateTableController;
 import localdbms.controller.DatabaseSelectionController;
 import localdbms.controller.TableOverviewController;
 import localdbms.database.*;
@@ -52,6 +53,16 @@ public class AppConfig {
         controller.setTables(FXCollections.observableArrayList());
         controller.setDatabases(dsController.getDatabases());
         controller.setDbIndex(dsController.getSelectedIndex());
+        return controller;
+    }
+
+    @Bean
+    @Autowired
+    public CreateTableController createTableController(TableOverviewController toController) throws StorageException {
+        CreateTableController controller = new CreateTableController();
+        controller.setTables(toController.getTables());
+        controller.setDatabases(toController.getDatabases());
+        controller.setDbIndex(toController.getDbIndex());
         return controller;
     }
 

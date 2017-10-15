@@ -80,9 +80,9 @@ public class DatabaseSelectionController extends AbstractController {
             Parent root = (Parent) controller.getView();
             Stage stage = new Stage();
             stage.setTitle("Tables");
-            stage.setMinHeight(300);
-            stage.setMinWidth(520);
-            stage.setScene(new Scene(root, 540, 300));
+            stage.setMinHeight(440);
+            stage.setMinWidth(840);
+            stage.setScene(new Scene(root, 840, 440));
             stage.show();
         } else {
             noDatabaseSelectedMessage();
