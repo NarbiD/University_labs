@@ -13,7 +13,7 @@ class Warning {
         alert.setContentText(throwable.getMessage());
         alert.showAndWait();
     }
-    
+
     static void show (Throwable throwable) {
         show("", throwable);
     }

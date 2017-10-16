@@ -70,33 +70,45 @@ public class CreateTableController extends AbstractController{
         return true;
     }
 
-    private Pair<List<String>, List<DataType>> getDataFromForm() throws EntryException {
+    private Pair<List<String>, List<DataType>> getDataFromForm() throws EntryException, IllegalArgumentException {
         List<DataType> types = FXCollections.observableArrayList();
         List<String> names = FXCollections.observableArrayList();
 
         for (int i = 0; i < Fields.getChildren().size(); i++) {
-            HBox hBox = (HBox)Fields.getChildren().get(i);
-            DataType type = null;
-            String name = "";
-            for (Node node : hBox.getChildren()) {
-                if (node instanceof ComboBox) {
-                    type = (DataType)((ComboBox)node).getValue();
-                } else if (node instanceof TextField) {
-                    name = ((TextField)node).getCharacters().toString();
-                }
-            }
-            boolean nameIsUndefined = name.equals("");
-            boolean typeIsNull = type == null;
-            if (nameIsUndefined && typeIsNull) {
-                continue;
-            } else if (nameIsUndefined || typeIsNull) {
-                throw new IllegalArgumentException("It is necessary to fill in either both fields in the line, or none");
-            } else {
+            Pair<String, DataType> dataFromLine = getDataFromHBox((HBox)Fields.getChildren().get(i));
+            String name = dataFromLine.getKey();
+            DataType type = dataFromLine.getValue();
+            if (!shouldBeIgnored(name, type)){
                 names.add(name);
                 types.add(type);
             }
         }
         return new Pair<>(names, types);
+    }
+
+    private Pair<String, DataType> getDataFromHBox(HBox hBox) {
+        DataType type = null;
+        String name = "";
+        for (Node node : hBox.getChildren()) {
+            if (node instanceof ComboBox) {
+                type = (DataType)((ComboBox)node).getValue();
+            } else if (node instanceof TextField) {
+                name = ((TextField)node).getCharacters().toString();
+            }
+        }
+        return new Pair<>(name, type);
+    }
+
+    private boolean shouldBeIgnored (String name, DataType type) {
+        boolean nameIsDefined = !name.equals("");
+        boolean typeIsNotNull = type != null;
+        if (nameIsDefined && typeIsNotNull) {
+            return false;
+        } else if (nameIsDefined || typeIsNotNull) {
+            throw new IllegalArgumentException("It is necessary to fill in either both fields in the line, or none");
+        } else {
+            return true;
+        }
     }
 
     public void addField(MouseEvent mouseEvent) {
