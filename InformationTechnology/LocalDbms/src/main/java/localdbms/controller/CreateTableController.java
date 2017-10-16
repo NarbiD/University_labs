@@ -12,24 +12,29 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import localdbms.database.*;
 import localdbms.database.exception.EntryException;
 import localdbms.database.exception.StorageException;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class CreateTableController extends AbstractController{
+    private IntegerProperty dbIndex;
+    private ObservableList<Database> databases;
+    private ObservableList<Table> tables;
+
     @FXML
     public VBox Fields;
 
     @FXML
-    public HBox SubmissionButtons;
+    public TextField tableNameField;
 
-    private IntegerProperty dbIndex;
-    private ObservableList<Database> databases;
-    private ObservableList<Table> tables;
+    @FXML
+    public Button btnAddField;
+
+    @FXML
+    public HBox SubmissionButtons;
 
     @FXML
     public Button btnCancel;
@@ -37,38 +42,61 @@ public class CreateTableController extends AbstractController{
     @FXML
     public Button btnOk;
 
-    @FXML
-    public TextField textField;
-
-    @FXML
-    public Button btn;
-
-    @FXML
-    public void submit(MouseEvent mouseEvent) throws StorageException {
+    public void submit(MouseEvent mouseEvent) {
         Database database = databases.get(dbIndex.get());
-        Table table = database.createTable(textField.getCharacters().toString());
-        List[] tableData = getData();
-        table.setTypes(tableData[1]);
-        table.setColumnNames(tableData[0]);
-        tables.add(table);
-        database.save();
-        close(mouseEvent);
+        try {
+            Table table = database.createTable(tableNameField.getCharacters().toString());
+            if (fillTableHeaderFromForm(table)) {
+                tables.add(table);
+                database.save();
+                close(mouseEvent);
+            } else {
+                database.getTables().remove(table);
+            }
+        } catch (StorageException e) {
+            Warning.show("Storage error!", e);
+        }
     }
 
-    private List[] getData() throws EntryException {
+    private boolean fillTableHeaderFromForm(Table table) {
+        try {
+            Pair<List<String>, List<DataType>> tableData = getDataFromForm();
+            table.setTypes(tableData.getValue());
+            table.setColumnNames(tableData.getKey());
+        } catch (IllegalArgumentException | EntryException e) {
+            Warning.show(e);
+            return false;
+        }
+        return true;
+    }
+
+    private Pair<List<String>, List<DataType>> getDataFromForm() throws EntryException {
         List<DataType> types = FXCollections.observableArrayList();
-        List<Object> names = FXCollections.observableArrayList();
+        List<String> names = FXCollections.observableArrayList();
+
         for (int i = 0; i < Fields.getChildren().size(); i++) {
             HBox hBox = (HBox)Fields.getChildren().get(i);
+            DataType type = null;
+            String name = "";
             for (Node node : hBox.getChildren()) {
                 if (node instanceof ComboBox) {
-                    types.add((DataType)((ComboBox)node).getValue());
+                    type = (DataType)((ComboBox)node).getValue();
                 } else if (node instanceof TextField) {
-                    names.add(((TextField)node).getCharacters().toString());
+                    name = ((TextField)node).getCharacters().toString();
                 }
             }
+            boolean nameIsUndefined = name.equals("");
+            boolean typeIsNull = type == null;
+            if (nameIsUndefined && typeIsNull) {
+                continue;
+            } else if (nameIsUndefined || typeIsNull) {
+                throw new IllegalArgumentException("It is necessary to fill in either both fields in the line, or none");
+            } else {
+                names.add(name);
+                types.add(type);
+            }
         }
-        return new List[]{names, types};
+        return new Pair<>(names, types);
     }
 
     public void addField(MouseEvent mouseEvent) {

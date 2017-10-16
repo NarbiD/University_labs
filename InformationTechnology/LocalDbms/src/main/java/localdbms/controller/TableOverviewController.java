@@ -19,11 +19,6 @@ import localdbms.database.*;
 import localdbms.database.exception.StorageException;
 import localdbms.database.exception.TableException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-
 public class TableOverviewController extends AbstractController {
     @FXML
     public TableView<Object> EntryOverview;
@@ -50,7 +45,6 @@ public class TableOverviewController extends AbstractController {
         tables.clear();
         tables.addAll(databases.get(dbIndex.getValue()).getTables());
         TableSelection.setItems(tables);
-//        setColumns(new EntryImpl(Arrays.asList("e",1,12.3), Arrays.asList(DataType.CHAR, DataType.INTEGER, DataType.REAL_INTERVAL)));
     }
 
     public void createTable_onClick(MouseEvent mouseEvent) {
