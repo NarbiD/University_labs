@@ -1,6 +1,7 @@
 package localdbms.controller;
 
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -27,9 +27,13 @@ public class TableOverviewController extends AbstractController {
     @FXML
     public Button btnSelect;
 
+    @FXML
+    public Button btnAddRow;
+
     private ObservableList<Table> tables;
     private ObservableList<Database> databases;
     private IntegerProperty dbIndex;
+
     private IntegerProperty tableSelectedIndex;
 
     @FXML
@@ -93,7 +97,23 @@ public class TableOverviewController extends AbstractController {
         }
     }
 
+    public void addRow_onClick(MouseEvent mouseEvent) {
+        Stage stage = new Stage();
+        Controller controller = SpringFxmlLoader.load("/view/createRowInTable.fxml");
+        Parent root = (Parent) controller.getView();
+        stage.setTitle("Create row in table");
+        int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
+        stage.setHeight(140.0 + columnsAmount*30.0);
+        stage.setMinWidth(440);
+        stage.setResizable(false);
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(((Node)mouseEvent.getSource()).getScene().getWindow());
+        stage.show();
+    }
+
     private void showEntries(Table table) {
+        EntryOverview.getColumns().clear();
         table.getColumnNames().forEach(this::addColumn);
         EntryOverview.getItems().addAll(table.getEntries());
     }
@@ -127,6 +147,9 @@ public class TableOverviewController extends AbstractController {
         this.tables = tables;
     }
 
+    public IntegerProperty getTableSelectedIndex() {
+        return tableSelectedIndex;
+    }
 
     public void setTableSelectedIndex(IntegerProperty index) {
         this.tableSelectedIndex = index;

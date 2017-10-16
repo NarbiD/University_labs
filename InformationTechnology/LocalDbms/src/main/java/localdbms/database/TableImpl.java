@@ -27,17 +27,28 @@ public class TableImpl implements Table {
         this.location = location;
         this.name = name;
         this.types = Arrays.asList(columnTypes);
+        this.columnNames = new ArrayList<>();
+        loadDataFromFile();
+    }
+
+    @Override
+    public void loadDataFromFile() throws EntryException, TableException {
         String rowInFile = new JSONArray().toString();
         String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile;
-        if (Tables.isTableExists(name, location)) {
-            readData = readTableFromStorage(location + name);
+        if (Tables.isTableExists(this.name, this.location)) {
+            readData = readTableFromStorage(this.location + this.name);
         }
         String[] s = readData.split("\n");
         List<DataType> readTypes = new ArrayList<>();
-        new JSONArray(s[0]).toList().forEach(title -> columnNames.add(title.toString()));
-        new JSONArray(s[1]).toList().forEach(type -> readTypes.add((DataType) type));
-        if (this.types.equals(readTypes)) {
-            this.entries = getEntriesFromJson(new JSONArray(s[2]), this.types);
+        List a = new JSONArray(s[0]).toList();
+        for (Object title : a) {
+            String t = title.toString();
+            columnNames.add(t);
+        }
+        new JSONArray(s[1]).toList().forEach(type -> readTypes.add(DataType.valueOf(type.toString())));
+        if (this.types.equals(readTypes) || types.isEmpty()) {
+            this.types = readTypes;
+            this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
         } else {
             throw new TableException("Expected types " + readData + " but " + this.types + " found");
         }

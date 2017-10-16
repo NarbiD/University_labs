@@ -83,6 +83,9 @@ public class CreateTableController extends AbstractController{
                 types.add(type);
             }
         }
+        if (names.isEmpty()) {
+            throw new IllegalArgumentException("You must create at least one column");
+        }
         return new Pair<>(names, types);
     }
 
