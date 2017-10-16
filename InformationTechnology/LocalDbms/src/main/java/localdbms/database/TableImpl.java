@@ -16,6 +16,7 @@ public class TableImpl implements Table {
     private List<DataType> types;
     private List<Entry> entries;
     private EntryFactory entryFactory = EntryImpl::new;
+
     private List<String> columnNames;
 
     public TableImpl() throws EntryException, TableException {
@@ -116,6 +117,11 @@ public class TableImpl implements Table {
                 return (field instanceof Character || field instanceof String) ? field.toString().toLowerCase() : field;
             }
         });
+    }
+
+    @Override
+    public List<String> getColumnNames() {
+        return columnNames;
     }
 
     @Override

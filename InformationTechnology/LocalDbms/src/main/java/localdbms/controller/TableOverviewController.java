@@ -2,6 +2,7 @@ package localdbms.controller;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -22,6 +23,10 @@ import localdbms.database.exception.TableException;
 public class TableOverviewController extends AbstractController {
     @FXML
     public TableView<Object> EntryOverview;
+
+    @FXML
+    public Button btnSelect;
+
     private ObservableList<Table> tables;
     private ObservableList<Database> databases;
     private IntegerProperty dbIndex;
@@ -74,18 +79,28 @@ public class TableOverviewController extends AbstractController {
     }
 
     private void noTableSelectedMessage() {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("No selection");
-        alert.setHeaderText("No table selected");
-        alert.setContentText("Please select a table in the list.");
-        alert.showAndWait();
+        Warning.show("No table selected. Please select a table in the list.");
     }
 
-    void setColumns(String... names) {
-        EntryOverview.setEditable(true);
-        for (String name : names) {
-            EntryOverview.getColumns().add(new TableColumn<Object, String>(name));
+    public void select_onClick() {
+        tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
+        if (tableSelectedIndex.get() >= 0) {
+            ObservableList<Table> tables = TableSelection.getItems();
+            Table table = tables.get(tableSelectedIndex.get());
+            showEntries(table);
+        } else {
+            noTableSelectedMessage();
         }
+    }
+
+    private void showEntries(Table table) {
+        table.getColumnNames().forEach(this::addColumn);
+        EntryOverview.getItems().addAll(table.getEntries());
+    }
+
+    private void addColumn(String name) {
+        EntryOverview.setEditable(true);
+        EntryOverview.getColumns().add(new TableColumn<Object, String>(name));
     }
 
     public ObservableList<Table> getTables() {

@@ -40,6 +40,7 @@
                 onMouseClicked="#createTable_onClick" prefWidth="150.0" text="Create table"/>
         <Button fx:id="btnDelete" mnemonicParsing="false" prefHeight="25.0" prefWidth="150.0" text="Delete table"
                 onMouseClicked="#deleteTable_onClick"/>
-        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="150.0" text="Button"/>
+        <Button fx:id="btnSelect" mnemonicParsing="false" prefHeight="25.0" prefWidth="150.0" text="Select"
+                onMouseClicked="#select_onClick"/>
     </VBox>
 </AnchorPane>

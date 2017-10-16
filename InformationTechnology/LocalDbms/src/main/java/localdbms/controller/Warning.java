@@ -17,4 +17,8 @@ class Warning {
     static void show (Throwable throwable) {
         show("", throwable);
     }
+
+    static void show (String message) {
+        show(message, new Throwable());
+    }
 }

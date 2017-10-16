@@ -8,6 +8,9 @@ public interface Table {
 
     String getName();
     List<DataType> getTypes();
+
+    List<String> getColumnNames();
+
     List<Entry> getEntries();
     String getLocation();
 
