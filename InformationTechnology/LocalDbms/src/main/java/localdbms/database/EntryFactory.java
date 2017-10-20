@@ -6,5 +6,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface EntryFactory {
-    Entry getEntryFromJson(JSONObject jsonObject, List<DataType> types) throws EntryException;
+    Entry getEntryFromJson(JSONObject jsonObject, List<DataType> types, RealConstraint constraint) throws EntryException;
 }

@@ -71,6 +71,8 @@ public class AppConfig {
         CreateRowInTableController controller = new CreateRowInTableController();
         controller.setTables(toController.getTables());
         controller.setTableIndex(toController.getTableSelectedIndex());
+        controller.setDatabases(toController.getDatabases());
+        controller.setDbIndex(toController.getDbIndex());
         return controller;
     }
 

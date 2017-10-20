@@ -11,41 +11,47 @@
 <?import javafx.collections.FXCollections?>
 <?import localdbms.database.DataType?>
 <AnchorPane prefHeight="240.0" prefWidth="370.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="localdbms.controller.CreateTableController">
-   <AnchorPane layoutX="-1.0" prefHeight="240.0" prefWidth="370.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      <TextField fx:id="tableNameField" layoutX="15.0" layoutY="35.0" prefHeight="25.0" prefWidth="340.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
-      <HBox fx:id="SubmissionButtons" alignment="CENTER" layoutX="73.0" layoutY="263.0" spacing="30.0" AnchorPane.bottomAnchor="10.0">
-         <Button fx:id="btnOk" defaultButton="true" layoutX="45.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#submit" prefHeight="25.0" prefWidth="100.0" text="OK" />
-         <Button fx:id="btnCancel" cancelButton="true" layoutX="175.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#close" prefHeight="25.0" prefWidth="100.0" text="Cancel" />
-      </HBox>
-      <Label layoutX="15.0" layoutY="15.0" prefHeight="15.0" prefWidth="160.0" text="Enter table name:" />
-      <VBox fx:id="Fields" layoutX="24.0" layoutY="73.0" prefWidth="335.0" spacing="5.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-         <HBox spacing="30.0">
-            <TextField />
-            <ComboBox prefWidth="150.0">
-               <items>
-                  <FXCollections fx:factory="observableArrayList">
-                     <DataType fx:value="CHAR"/>
-                     <DataType fx:value="INTEGER"/>
-                     <DataType fx:value="REAL"/>
-                     <DataType fx:value="REAL_INTERVAL"/>
-                  </FXCollections>
-               </items>
-            </ComboBox>
-         </HBox>
-         <HBox spacing="30.0">
-            <TextField />
-            <ComboBox prefWidth="150.0">
-               <items>
-                  <FXCollections fx:factory="observableArrayList">
-                     <DataType fx:value="CHAR"/>
-                     <DataType fx:value="INTEGER"/>
-                     <DataType fx:value="REAL"/>
-                     <DataType fx:value="REAL_INTERVAL"/>
-                  </FXCollections>
-               </items>
-            </ComboBox>
-         </HBox>
-      </VBox>
-      <Button fx:id="btnAddField" layoutX="113.0" layoutY="221.0" mnemonicParsing="false" onMouseClicked="#addField" prefHeight="25.0" prefWidth="150.0" text="Add field" AnchorPane.bottomAnchor="60.0" />
-   </AnchorPane>
+    <AnchorPane layoutX="-1.0" prefHeight="240.0" prefWidth="370.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <TextField fx:id="tableNameField" layoutX="15.0" layoutY="35.0" prefHeight="25.0" prefWidth="340.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+        <HBox fx:id="SubmissionButtons" alignment="CENTER" layoutX="73.0" layoutY="263.0" spacing="30.0" AnchorPane.bottomAnchor="10.0">
+            <Button fx:id="btnOk" defaultButton="true" layoutX="45.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#submit" prefHeight="25.0" prefWidth="100.0" text="OK" />
+            <Button fx:id="btnCancel" cancelButton="true" layoutX="175.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#close" prefHeight="25.0" prefWidth="100.0" text="Cancel" />
+        </HBox>
+        <Label layoutX="15.0" layoutY="15.0" prefHeight="15.0" prefWidth="160.0" text="Enter table name:" />
+        <VBox fx:id="Fields" layoutX="24.0" layoutY="73.0" prefWidth="335.0" spacing="5.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+            <Label text="Enter intervals constraints"/>
+            <HBox spacing="30.0" fx:id="Constraints" >
+                <TextField promptText="0.0"/>
+                <TextField promptText="100.0"/>
+            </HBox>
+            <Label text="Enter columns names and types"/>
+            <HBox spacing="30.0">
+                <TextField />
+                <ComboBox prefWidth="150.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <DataType fx:value="CHAR"/>
+                            <DataType fx:value="INTEGER"/>
+                            <DataType fx:value="REAL"/>
+                            <DataType fx:value="REAL_INTERVAL"/>
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+            </HBox>
+            <HBox spacing="30.0">
+                <TextField />
+                <ComboBox prefWidth="150.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <DataType fx:value="CHAR"/>
+                            <DataType fx:value="INTEGER"/>
+                            <DataType fx:value="REAL"/>
+                            <DataType fx:value="REAL_INTERVAL"/>
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+            </HBox>
+        </VBox>
+        <Button fx:id="btnAddField" layoutX="113.0" layoutY="221.0" mnemonicParsing="false" onMouseClicked="#addField" prefHeight="25.0" prefWidth="150.0" text="Add field" AnchorPane.bottomAnchor="60.0" />
+    </AnchorPane>
 </AnchorPane>

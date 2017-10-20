@@ -9,7 +9,7 @@ public interface Entry {
 
     BufferedImage getImage();
 
-    void setPic(BufferedImage image);
+    void setImage(BufferedImage image);
 
     JSONObject getJson();
 

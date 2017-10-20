@@ -4,6 +4,7 @@ import localdbms.database.exception.EntryException;
 import localdbms.database.exception.TableException;
 import org.json.*;
 
+import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TableImpl implements Table {
+    File pic;
+    private RealConstraint constraint;
     private String location;
     private String name;
     private List<DataType> types;
@@ -28,24 +31,28 @@ public class TableImpl implements Table {
         this.name = name;
         this.types = Arrays.asList(columnTypes);
         this.columnNames = new ArrayList<>();
+        this.constraint = new RealConstraint();
         loadDataFromFile();
     }
 
     @Override
     public void loadDataFromFile() throws EntryException, TableException {
         String rowInFile = new JSONArray().toString();
-        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile;
+        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile;
         if (Tables.isTableExists(this.name, this.location)) {
             readData = readTableFromStorage(this.location + this.name);
         }
         String[] s = readData.split("\n");
         List<DataType> readTypes = new ArrayList<>();
-        List a = new JSONArray(s[0]).toList();
-        for (Object title : a) {
+        for (Object title : new JSONArray(s[0]).toList()) {
             String t = title.toString();
             columnNames.add(t);
         }
         new JSONArray(s[1]).toList().forEach(type -> readTypes.add(DataType.valueOf(type.toString())));
+        JSONArray constraints = new JSONArray(s[3]);
+        if (constraints.length() != 0) {
+            this.constraint = new RealConstraint(constraints.getDouble(0), constraints.getDouble(1));
+        }
         if (this.types.equals(readTypes) || types.isEmpty()) {
             this.types = readTypes;
             this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
@@ -56,7 +63,7 @@ public class TableImpl implements Table {
 
     private String readTableFromStorage(String storageLocation) {
         try (BufferedReader reader = new BufferedReader(new FileReader(storageLocation))) {
-            return reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine();
+            return reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine();
         } catch (IOException e) {
             throw new RuntimeException("Can not read table from storage", e);
         }
@@ -66,7 +73,8 @@ public class TableImpl implements Table {
         List<Entry> entries = new ArrayList<>();
         for (Object json : jsonArray) {
             JSONObject jsonObject = (JSONObject)json;
-            entries.add(entryFactory.getEntryFromJson(jsonObject, types));
+            Entry entry = entryFactory.getEntryFromJson(jsonObject, types, constraint);
+            entries.add(entry);
         }
         return entries;
     }
@@ -84,7 +92,14 @@ public class TableImpl implements Table {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
             writer.write(new JSONArray(this.columnNames).toString() + "\n");
             writer.write(new JSONArray(this.types).toString() + "\n");
-            writer.write(this.getJsonArray().toString());
+            writer.write(this.getJsonArray().toString() + "\n");
+            JSONArray constraints = new JSONArray();
+            if (constraint.isDefined()) {
+                constraints.put(this.constraint.getMinValue());
+                constraints.put(this.constraint.getMaxValue());
+            }
+            System.err.println(constraints);
+            writer.write(constraints.toString());
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("Can not write table to storage", e);
@@ -105,11 +120,25 @@ public class TableImpl implements Table {
     }
 
     @Override
+    public void addRow(List<Object> values, File pic) throws TableException, EntryException {
+        if (values.size() != types.size()) {
+            throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
+        }
+        Entry entry = new EntryImpl(values, types, constraint);
+        try {
+            entry.setImage(ImageIO.read(pic));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        entries.add(entry);
+    }
+
+    @Override
     public void addRow(List<Object> values) throws TableException, EntryException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
         }
-        Entry entry = new EntryImpl(values, types);
+        Entry entry = new EntryImpl(values, types, constraint);
         entries.add(entry);
     }
 
@@ -181,6 +210,16 @@ public class TableImpl implements Table {
 
     public void setEntries(List<Entry> entries) {
         this.entries = entries;
+    }
+
+    @Override
+    public RealConstraint getConstraint() {
+        return constraint;
+    }
+
+    @Override
+    public void setConstraint(RealConstraint constraint) {
+        this.constraint = constraint;
     }
 
     @Override

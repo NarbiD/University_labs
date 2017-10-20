@@ -1,26 +1,27 @@
 package localdbms.controller;
 
 import javafx.beans.property.IntegerProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
+import javafx.stage.FileChooser;
 import localdbms.database.DataType;
+import localdbms.database.Database;
 import localdbms.database.Table;
+import localdbms.database.TypeChecker;
+import localdbms.database.exception.StorageException;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreateRowInTableController extends AbstractController{
-
 
     @FXML
     public VBox Fields;
@@ -35,10 +36,18 @@ public class CreateRowInTableController extends AbstractController{
     public HBox SubmissionButtons;
 
     @FXML
-    public AnchorPane Stage;
+    public Button btnLoadPic;
 
     private ObservableList<Table> tables;
     private IntegerProperty tableIndex;
+    private ObservableList<Database> databases;
+    private File image;
+
+    public void setDbIndex(IntegerProperty dbIndex) {
+        this.dbIndex = dbIndex;
+    }
+
+    private IntegerProperty dbIndex;
 
     @FXML
     public void initialize() {
@@ -49,8 +58,6 @@ public class CreateRowInTableController extends AbstractController{
     }
 
     private void addField(String name, DataType type) {
-        resizeWindow();
-
         Label fieldName = new Label(name);
         fieldName.setPrefSize(180.0, 25.0);
 
@@ -65,13 +72,54 @@ public class CreateRowInTableController extends AbstractController{
         Fields.getChildren().add(hbox);
     }
 
-    private void resizeWindow() {
-        SubmissionButtons.setLayoutY(SubmissionButtons.getLayoutY());
-//        Window window = Stage.getScene().getWindow();
-//        window.setHeight(window.getHeight() + 30);
+    public void submit(MouseEvent mouseEvent)  {
+        Table table = tables.get(tableIndex.get());
+        List<String> dataFromFields = getDataFromForm();
+        try {
+            List<Object> values = getObjectsByText(dataFromFields);
+            put(table, values);
+            close(mouseEvent);
+        } catch (NumberFormatException | StorageException e) {
+            Warning.show(e);
+        }
     }
 
-    public void submit(MouseEvent mouseEvent) {
+    private List<String> getDataFromForm() {
+        List<String> dataFromTextFields = new ArrayList<>();
+        for (Node node : Fields.getChildren()) {
+            List<Node> hBox = ((HBox) node).getChildren();
+            if (!hBox.isEmpty()) {
+                dataFromTextFields.add(((TextField) hBox.get(1)).getCharacters().toString());
+            }
+        }
+        return dataFromTextFields;
+    }
+
+    private List<Object> getObjectsByText(List<String> data) throws NumberFormatException {
+        List<Object> parsedObjects = new ArrayList<>();
+        List<DataType> types = tables.get(tableIndex.get()).getTypes();
+        for (int column = 0; column < data.size(); column++) {
+            DataType cellType = types.get(column);
+            String cellData = data.get(column);
+            try {
+                parsedObjects.add(TypeChecker.parseObjectByType(cellData, cellType));
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Expected " + cellType + " value in " +
+                        column + " column but " + cellData + " found");
+            }
+        }
+        return parsedObjects;
+    }
+
+    private void put(Table table, List<Object> values) throws StorageException{
+        if (image != null) {
+            table.addRow(values, image);
+        } else {
+            table.addRow(values);
+        }
+        databases.get(dbIndex.get()).getTables().clear();
+        databases.get(dbIndex.get()).getTables().addAll(tables);
+        databases.get(dbIndex.get()).save();
     }
 
     public void close(MouseEvent mouseEvent) {
@@ -84,5 +132,16 @@ public class CreateRowInTableController extends AbstractController{
 
     public void setTableIndex(IntegerProperty tableIndex) {
         this.tableIndex = tableIndex;
+    }
+
+    public void setDatabases(ObservableList<Database> databases) {
+        this.databases = databases;
+    }
+
+    public void loadPic(MouseEvent mouseEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open image...");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image File", "*.png"));
+        image = fileChooser.showOpenDialog(((Node) mouseEvent.getSource()).getScene().getWindow());
     }
 }

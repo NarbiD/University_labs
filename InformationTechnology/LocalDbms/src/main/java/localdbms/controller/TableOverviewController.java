@@ -28,7 +28,6 @@ import java.util.List;
 
 public class TableOverviewController extends AbstractController {
 
-
     private ObservableList<Table> tables;
     private ObservableList<Database> databases;
     private IntegerProperty dbIndex;
@@ -111,29 +110,33 @@ public class TableOverviewController extends AbstractController {
     }
 
     public void addRow_onClick(MouseEvent mouseEvent) {
-        Stage stage = new Stage();
-        Controller controller = SpringFxmlLoader.load("/view/createRowInTable.fxml");
-        Parent root = (Parent) controller.getView();
-        stage.setTitle("Create row in table");
-        int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
-        stage.setHeight(170.0 + columnsAmount*30.0);
-        stage.setMinWidth(440);
-        stage.setResizable(false);
-        stage.setScene(new Scene(root));
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(((Node)mouseEvent.getSource()).getScene().getWindow());
-        stage.show();
+        tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
+        if (tableSelectedIndex.get() >= 0) {
+            Stage stage = new Stage();
+            Controller controller = SpringFxmlLoader.load("/view/createRowInTable.fxml");
+            Parent root = (Parent) controller.getView();
+            stage.setTitle("Create row in table");
+            int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
+            stage.setHeight(170.0 + columnsAmount*30.0);
+            stage.setMinWidth(440);
+            stage.setResizable(false);
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node)mouseEvent.getSource()).getScene().getWindow());
+            stage.show();
+        } else {
+            noTableSelectedMessage();
+        }
     }
 
     private void showEntries(Table table) {
         EntryOverview.getColumns().clear();
         table.getColumnNames().forEach(this::addColumn);
+        setValueFactories();
 
         List<Entry> entries = table.getEntries();
         ObservableList<Object> values = FXCollections.observableArrayList();
         entries.forEach(entry -> values.add(FXCollections.observableArrayList(entry.getValues())));
-        setValueFactories();
-
         EntryOverview.setItems(values);
     }
 

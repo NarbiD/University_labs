@@ -35,7 +35,7 @@ public class TableTest {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
         Table table = tableFactory.getTable();
         table.setTypes(dataTypes);
-        EntryImpl entry = new EntryImpl(Arrays.asList(12, 'c'), table.getTypes());
+        EntryImpl entry = new EntryImpl(Arrays.asList(12, 'c'), table.getTypes(), new RealConstraint());
         table.addRows(entry);
         Assert.assertFalse(table.isEmpty());
         Assert.assertTrue(entry.equals(table.getEntries().get(0)));
@@ -46,14 +46,14 @@ public class TableTest {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
         Table unsortedTable = tableFactory.getTable();
         unsortedTable.setTypes(dataTypes);
-        unsortedTable.addRows(new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList(2, 'd'), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList(4, 'a'), unsortedTable.getTypes()));
+        unsortedTable.addRows(new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList(2, 'd'), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList(4, 'a'), unsortedTable.getTypes(), new RealConstraint()));
         Table sortedTable = tableFactory.getTable();
         sortedTable.setTypes(dataTypes);
-        sortedTable.addRows(new EntryImpl(Arrays.asList(2, 'd'), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList(4, 'a'), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes()));
+        sortedTable.addRows(new EntryImpl(Arrays.asList(2, 'd'), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList(4, 'a'), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes(), new RealConstraint()));
         Assert.assertFalse(unsortedTable.getEntries().equals(sortedTable.getEntries()));
         unsortedTable.sort(0);
         Assert.assertTrue(unsortedTable.getEntries().equals(sortedTable.getEntries()));
@@ -64,14 +64,14 @@ public class TableTest {
         DataType[] dataTypes = {DataType.INTEGER, DataType.CHAR};
         Table unsortedTable = tableFactory.getTable();
         unsortedTable.setTypes(dataTypes);
-        unsortedTable.addRows(new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes()),
-                new EntryImpl(Arrays.asList(2, 'D'), unsortedTable.getTypes()),
-                new EntryImpl(Arrays.asList(4, 'A'), unsortedTable.getTypes()));
+        unsortedTable.addRows(new EntryImpl(Arrays.asList(12, 'c'), unsortedTable.getTypes(), new RealConstraint()),
+                new EntryImpl(Arrays.asList(2, 'D'), unsortedTable.getTypes(), new RealConstraint()),
+                new EntryImpl(Arrays.asList(4, 'A'), unsortedTable.getTypes(), new RealConstraint()));
         Table sortedTable = tableFactory.getTable();
         sortedTable.setTypes(dataTypes);
-        sortedTable.addRows(new EntryImpl(Arrays.asList(4, 'A'), sortedTable.getTypes()),
-            new EntryImpl(Arrays.asList(12, 'c'), sortedTable.getTypes()),
-            new EntryImpl(Arrays.asList(2, 'D'), sortedTable.getTypes()));
+        sortedTable.addRows(new EntryImpl(Arrays.asList(4, 'A'), sortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList(12, 'c'), sortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList(2, 'D'), sortedTable.getTypes(), new RealConstraint()));
         Assert.assertFalse(unsortedTable.getEntries().equals(sortedTable.getEntries()));
         unsortedTable.sort(1);
         Assert.assertTrue(unsortedTable.getEntries().equals(sortedTable.getEntries()));
@@ -82,14 +82,14 @@ public class TableTest {
         DataType[] dataTypes = {DataType.CHAR, DataType.REAL};
         Table unsortedTable = tableFactory.getTable();
         unsortedTable.setTypes(dataTypes);
-        unsortedTable.addRows(new EntryImpl(Arrays.asList('c', 12.7545), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList('d', 34.45), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList('a', 24.1), unsortedTable.getTypes()));
+        unsortedTable.addRows(new EntryImpl(Arrays.asList('c', 12.7545), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList('d', 34.45), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList('a', 24.1), unsortedTable.getTypes(), new RealConstraint()));
         Table sortedTable = tableFactory.getTable();
         sortedTable.setTypes(dataTypes);
-        sortedTable.addRows(new EntryImpl(Arrays.asList('c', 12.7545), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList('a', 24.1), unsortedTable.getTypes()),
-            new EntryImpl(Arrays.asList('d', 34.45), unsortedTable.getTypes()));
+        sortedTable.addRows(new EntryImpl(Arrays.asList('c', 12.7545), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList('a', 24.1), unsortedTable.getTypes(), new RealConstraint()),
+            new EntryImpl(Arrays.asList('d', 34.45), unsortedTable.getTypes(), new RealConstraint()));
         Assert.assertFalse(unsortedTable.getEntries().equals(sortedTable.getEntries()));
         unsortedTable.sort(1);
         Assert.assertTrue(unsortedTable.getEntries().equals(sortedTable.getEntries()));

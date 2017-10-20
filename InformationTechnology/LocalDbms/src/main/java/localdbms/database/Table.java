@@ -4,6 +4,7 @@ import localdbms.database.exception.EntryException;
 import localdbms.database.exception.StorageException;
 import localdbms.database.exception.TableException;
 
+import java.io.File;
 import java.util.List;
 
 public interface Table {
@@ -17,6 +18,9 @@ public interface Table {
     String getLocation();
 
     void addRows(Entry... rows);
+
+    void addRow(List<Object> values, File pic) throws TableException, EntryException;
+
     void addRow(List<Object> values) throws StorageException;
     void sort(int fieldNumber);
 
@@ -31,4 +35,7 @@ public interface Table {
     void setTypes(DataType... types);
 
     void setColumnNames(List<String> names);
+
+    RealConstraint getConstraint();
+    void setConstraint(RealConstraint realIntervalConstraint);
 }

@@ -12,8 +12,9 @@ public class EntryImpl implements Entry {
     public BufferedImage getImage() {
         return image;
     }
+
     @Override
-    public void setPic(BufferedImage image) {
+    public void setImage(BufferedImage image) {
         this.image = image;
     }
 
@@ -21,13 +22,13 @@ public class EntryImpl implements Entry {
     private List<DataType> types;
     private List<Object> values;
 
-    public EntryImpl(List<Object> values, List<DataType> types) throws EntryException {
+    public EntryImpl(List<Object> values, List<DataType> types, RealConstraint constraint) throws EntryException {
         if (types.size() != values.size()) {
             throw new EntryException("Expected types.size() == values.size() but types size == " +
                     types.size() + " and values.size() == " + values.size() + " found");
         }
         for (int column = 0; column < values.size(); column++) {
-            if (!TypeChecker.instanceOf(values.get(column), types.get(column))){
+            if (!TypeChecker.instanceOf(values.get(column), types.get(column), constraint)) {
                 throw new EntryException("Invalid type in table cell: expected type " + types.get(column) +
                         " in column " + column + " but value " + values.get(column) +
                         " (" + values.get(column).getClass() + ") found");
@@ -38,11 +39,11 @@ public class EntryImpl implements Entry {
     }
 
     public EntryImpl() throws EntryException {
-        this(new ArrayList<>(), new ArrayList<>());
+        this(new ArrayList<>(), new ArrayList<>(), new RealConstraint());
     }
 
-    public EntryImpl(JSONObject json, List<DataType> types) throws EntryException {
-        this(getValuesFromJson(json), types);
+    public EntryImpl(JSONObject json, List<DataType> types, RealConstraint constraint) throws EntryException {
+        this(getValuesFromJson(json), types, constraint);
     }
 
     private static List<Object> getValuesFromJson(JSONObject json) {

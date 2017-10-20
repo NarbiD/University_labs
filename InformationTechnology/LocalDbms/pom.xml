@@ -6,7 +6,7 @@
 
     <groupId>InformationTechnology</groupId>
     <artifactId>LocalDbms</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -69,8 +69,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
 
 </project>

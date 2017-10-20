@@ -2,11 +2,9 @@ package localdbms.database;
 
 import java.util.regex.Pattern;
 
-class TypeChecker {
-    private static final double DEFAULT_REAL_INTERVAL_MIN_VALUE = 10.0;
-    private static final double DEFAULT_REAL_INTERVAL_MAX_VALUE = 100.0;
+public class TypeChecker {
 
-    static boolean instanceOf(Object object, DataType dataType) {
+    public static boolean instanceOf(Object object, DataType dataType) {
         switch (dataType) {
             case INTEGER:
                 return object instanceof Integer;
@@ -15,17 +13,35 @@ class TypeChecker {
             case REAL:
                 return object instanceof Double || object instanceof Integer;
             case REAL_INTERVAL:
-                return (object instanceof Double || object instanceof Integer) && checkRealInterval((double)object);
+                return (object instanceof Double || object instanceof Integer);
             default:
                 return false;
         }
     }
 
-    private static boolean checkRealInterval(Double value) {
-        return checkRealInterval(value, DEFAULT_REAL_INTERVAL_MIN_VALUE, DEFAULT_REAL_INTERVAL_MAX_VALUE);
+    public static boolean instanceOf(Object object, DataType dataType, RealConstraint constraint) {
+        if (dataType == DataType.REAL_INTERVAL) {
+            if (object instanceof Integer) {
+                object = Double.valueOf((Integer)object);
+            }
+            return object instanceof Double && constraint.isValueValid((Double) object);
+        } else {
+            return instanceOf(object, dataType);
+        }
     }
 
-    private static boolean checkRealInterval(Double value, Double minValue, Double maxValue) {
-        return minValue <= value && maxValue >= value;
+    public static Object parseObjectByType(String object, DataType dataType) throws NumberFormatException {
+        switch (dataType) {
+            case INTEGER:
+                return Integer.valueOf(object);
+            case CHAR:
+                return object.charAt(0);
+            case REAL:
+                return Double.valueOf(object);
+            case REAL_INTERVAL:
+                return Double.valueOf(object);
+            default:
+                throw new NumberFormatException("Unknown data format");
+        }
     }
 }
