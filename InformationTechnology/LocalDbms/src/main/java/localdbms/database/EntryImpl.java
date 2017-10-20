@@ -3,11 +3,21 @@ package localdbms.database;
 import localdbms.database.exception.EntryException;
 import org.json.JSONObject;
 
+import java.awt.image.BufferedImage;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.List;
 
 public class EntryImpl implements Entry {
+    @Override
+    public BufferedImage getImage() {
+        return image;
+    }
+    @Override
+    public void setPic(BufferedImage image) {
+        this.image = image;
+    }
 
+    private BufferedImage image;
     private List<DataType> types;
     private List<Object> values;
 

@@ -62,12 +62,17 @@ public class DatabaseSelectionController extends AbstractController {
         stage.show();
     }
 
-    public void deleteDatabase_onClick(MouseEvent mouseEvent) throws StorageException {
+    public void deleteDatabase_onClick(MouseEvent mouseEvent) {
         selectedIndex.set(DatabaseSelectionTable.getSelectionModel().getSelectedIndex());
         if (selectedIndex.get() >= 0) {
             ObservableList<Database> databases = DatabaseSelectionTable.getItems();
-            databases.get(selectedIndex.get()).delete();  // delete from storage
-            databases.remove(selectedIndex.get());        // delete from list
+            try {
+                databases.get(selectedIndex.get()).delete();  // delete from storage
+            } catch (StorageException e) {
+                Warning.show(e);
+                return;
+            }
+            databases.remove(selectedIndex.get());            // delete from list
         } else {
             noDatabaseSelectedMessage();
         }
@@ -90,11 +95,7 @@ public class DatabaseSelectionController extends AbstractController {
     }
 
     private void noDatabaseSelectedMessage() {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("No selection");
-        alert.setHeaderText("No database selected");
-        alert.setContentText("Please select a database in the table.");
-        alert.showAndWait();
+        Warning.show("No database selected. Please select a database in the table.");
     }
 
     public IntegerProperty getSelectedIndex() {

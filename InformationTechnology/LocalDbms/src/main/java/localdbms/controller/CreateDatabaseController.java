@@ -25,7 +25,11 @@ public class CreateDatabaseController extends AbstractController {
 
     @FXML
     public void submit(MouseEvent mouseEvent) throws StorageException {
-        databases.add(dbms.createDatabase(textField.getCharacters().toString()));
+        try {
+            databases.add(dbms.createDatabase(textField.getCharacters().toString()));
+        } catch (StorageException e) {
+            Warning.show(e);
+        }
         close(mouseEvent);
     }
 
