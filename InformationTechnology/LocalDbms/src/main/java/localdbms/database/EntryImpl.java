@@ -30,7 +30,7 @@ public class EntryImpl implements Entry {
         for (int column = 0; column < values.size(); column++) {
             if (!TypeChecker.instanceOf(values.get(column), types.get(column), constraint)) {
                 throw new EntryException("Invalid type in table cell: expected type " + types.get(column) +
-                        " in column " + column + " but value " + values.get(column) +
+                        " in column " + (column+1) + " but value " + values.get(column) +
                         " (" + values.get(column).getClass() + ") found");
             }
         }

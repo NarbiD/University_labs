@@ -98,7 +98,6 @@ public class TableImpl implements Table {
                 constraints.put(this.constraint.getMinValue());
                 constraints.put(this.constraint.getMaxValue());
             }
-            System.err.println(constraints);
             writer.write(constraints.toString());
             writer.flush();
         } catch (IOException e) {

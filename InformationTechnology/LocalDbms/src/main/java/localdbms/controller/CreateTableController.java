@@ -16,13 +16,19 @@ import javafx.util.Pair;
 import localdbms.database.*;
 import localdbms.database.exception.EntryException;
 import localdbms.database.exception.StorageException;
+import localdbms.database.exception.TableException;
+
 import java.util.List;
 
 
 public class CreateTableController extends AbstractController{
+
     private IntegerProperty dbIndex;
     private ObservableList<Database> databases;
     private ObservableList<Table> tables;
+
+    @FXML
+    public HBox Constraints;
 
     @FXML
     public VBox Fields;
@@ -45,35 +51,31 @@ public class CreateTableController extends AbstractController{
     public void submit(MouseEvent mouseEvent) {
         Database database = databases.get(dbIndex.get());
         try {
-            Table table = database.createTable(tableNameField.getCharacters().toString());
-            if (fillTableHeaderFromForm(table)) {
-                tables.add(table);
-                database.save();
-                close(mouseEvent);
-            } else {
-                database.getTables().remove(table);
-            }
-        } catch (StorageException e) {
-            Warning.show("Storage error!", e);
-        }
-    }
-
-    private boolean fillTableHeaderFromForm(Table table) {
-        try {
-            Pair<List<String>, List<DataType>> tableData = getDataFromForm();
-            table.setTypes(tableData.getValue());
-            table.setColumnNames(tableData.getKey());
-        } catch (IllegalArgumentException | EntryException e) {
+            Table table = createTableByForm(database);
+            tables.add(table);
+            database.save();
+            close(mouseEvent);
+        } catch (StorageException | IllegalArgumentException e) {
             Warning.show(e);
-            return false;
         }
-        return true;
     }
 
-    private Pair<List<String>, List<DataType>> getDataFromForm() throws EntryException, IllegalArgumentException {
+    private Table createTableByForm(Database database) throws IllegalArgumentException, StorageException {
+        String tableName = tableNameField.getCharacters().toString();
+        if (tableName.equals("")) {
+            throw new IllegalArgumentException("Required name for the table");
+        }
+        Table table = database.createTable(tableName);
+        FromData formData = getDataFromForm();
+        table.setTypes(formData.types);
+        table.setColumnNames(formData.names);
+        table.setConstraint(formData.constraint);
+        return table;
+    }
+
+    private FromData getDataFromForm() throws IllegalArgumentException {
         List<DataType> types = FXCollections.observableArrayList();
         List<String> names = FXCollections.observableArrayList();
-
         for (int i = 0; i < Fields.getChildren().size(); i++) {
             Pair<String, DataType> dataFromLine = getDataFromHBox((HBox)Fields.getChildren().get(i));
             String name = dataFromLine.getKey();
@@ -86,7 +88,20 @@ public class CreateTableController extends AbstractController{
         if (names.isEmpty()) {
             throw new IllegalArgumentException("You must create at least one column");
         }
-        return new Pair<>(names, types);
+        RealConstraint constraint = getConstraintsFromForm();
+        return new FromData(names, types, constraint);
+    }
+
+    private static class FromData {
+        List<DataType> types;
+        List<String> names;
+        RealConstraint constraint;
+
+        FromData(List<String> names, List<DataType> types, RealConstraint constraint) {
+            this.names = names;
+            this.types = types;
+            this.constraint = constraint;
+        }
     }
 
     private Pair<String, DataType> getDataFromHBox(HBox hBox) {
@@ -102,7 +117,7 @@ public class CreateTableController extends AbstractController{
         return new Pair<>(name, type);
     }
 
-    private boolean shouldBeIgnored (String name, DataType type) {
+    private boolean shouldBeIgnored (String name, DataType type) throws IllegalArgumentException {
         boolean nameIsDefined = !name.equals("");
         boolean typeIsNotNull = type != null;
         if (nameIsDefined && typeIsNotNull) {
@@ -112,6 +127,22 @@ public class CreateTableController extends AbstractController{
         } else {
             return true;
         }
+    }
+
+    private RealConstraint getConstraintsFromForm() throws IllegalArgumentException{
+        RealConstraint constraint;
+        String minValueString = ((TextField) Constraints.getChildren().get(0)).getCharacters().toString();
+        String maxValueString = ((TextField) Constraints.getChildren().get(1)).getCharacters().toString();
+        if (maxValueString.equals(minValueString) && maxValueString.equals("")) {
+            constraint = new RealConstraint();
+        } else if (maxValueString.equals("") || minValueString.equals("")){
+            throw new IllegalArgumentException("It is necessary to fill in either both constraint fields in the line, or none");
+        } else {
+            Double minValue = Double.valueOf(minValueString);
+            Double maxValue = Double.valueOf(maxValueString);
+            constraint = new RealConstraint(minValue, maxValue);
+        }
+        return constraint;
     }
 
     public void addField(MouseEvent mouseEvent) {
@@ -152,4 +183,6 @@ public class CreateTableController extends AbstractController{
     public void setDatabases(ObservableList<Database> databases) {
         this.databases = databases;
     }
+
+
 }
