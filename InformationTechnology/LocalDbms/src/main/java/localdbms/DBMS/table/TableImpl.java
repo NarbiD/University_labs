@@ -17,7 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TableImpl implements Table {
-    File pic;
     private RealConstraint constraint;
     private String location;
     private String name;
@@ -183,10 +182,6 @@ public class TableImpl implements Table {
         return this.types;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
     @Override
     public void setLocation(String location) {
         this.location = location;
@@ -210,15 +205,6 @@ public class TableImpl implements Table {
     @Override
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setEntries(List<Entry> entries) {
-        this.entries = entries;
-    }
-
-    @Override
-    public RealConstraint getConstraint() {
-        return constraint;
     }
 
     @Override

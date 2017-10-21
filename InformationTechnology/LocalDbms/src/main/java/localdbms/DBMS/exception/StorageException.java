@@ -1,9 +1,6 @@
 package localdbms.DBMS.exception;
 
 public class StorageException extends Exception {
-    public StorageException() {
-    }
-
     public StorageException(String message) {
         super(message);
     }
@@ -14,9 +11,5 @@ public class StorageException extends Exception {
 
     public StorageException(Throwable cause) {
         super(cause);
-    }
-
-    public StorageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

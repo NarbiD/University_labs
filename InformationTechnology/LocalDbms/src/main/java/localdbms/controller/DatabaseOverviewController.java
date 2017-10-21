@@ -19,7 +19,7 @@ import localdbms.DBMS.exception.StorageException;
 import localdbms.service.DatabaseService;
 
 
-public class DatabaseSelectionController extends AbstractController {
+public class DatabaseOverviewController extends AbstractController {
 
     private IntegerProperty selectedIndex;
     private DatabaseService databaseService;
@@ -51,7 +51,7 @@ public class DatabaseSelectionController extends AbstractController {
         Parent root = (Parent) controller.getView();
         stage.setTitle("Create database");
         stage.setMinHeight(80);
-        stage.setMinWidth(440);
+        stage.setMinWidth(300);
         stage.setResizable(false);
         stage.setScene(new Scene(root));
         stage.initModality(Modality.WINDOW_MODAL);
@@ -82,6 +82,8 @@ public class DatabaseSelectionController extends AbstractController {
             stage.setMinHeight(440);
             stage.setMinWidth(840);
             stage.setScene(new Scene(root, 840, 440));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node)mouseEvent.getSource()).getScene().getWindow());
             stage.show();
         } else {
             noDatabaseSelectedMessage();

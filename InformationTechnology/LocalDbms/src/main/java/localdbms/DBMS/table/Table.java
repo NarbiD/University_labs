@@ -18,7 +18,6 @@ public interface Table {
     List<String> getColumnNames();
 
     List<Entry> getEntries();
-    String getLocation();
 
     void addRows(Entry... rows);
 
@@ -39,6 +38,5 @@ public interface Table {
 
     void setColumnNames(List<String> names);
 
-    RealConstraint getConstraint();
     void setConstraint(RealConstraint realIntervalConstraint);
 }

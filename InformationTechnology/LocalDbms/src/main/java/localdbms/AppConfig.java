@@ -48,7 +48,7 @@ public class AppConfig {
     }
 
     @Bean
-    public TableService tableService(DatabaseSelectionController dsController) throws StorageException {
+    public TableService tableService(DatabaseOverviewController dsController) throws StorageException {
         TableService tableService = new TableService();
         tableService.setDatabases(FXCollections.observableArrayList());
         tableService.setDatabases(dsController.getDatabases());
@@ -58,8 +58,8 @@ public class AppConfig {
 
     @Bean
     @Autowired
-    public DatabaseSelectionController databaseSelectionController(DatabaseService dbService) throws StorageException {
-        DatabaseSelectionController controller = new DatabaseSelectionController();
+    public DatabaseOverviewController databaseSelectionController(DatabaseService dbService) throws StorageException {
+        DatabaseOverviewController controller = new DatabaseOverviewController();
         controller.setSelectedIndex(new SimpleIntegerProperty());
         controller.setDatabaseService(dbService);
         return controller;
@@ -75,12 +75,10 @@ public class AppConfig {
 
     @Bean
     @Autowired
-    public TableOverviewController tableOverviewController(DatabaseSelectionController dsController, TableService tableService) throws StorageException {
+    public TableOverviewController tableOverviewController(TableService tableService) throws StorageException {
         TableOverviewController controller = new TableOverviewController();
         ObservableList<Table> tables = FXCollections.observableArrayList();
         controller.setTables(tables);
-        controller.setDatabases(dsController.getDatabases());
-        controller.setDbIndex(dsController.getSelectedIndex());
         controller.setTableSelectedIndex(new SimpleIntegerProperty());
         controller.setTableService(tableService);
         return controller;
@@ -88,18 +86,16 @@ public class AppConfig {
 
     @Bean
     @Autowired
-    public CreateTableController createTableController(TableOverviewController toController, TableService tableService) throws StorageException {
+    public CreateTableController createTableController(TableService tableService) throws StorageException {
         CreateTableController controller = new CreateTableController();
-        controller.setTables(toController.getTables());
-        controller.setDatabases(toController.getDatabases());
-        controller.setDbIndex(toController.getDbIndex());
         controller.setTableService(tableService);
         return controller;
     }
 
     @Bean
     @Autowired
-    public CreateRowInTableController createRowInTableController(TableOverviewController toController, TableService tableService) throws StorageException {
+    public CreateRowInTableController createRowInTableController(
+            TableOverviewController toController, TableService tableService) throws StorageException {
         CreateRowInTableController controller = new CreateRowInTableController();
         controller.setTableIndex(toController.getTableSelectedIndex());
         controller.setTableService(tableService);

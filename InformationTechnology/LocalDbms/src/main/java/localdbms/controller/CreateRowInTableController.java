@@ -1,7 +1,6 @@
 package localdbms.controller;
 
 import javafx.beans.property.IntegerProperty;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -12,7 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import localdbms.DataType;
-import localdbms.DBMS.database.Database;
 import localdbms.DBMS.table.Table;
 import localdbms.DBMS.datatype.TypeManager;
 import localdbms.DBMS.exception.StorageException;

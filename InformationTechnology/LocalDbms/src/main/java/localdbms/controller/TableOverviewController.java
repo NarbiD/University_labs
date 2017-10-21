@@ -19,7 +19,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import localdbms.SpringFxmlLoader;
-import localdbms.DBMS.database.Database;
 import localdbms.DBMS.entry.Entry;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.table.Table;
@@ -34,8 +33,6 @@ public class TableOverviewController extends AbstractController {
     private ObservableList<Table> tables;
 
     private IntegerProperty tableSelectedIndex;
-    private ObservableList<Database> databases;
-    private IntegerProperty dbIndex;
 
     public void setTableService(TableService tableService) {
         this.tableService = tableService;
@@ -147,8 +144,8 @@ public class TableOverviewController extends AbstractController {
             Parent root = (Parent) controller.getView();
             stage.setTitle("Create row in table");
             int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
-            stage.setHeight(170.0 + columnsAmount*30.0);
-            stage.setMinWidth(400);
+            stage.setHeight(160.0 + columnsAmount*30.0);
+            stage.setMinWidth(370);
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
@@ -157,26 +154,6 @@ public class TableOverviewController extends AbstractController {
         } else {
             noTableSelectedMessage();
         }
-    }
-
-    public ObservableList<Table> getTables() {
-        return tables;
-    }
-
-    public IntegerProperty getDbIndex() {
-        return dbIndex;
-    }
-
-    public ObservableList<Database> getDatabases() {
-        return databases;
-    }
-
-    public void setDatabases(ObservableList<Database> databases) {
-        this.databases = databases;
-    }
-
-    public void setDbIndex(IntegerProperty dbIndex) {
-        this.dbIndex = dbIndex;
     }
 
     public void setTables(ObservableList<Table> tables) {

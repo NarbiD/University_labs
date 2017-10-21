@@ -69,35 +69,6 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public String getLocation() {
-        return this.location;
-    }
-
-    @Override
-    public String toString() {
-        return "Database " + this.name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DatabaseImpl)) return false;
-
-        DatabaseImpl database = (DatabaseImpl) o;
-
-        boolean isNamesEquals = name != null ? name.equals(database.name) : database.name == null;
-        boolean isLocationsEquals = location != null ? location.equals(database.location) : database.location == null;
-        return isNamesEquals && isLocationsEquals;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (location != null ? location.hashCode() : 0);
-        return result;
-    }
-
-    @Override
     public Table createTable(String name, DataType... columnTypes) throws EntryException, TableException {
         Table table = tableFactory.getTable();
         table.setName(name);
@@ -151,4 +122,29 @@ public class DatabaseImpl implements Database {
             throw new DatabaseException("Database does not exist on storage");
         }
     }
+
+    @Override
+    public String toString() {
+        return "Database " + this.name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DatabaseImpl)) return false;
+
+        DatabaseImpl database = (DatabaseImpl) o;
+
+        boolean isNamesEquals = name != null ? name.equals(database.name) : database.name == null;
+        boolean isLocationsEquals = location != null ? location.equals(database.location) : database.location == null;
+        return isNamesEquals && isLocationsEquals;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (location != null ? location.hashCode() : 0);
+        return result;
+    }
+
 }

@@ -1,8 +1,6 @@
 package localdbms.controller;
 
-import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -13,21 +11,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import javafx.util.Pair;
-import localdbms.DBMS.database.Database;
 import localdbms.DBMS.datatype.constraint.RealConstraint;
 import localdbms.DataType;
 import localdbms.DBMS.exception.StorageException;
-import localdbms.DBMS.table.Table;
 import localdbms.service.TableService;
 
 import java.util.List;
 
 
 public class CreateTableController extends AbstractController{
-
-    private IntegerProperty dbIndex;
-    private ObservableList<Database> databases;
-    private ObservableList<Table> tables;
 
     public void setTableService(TableService tableService) {
         this.tableService = tableService;
@@ -168,18 +160,4 @@ public class CreateTableController extends AbstractController{
     public void close(MouseEvent mouseEvent) {
         hide(mouseEvent);
     }
-
-    public void setDbIndex(IntegerProperty dbIndex) {
-        this.dbIndex = dbIndex;
-    }
-
-    public void setTables(ObservableList<Table> tables) {
-        this.tables = tables;
-    }
-
-    public void setDatabases(ObservableList<Database> databases) {
-        this.databases = databases;
-    }
-
-
 }

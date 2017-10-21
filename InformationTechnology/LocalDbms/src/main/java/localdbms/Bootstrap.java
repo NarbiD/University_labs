@@ -15,7 +15,7 @@ public class Bootstrap extends Application {
 
     @Override
     public void start(Stage stage) {
-        Controller controller = SpringFxmlLoader.load("/view/databaseSelection.fxml");
+        Controller controller = SpringFxmlLoader.load("/view/databaseOverview.fxml");
         Parent root = (Parent) controller.getView();
         stage.setTitle("Local DBMS");
         stage.setMinHeight(300);

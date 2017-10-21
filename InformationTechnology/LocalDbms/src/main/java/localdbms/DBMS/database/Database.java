@@ -22,7 +22,6 @@ public interface Database {
 
     String getName();
     void setName(String name) throws StorageException;
-    String getLocation();
 
     void loadTablesFromStorage() throws StorageException;
 }
