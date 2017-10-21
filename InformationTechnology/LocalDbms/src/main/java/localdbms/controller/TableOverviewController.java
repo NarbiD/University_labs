@@ -19,9 +19,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import localdbms.SpringFxmlLoader;
-import localdbms.database.*;
-import localdbms.database.exception.StorageException;
-import localdbms.database.exception.TableException;
+import localdbms.DBMS.database.Database;
+import localdbms.DBMS.entry.Entry;
+import localdbms.DBMS.exception.StorageException;
+import localdbms.DBMS.table.Table;
+import localdbms.service.TableService;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -29,9 +32,16 @@ import java.util.List;
 public class TableOverviewController extends AbstractController {
 
     private ObservableList<Table> tables;
+
+    private IntegerProperty tableSelectedIndex;
     private ObservableList<Database> databases;
     private IntegerProperty dbIndex;
-    private IntegerProperty tableSelectedIndex;
+
+    public void setTableService(TableService tableService) {
+        this.tableService = tableService;
+    }
+
+    private TableService tableService;
 
     @FXML
     private ImageView imageView;
@@ -60,8 +70,7 @@ public class TableOverviewController extends AbstractController {
     @FXML
     public void initialize() throws StorageException {
         TablesCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
-        tables.clear();
-        tables.addAll(databases.get(dbIndex.getValue()).getTables());
+        tables = tableService.getTables();
         TableSelection.setItems(tables);
     }
 
@@ -82,14 +91,11 @@ public class TableOverviewController extends AbstractController {
     public void deleteTable_onClick()  {
         tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
-            ObservableList<Table> tables = TableSelection.getItems();
-            Table table = tables.get(tableSelectedIndex.get());
             try {
-                Tables.delete(table.getName(), table.getLocation());  // delete from storage
-            } catch (TableException e) {
+                tableService.deleteTable(tableSelectedIndex.get());
+            } catch (StorageException e) {
                 Warning.show(e);
             }
-            tables.remove(table);  // delete from list
         } else {
             noTableSelectedMessage();
         }
@@ -102,28 +108,7 @@ public class TableOverviewController extends AbstractController {
     public void select_onClick() {
         tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
-            Table table = TableSelection.getItems().get(tableSelectedIndex.get());
-            showEntries(table);
-        } else {
-            noTableSelectedMessage();
-        }
-    }
-
-    public void addRow_onClick(MouseEvent mouseEvent) {
-        tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
-        if (tableSelectedIndex.get() >= 0) {
-            Stage stage = new Stage();
-            Controller controller = SpringFxmlLoader.load("/view/createRowInTable.fxml");
-            Parent root = (Parent) controller.getView();
-            stage.setTitle("Create row in table");
-            int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
-            stage.setHeight(170.0 + columnsAmount*30.0);
-            stage.setMinWidth(400);
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node)mouseEvent.getSource()).getScene().getWindow());
-            stage.show();
+            showEntries(tableService.getTable(tableSelectedIndex.get()));
         } else {
             noTableSelectedMessage();
         }
@@ -151,6 +136,26 @@ public class TableOverviewController extends AbstractController {
             final int finalColumnNum = columnNum;
             EntryOverview.getColumns().get(finalColumnNum).setCellValueFactory(cell ->
                     new SimpleObjectProperty(((List<Object>)cell.getValue()).get(finalColumnNum)));
+        }
+    }
+
+    public void addRow_onClick(MouseEvent mouseEvent) {
+        tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
+        if (tableSelectedIndex.get() >= 0) {
+            Stage stage = new Stage();
+            Controller controller = SpringFxmlLoader.load("/view/createRowInTable.fxml");
+            Parent root = (Parent) controller.getView();
+            stage.setTitle("Create row in table");
+            int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
+            stage.setHeight(170.0 + columnsAmount*30.0);
+            stage.setMinWidth(400);
+            stage.setResizable(false);
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node)mouseEvent.getSource()).getScene().getWindow());
+            stage.show();
+        } else {
+            noTableSelectedMessage();
         }
     }
 

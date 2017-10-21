@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -15,16 +14,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import localdbms.SpringFxmlLoader;
-import localdbms.database.Database;
-import localdbms.database.Dbms;
-import localdbms.database.exception.StorageException;
+import localdbms.DBMS.database.Database;
+import localdbms.DBMS.exception.StorageException;
+import localdbms.service.DatabaseService;
 
 
 public class DatabaseSelectionController extends AbstractController {
 
-    private Dbms dbms;
-    private ObservableList<Database> databases;
     private IntegerProperty selectedIndex;
+    private DatabaseService databaseService;
 
     @FXML
     public Button btnCreateDatabase;
@@ -36,16 +34,15 @@ public class DatabaseSelectionController extends AbstractController {
     public Button btnSelect;
 
     @FXML
-    public TableColumn<Database, String> Databases;
+    public TableColumn<Database, String> databases;
 
     @FXML
-    public TableView<Database> DatabaseSelectionTable;
+    public TableView<Database> databaseView;
 
     @FXML
     public void initialize() throws StorageException {
-        Databases.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
-        databases.addAll(dbms.getAllDatabases());
-        DatabaseSelectionTable.setItems(databases);
+        databases.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        databaseView.setItems(databaseService.getDatabases());
     }
 
     public void createDatabase_onClick(MouseEvent mouseEvent) {
@@ -63,23 +60,20 @@ public class DatabaseSelectionController extends AbstractController {
     }
 
     public void deleteDatabase_onClick(MouseEvent mouseEvent) {
-        selectedIndex.set(DatabaseSelectionTable.getSelectionModel().getSelectedIndex());
+        selectedIndex.set(databaseView.getSelectionModel().getSelectedIndex());
         if (selectedIndex.get() >= 0) {
-            ObservableList<Database> databases = DatabaseSelectionTable.getItems();
             try {
-                databases.get(selectedIndex.get()).delete();  // delete from storage
+                databaseService.deleteDatabase(selectedIndex.get());
             } catch (StorageException e) {
                 Warning.show(e);
-                return;
             }
-            databases.remove(selectedIndex.get());            // delete from list
         } else {
             noDatabaseSelectedMessage();
         }
     }
 
     public void selectDatabase_onClick(MouseEvent mouseEvent) {
-        this.selectedIndex.set(DatabaseSelectionTable.getSelectionModel().getSelectedIndex());
+        this.selectedIndex.set(databaseView.getSelectionModel().getSelectedIndex());
         if (this.selectedIndex.get() >= 0) {
             Controller controller = SpringFxmlLoader.load("/view/tableOverview.fxml");
             Parent root = (Parent) controller.getView();
@@ -103,7 +97,7 @@ public class DatabaseSelectionController extends AbstractController {
     }
 
     public ObservableList<Database> getDatabases() {
-        return this.databases;
+        return databaseService.getDatabases();
     }
 
     public void setSelectedIndex(IntegerProperty index) {
@@ -111,11 +105,10 @@ public class DatabaseSelectionController extends AbstractController {
     }
 
     public void setDatabases(ObservableList<Database> databases) {
-        this.databases = databases;
+        databaseService.setDatabases(databases);
     }
 
-    public void setDbms(Dbms dbms) {
-        this.dbms = dbms;
+    public void setDatabaseService(DatabaseService databaseService) {
+        this.databaseService = databaseService;
     }
-
 }

@@ -2,11 +2,21 @@ package localdbms;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import localdbms.DBMS.Dbms;
+import localdbms.DBMS.DbmsImpl;
 import localdbms.controller.*;
-import localdbms.database.*;
-import localdbms.database.exception.EntryException;
-import localdbms.database.exception.StorageException;
-import localdbms.database.exception.TableException;
+import localdbms.DBMS.database.Database;
+import localdbms.DBMS.database.DatabaseFactory;
+import localdbms.DBMS.database.DatabaseImpl;
+import localdbms.DBMS.exception.EntryException;
+import localdbms.DBMS.exception.StorageException;
+import localdbms.DBMS.exception.TableException;
+import localdbms.DBMS.table.Table;
+import localdbms.DBMS.table.TableFactory;
+import localdbms.DBMS.table.TableImpl;
+import localdbms.service.DatabaseService;
+import localdbms.service.TableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,57 +32,77 @@ public class AppConfig {
 
     @Bean
     public Dbms dbms() throws StorageException {
-        return new DbmsImpl();
+        Dbms dbms = new DbmsImpl();
+        dbms.setDatabases(FXCollections.observableArrayList());
+        dbms.loadDatabaseFromStorage();
+        return dbms;
     }
 
     @Bean
     @Autowired
-    public DatabaseSelectionController databaseSelectionController(Dbms dbms) throws StorageException {
+    public DatabaseService databaseService(Dbms dbms) throws StorageException {
+        DatabaseService databaseService = new DatabaseService();
+        databaseService.setDatabases(FXCollections.observableArrayList());
+        databaseService.setDbms(dbms);
+        return databaseService;
+    }
+
+    @Bean
+    public TableService tableService(DatabaseSelectionController dsController) throws StorageException {
+        TableService tableService = new TableService();
+        tableService.setDatabases(FXCollections.observableArrayList());
+        tableService.setDatabases(dsController.getDatabases());
+        tableService.setDbIndex(dsController.getSelectedIndex());
+        return tableService;
+    }
+
+    @Bean
+    @Autowired
+    public DatabaseSelectionController databaseSelectionController(DatabaseService dbService) throws StorageException {
         DatabaseSelectionController controller = new DatabaseSelectionController();
         controller.setSelectedIndex(new SimpleIntegerProperty());
-        controller.setDatabases(FXCollections.observableArrayList());
-        controller.setDbms(dbms);
+        controller.setDatabaseService(dbService);
         return controller;
     }
 
     @Bean
     @Autowired
-    public CreateDatabaseController createDatabaseController(Dbms dbms, DatabaseSelectionController dsController) throws StorageException {
+    public CreateDatabaseController createDatabaseController(DatabaseService databaseService) throws StorageException {
         CreateDatabaseController controller = new CreateDatabaseController();
-        controller.setDbms(dbms);
-        controller.setDatabases(dsController.getDatabases());
+        controller.setDatabaseService(databaseService);
         return controller;
     }
 
     @Bean
     @Autowired
-    public TableOverviewController tableOverviewController(DatabaseSelectionController dsController) throws StorageException {
+    public TableOverviewController tableOverviewController(DatabaseSelectionController dsController, TableService tableService) throws StorageException {
         TableOverviewController controller = new TableOverviewController();
-        controller.setTables(FXCollections.observableArrayList());
+        ObservableList<Table> tables = FXCollections.observableArrayList();
+        controller.setTables(tables);
         controller.setDatabases(dsController.getDatabases());
         controller.setDbIndex(dsController.getSelectedIndex());
         controller.setTableSelectedIndex(new SimpleIntegerProperty());
+        controller.setTableService(tableService);
         return controller;
     }
 
     @Bean
     @Autowired
-    public CreateTableController createTableController(TableOverviewController toController) throws StorageException {
+    public CreateTableController createTableController(TableOverviewController toController, TableService tableService) throws StorageException {
         CreateTableController controller = new CreateTableController();
         controller.setTables(toController.getTables());
         controller.setDatabases(toController.getDatabases());
         controller.setDbIndex(toController.getDbIndex());
+        controller.setTableService(tableService);
         return controller;
     }
 
     @Bean
     @Autowired
-    public CreateRowInTableController createRowInTableController(TableOverviewController toController) throws StorageException {
+    public CreateRowInTableController createRowInTableController(TableOverviewController toController, TableService tableService) throws StorageException {
         CreateRowInTableController controller = new CreateRowInTableController();
-        controller.setTables(toController.getTables());
         controller.setTableIndex(toController.getTableSelectedIndex());
-        controller.setDatabases(toController.getDatabases());
-        controller.setDbIndex(toController.getDbIndex());
+        controller.setTableService(tableService);
         return controller;
     }
 

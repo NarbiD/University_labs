@@ -13,10 +13,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import javafx.util.Pair;
-import localdbms.database.*;
-import localdbms.database.exception.EntryException;
-import localdbms.database.exception.StorageException;
-import localdbms.database.exception.TableException;
+import localdbms.DBMS.database.Database;
+import localdbms.DBMS.datatype.constraint.RealConstraint;
+import localdbms.DataType;
+import localdbms.DBMS.exception.StorageException;
+import localdbms.DBMS.table.Table;
+import localdbms.service.TableService;
 
 import java.util.List;
 
@@ -26,6 +28,12 @@ public class CreateTableController extends AbstractController{
     private IntegerProperty dbIndex;
     private ObservableList<Database> databases;
     private ObservableList<Table> tables;
+
+    public void setTableService(TableService tableService) {
+        this.tableService = tableService;
+    }
+
+    private TableService tableService;
 
     @FXML
     public HBox Constraints;
@@ -49,31 +57,21 @@ public class CreateTableController extends AbstractController{
     public Button btnOk;
 
     public void submit(MouseEvent mouseEvent) {
-        Database database = databases.get(dbIndex.get());
         try {
-            Table table = createTableByForm(database);
-            tables.add(table);
-            database.save();
+            createTableByForm();
             close(mouseEvent);
         } catch (StorageException | IllegalArgumentException e) {
             Warning.show(e);
         }
     }
 
-    private Table createTableByForm(Database database) throws IllegalArgumentException, StorageException {
-        String tableName = tableNameField.getCharacters().toString();
-        if (tableName.equals("")) {
-            throw new IllegalArgumentException("Required name for the table");
-        }
-        Table table = database.createTable(tableName);
+    private void createTableByForm() throws IllegalArgumentException, StorageException {
         FromData formData = getDataFromForm();
-        table.setTypes(formData.types);
-        table.setColumnNames(formData.names);
-        table.setConstraint(formData.constraint);
-        return table;
+        tableService.createTable(formData.tableName, formData.types, formData.names, formData.constraint);
     }
 
     private FromData getDataFromForm() throws IllegalArgumentException {
+        String tableName = tableNameField.getCharacters().toString();
         List<DataType> types = FXCollections.observableArrayList();
         List<String> names = FXCollections.observableArrayList();
         for (int i = 0; i < Fields.getChildren().size(); i++) {
@@ -85,19 +83,18 @@ public class CreateTableController extends AbstractController{
                 types.add(type);
             }
         }
-        if (names.isEmpty()) {
-            throw new IllegalArgumentException("You must create at least one column");
-        }
         RealConstraint constraint = getConstraintsFromForm();
-        return new FromData(names, types, constraint);
+        return new FromData(tableName, names, types, constraint);
     }
 
     private static class FromData {
+        String tableName;
         List<DataType> types;
         List<String> names;
         RealConstraint constraint;
 
-        FromData(List<String> names, List<DataType> types, RealConstraint constraint) {
+        FromData(String tableName, List<String> names, List<DataType> types, RealConstraint constraint) {
+            this.tableName = tableName;
             this.names = names;
             this.types = types;
             this.constraint = constraint;

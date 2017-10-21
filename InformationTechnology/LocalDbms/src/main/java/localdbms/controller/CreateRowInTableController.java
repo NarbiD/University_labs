@@ -11,11 +11,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import localdbms.database.DataType;
-import localdbms.database.Database;
-import localdbms.database.Table;
-import localdbms.database.TypeChecker;
-import localdbms.database.exception.StorageException;
+import localdbms.DataType;
+import localdbms.DBMS.database.Database;
+import localdbms.DBMS.table.Table;
+import localdbms.DBMS.datatype.TypeManager;
+import localdbms.DBMS.exception.StorageException;
+import localdbms.service.TableService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,20 +39,17 @@ public class CreateRowInTableController extends AbstractController{
     @FXML
     public Button btnLoadPic;
 
-    private ObservableList<Table> tables;
-    private IntegerProperty tableIndex;
-    private ObservableList<Database> databases;
-    private File image;
-
-    public void setDbIndex(IntegerProperty dbIndex) {
-        this.dbIndex = dbIndex;
+    public void setTableService(TableService tableService) {
+        this.tableService = tableService;
     }
 
-    private IntegerProperty dbIndex;
+    private TableService tableService;
+    private IntegerProperty tableIndex;
+    private File image;
 
     @FXML
     public void initialize() {
-        Table table = tables.get(tableIndex.get());
+        Table table = tableService.getTable(tableIndex.get());
         for (int i = 0; i < table.getColumnNames().size(); i++) {
             addField(table.getColumnNames().get(i), table.getTypes().get(i));
         }
@@ -73,11 +71,10 @@ public class CreateRowInTableController extends AbstractController{
     }
 
     public void submit(MouseEvent mouseEvent)  {
-        Table table = tables.get(tableIndex.get());
-        List<String> dataFromFields = getDataFromForm();
+        List<String> textDataFromFields = getDataFromForm();
         try {
-            List<Object> values = getObjectsByText(dataFromFields);
-            put(table, values);
+            List<Object> values = getObjectsByText(textDataFromFields);
+            tableService.addRow(tableIndex.get(), values, image);
             close(mouseEvent);
         } catch (NumberFormatException | StorageException e) {
             Warning.show(e);
@@ -97,12 +94,12 @@ public class CreateRowInTableController extends AbstractController{
 
     private List<Object> getObjectsByText(List<String> data) throws NumberFormatException {
         List<Object> parsedObjects = new ArrayList<>();
-        List<DataType> types = tables.get(tableIndex.get()).getTypes();
+        List<DataType> types = tableService.getTable(tableIndex.get()).getTypes();
         for (int column = 0; column < data.size(); column++) {
             DataType cellType = types.get(column);
             String cellData = data.get(column);
             try {
-                parsedObjects.add(TypeChecker.parseObjectByType(cellData, cellType));
+                parsedObjects.add(TypeManager.parseObjectByType(cellData, cellType));
             } catch (NumberFormatException e) {
                 throw new NumberFormatException("Expected " + cellType + " value in " +
                         column + " column but " + cellData + " found");
@@ -111,31 +108,12 @@ public class CreateRowInTableController extends AbstractController{
         return parsedObjects;
     }
 
-    private void put(Table table, List<Object> values) throws StorageException{
-        if (image != null) {
-            table.addRow(values, image);
-        } else {
-            table.addRow(values);
-        }
-        databases.get(dbIndex.get()).getTables().clear();
-        databases.get(dbIndex.get()).getTables().addAll(tables);
-        databases.get(dbIndex.get()).save();
-    }
-
     public void close(MouseEvent mouseEvent) {
         hide(mouseEvent);
     }
 
-    public void setTables(ObservableList<Table> tables) {
-        this.tables = tables;
-    }
-
     public void setTableIndex(IntegerProperty tableIndex) {
         this.tableIndex = tableIndex;
-    }
-
-    public void setDatabases(ObservableList<Database> databases) {
-        this.databases = databases;
     }
 
     public void loadPic(MouseEvent mouseEvent) {

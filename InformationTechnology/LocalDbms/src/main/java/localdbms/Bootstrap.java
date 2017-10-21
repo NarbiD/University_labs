@@ -1,14 +1,11 @@
 package localdbms;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import localdbms.controller.Controller;
-import localdbms.controller.DatabaseSelectionController;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 
 public class Bootstrap extends Application {
 
