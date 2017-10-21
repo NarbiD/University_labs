@@ -70,8 +70,8 @@ public class TableOverviewController extends AbstractController {
         Controller controller = SpringFxmlLoader.load("/view/createTable.fxml");
         Parent root = (Parent) controller.getView();
         stage.setTitle("Create table");
-        stage.setMinWidth(440);
-        stage.setHeight(340);
+        stage.setMinWidth(360);
+        stage.setMinHeight(310);
         stage.setResizable(false);
         stage.setScene(new Scene(root));
         stage.initModality(Modality.WINDOW_MODAL);
@@ -118,7 +118,7 @@ public class TableOverviewController extends AbstractController {
             stage.setTitle("Create row in table");
             int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
             stage.setHeight(170.0 + columnsAmount*30.0);
-            stage.setMinWidth(440);
+            stage.setMinWidth(400);
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
