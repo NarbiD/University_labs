@@ -27,6 +27,7 @@ import localdbms.service.TableService;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class TableOverviewController extends AbstractController {
 
@@ -171,8 +172,10 @@ public class TableOverviewController extends AbstractController {
     public void loadImage(MouseEvent mouseEvent) throws IOException {
         Table t = TableSelection.getItems().get(TableSelection.getSelectionModel().getSelectedIndex());
         Entry entry = t.getEntries().get(EntryOverview.getSelectionModel().getSelectedIndex());
-        BufferedImage bufferedImage = entry.getImage();
-        Image image = SwingFXUtils.toFXImage(bufferedImage, null);
-        this.imageView.setImage(image);
+        Optional<BufferedImage> bufferedImage = Optional.ofNullable(entry.getImage());
+        if (bufferedImage.isPresent()) {
+            Image image = SwingFXUtils.toFXImage(bufferedImage.get(), null);
+            this.imageView.setImage(image);
+        }
     }
 }

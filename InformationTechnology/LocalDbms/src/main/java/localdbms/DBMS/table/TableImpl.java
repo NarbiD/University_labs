@@ -9,6 +9,7 @@ import localdbms.DBMS.exception.EntryException;
 import localdbms.DBMS.exception.TableException;
 import org.json.*;
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -64,14 +65,7 @@ public class TableImpl implements Table {
             this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
             for (int i = 0; i < entries.size(); i++) {
                 byte[] bytes = JSONtoByteArray((JSONArray)ByteArrayJson.get(i));
-                entries.get(i).setImage(ImageIO.read(new ByteArrayInputStream(bytes)));
-                System.out.println(Arrays.toString(bytes));
-//                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(b);
-//                try {
-//                    entries.get(i).setImage(ImageIO.read(byteArrayInputStream));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                this.entries.get(i).setImage(ImageIO.read(new ByteArrayInputStream(bytes)));
             }
         } else {
             throw new TableException("Expected types " + readData + " but " + this.types + " found");
@@ -119,7 +113,9 @@ public class TableImpl implements Table {
             entries.forEach(entry -> {
                 try {
                     ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-                    ImageIO.write(entry.getImage(), "png", byteArray);
+                    BufferedImage image = entry.getImage();
+                    if (image != null)
+                        ImageIO.write(image,"png", byteArray);
                     byteArraysWithImages.add(byteArray.toByteArray());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -157,16 +153,12 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRow(List<Object> values, File pic) throws TableException, EntryException {
+    public void addRow(List<Object> values, Optional<BufferedImage> image) throws TableException, EntryException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
         }
         Entry entry = new EntryImpl(values, types, constraint);
-        try {
-            entry.setImage(ImageIO.read(pic));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        image.ifPresent(entry::setImage);
         entries.add(entry);
     }
 

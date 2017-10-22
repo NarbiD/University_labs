@@ -11,8 +11,10 @@ import localdbms.DBMS.datatype.constraint.RealConstraint;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.table.Table;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 
 public class TableService {
@@ -54,9 +56,9 @@ public class TableService {
         db.save();
     }
 
-    public void addRow(int tableIndex, List<Object> values, File image) throws StorageException {
+    public void addRow(int tableIndex, List<Object> values, Optional<BufferedImage> image) throws StorageException {
         Table table = getTable(tableIndex);
-        if (image != null) {
+        if (image.isPresent()) {
             table.addRow(values, image);
         } else {
             table.addRow(values);

@@ -7,9 +7,11 @@ import localdbms.DBMS.exception.EntryException;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.exception.TableException;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public interface Table {
 
@@ -22,7 +24,7 @@ public interface Table {
 
     void addRows(Entry... rows);
 
-    void addRow(List<Object> values, File pic) throws TableException, EntryException;
+    void addRow(List<Object> values, Optional<BufferedImage> image) throws TableException, EntryException;
 
     void addRow(List<Object> values) throws StorageException;
     void sort(int fieldNumber);
