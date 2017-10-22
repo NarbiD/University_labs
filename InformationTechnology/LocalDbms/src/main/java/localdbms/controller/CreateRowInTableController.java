@@ -16,9 +16,13 @@ import localdbms.DBMS.datatype.TypeManager;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.service.TableService;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CreateRowInTableController extends AbstractController{
 
@@ -41,9 +45,10 @@ public class CreateRowInTableController extends AbstractController{
         this.tableService = tableService;
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private Optional<BufferedImage> image;
     private TableService tableService;
     private IntegerProperty tableIndex;
-    private File image;
 
     @FXML
     public void initialize() {
@@ -73,6 +78,7 @@ public class CreateRowInTableController extends AbstractController{
         try {
             List<Object> values = getObjectsByText(textDataFromFields);
             tableService.addRow(tableIndex.get(), values, image);
+            image = Optional.empty();
             close(mouseEvent);
         } catch (NumberFormatException | StorageException e) {
             Warning.show(e);
@@ -114,10 +120,11 @@ public class CreateRowInTableController extends AbstractController{
         this.tableIndex = tableIndex;
     }
 
-    public void loadPic(MouseEvent mouseEvent) {
+    public void loadPic(MouseEvent mouseEvent) throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open image...");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image File", "*.png"));
-        image = fileChooser.showOpenDialog(((Node) mouseEvent.getSource()).getScene().getWindow());
+        File imagePath = fileChooser.showOpenDialog(((Node) mouseEvent.getSource()).getScene().getWindow());
+        image = Optional.ofNullable(ImageIO.read(imagePath));
     }
 }

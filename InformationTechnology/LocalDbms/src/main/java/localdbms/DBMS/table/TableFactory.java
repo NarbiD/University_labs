@@ -1,9 +1,8 @@
 package localdbms.DBMS.table;
 
-import localdbms.DBMS.exception.EntryException;
-import localdbms.DBMS.exception.TableException;
+import localdbms.DBMS.exception.StorageException;
 
 @FunctionalInterface
 public interface TableFactory {
-    Table getTable() throws EntryException, TableException;
+    Table getTable() throws StorageException;
 }

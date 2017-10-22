@@ -35,10 +35,6 @@ public class TableOverviewController extends AbstractController {
 
     private IntegerProperty tableSelectedIndex;
 
-    public void setTableService(TableService tableService) {
-        this.tableService = tableService;
-    }
-
     private TableService tableService;
 
     @FXML
@@ -68,6 +64,7 @@ public class TableOverviewController extends AbstractController {
     @FXML
     public void initialize() throws StorageException {
         TablesCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        tableService.initTables();
         tables = tableService.getTables();
         TableSelection.setItems(tables);
     }
@@ -167,6 +164,10 @@ public class TableOverviewController extends AbstractController {
 
     public void setTableSelectedIndex(IntegerProperty index) {
         this.tableSelectedIndex = index;
+    }
+
+    public void setTableService(TableService tableService) {
+        this.tableService = tableService;
     }
 
     public void loadImage(MouseEvent mouseEvent) throws IOException {

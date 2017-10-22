@@ -4,6 +4,7 @@ import localdbms.DBMS.entry.Entry;
 import localdbms.DBMS.entry.EntryFactory;
 import localdbms.DBMS.entry.EntryImpl;
 import localdbms.DBMS.datatype.constraint.RealConstraint;
+import localdbms.DBMS.exception.StorageException;
 import localdbms.DataType;
 import localdbms.DBMS.exception.EntryException;
 import localdbms.DBMS.exception.TableException;
@@ -20,20 +21,20 @@ public class TableImpl implements Table {
     private String name;
     private List<DataType> types;
     private List<Entry> entries;
-    private EntryFactory entryFactory = EntryImpl::new;
-
+    private EntryFactory entryFactory;
     private List<String> columnNames;
 
-    public TableImpl() throws EntryException, TableException {
+    public TableImpl() throws StorageException {
         this("", "");
     }
 
-    public TableImpl(String name, String location, DataType... columnTypes) throws EntryException, TableException {
+    public TableImpl(String name, String location, DataType... columnTypes) throws StorageException {
         this.location = location;
         this.name = name;
         this.types = Arrays.asList(columnTypes);
         this.columnNames = new ArrayList<>();
         this.constraint = new RealConstraint();
+        this.entryFactory = EntryImpl::new;
         try {
             loadDataFromFile();
         } catch (IOException e) {
@@ -42,7 +43,7 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void loadDataFromFile() throws EntryException, TableException, IOException {
+    public void loadDataFromFile() throws StorageException, IOException {
         String rowInFile = new JSONArray().toString();
         String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile;
         if (Tables.isTableExists(this.name, this.location)) {
@@ -104,7 +105,7 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void writeToFile() throws EntryException, TableException {
+    public void writeToFile() throws StorageException {
         if (this.name.equals("") || this.location.equals("") ) {
             throw new TableException("Expected defined name, location and types");
         }
@@ -153,21 +154,12 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRow(List<Object> values, Optional<BufferedImage> image) throws TableException, EntryException {
+    public void addRow(List<Object> values, Optional<BufferedImage> image) throws StorageException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
         }
         Entry entry = new EntryImpl(values, types, constraint);
         image.ifPresent(entry::setImage);
-        entries.add(entry);
-    }
-
-    @Override
-    public void addRow(List<Object> values) throws TableException, EntryException {
-        if (values.size() != types.size()) {
-            throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
-        }
-        Entry entry = new EntryImpl(values, types, constraint);
         entries.add(entry);
     }
 
@@ -258,5 +250,9 @@ public class TableImpl implements Table {
         result = 31 * result + (types != null ? types.hashCode() : 0);
         result = 31 * result + (entries != null ? entries.hashCode() : 0);
         return result;
+    }
+
+    public void setEntryFactory(EntryFactory entryFactory) {
+        this.entryFactory = entryFactory;
     }
 }

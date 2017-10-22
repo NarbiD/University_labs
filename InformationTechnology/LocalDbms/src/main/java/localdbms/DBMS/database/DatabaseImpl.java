@@ -1,13 +1,12 @@
 package localdbms.DBMS.database;
 
+import localdbms.DBMS.table.TableImpl;
 import localdbms.DataType;
 import localdbms.DBMS.exception.DatabaseException;
-import localdbms.DBMS.exception.EntryException;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.exception.TableException;
 import localdbms.DBMS.table.Table;
 import localdbms.DBMS.table.TableFactory;
-import localdbms.DBMS.table.TableImpl;
 import localdbms.DBMS.table.Tables;
 
 import java.io.*;
@@ -17,10 +16,9 @@ import java.util.List;
 public class DatabaseImpl implements Database {
 
     private String name;
-
     private List<Table> tables;
     private String location;
-    private TableFactory tableFactory = TableImpl::new;
+    private TableFactory tableFactory;
 
     public DatabaseImpl() throws StorageException {
         this("");
@@ -34,8 +32,10 @@ public class DatabaseImpl implements Database {
         this.name = name;
         this.location = location;
         this.tables = new ArrayList<>();
+        this.tableFactory = TableImpl::new;
     }
 
+    @Override
     public void loadTablesFromStorage() throws StorageException {
         File[] files = new File(this.location + this.name).listFiles();
         for (File entry : files != null ? files : new File[0]) {
@@ -73,7 +73,7 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public Table createTable(String name, DataType... columnTypes) throws EntryException, TableException {
+    public Table createTable(String name, DataType... columnTypes) throws StorageException {
         Table table = tableFactory.getTable();
         table.setName(name);
         table.setLocation(this.location + this.name + File.separator);
@@ -151,4 +151,7 @@ public class DatabaseImpl implements Database {
         return result;
     }
 
+    public void setTableFactory(TableFactory tableFactory) {
+        this.tableFactory = tableFactory;
+    }
 }

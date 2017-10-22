@@ -6,21 +6,13 @@ import javafx.collections.ObservableList;
 import localdbms.DBMS.Dbms;
 import localdbms.DBMS.DbmsImpl;
 import localdbms.controller.*;
-import localdbms.DBMS.database.Database;
-import localdbms.DBMS.database.DatabaseFactory;
-import localdbms.DBMS.database.DatabaseImpl;
-import localdbms.DBMS.exception.EntryException;
 import localdbms.DBMS.exception.StorageException;
-import localdbms.DBMS.exception.TableException;
 import localdbms.DBMS.table.Table;
-import localdbms.DBMS.table.TableFactory;
-import localdbms.DBMS.table.TableImpl;
 import localdbms.service.DatabaseService;
 import localdbms.service.TableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class AppConfig {
@@ -32,7 +24,7 @@ public class AppConfig {
 
     @Bean
     public Dbms dbms() throws StorageException {
-        Dbms dbms = new DbmsImpl();
+        DbmsImpl dbms = new DbmsImpl();
         dbms.setDatabases(FXCollections.observableArrayList());
         dbms.loadDatabaseFromStorage();
         return dbms;
@@ -50,9 +42,9 @@ public class AppConfig {
     @Bean
     public TableService tableService(DatabaseOverviewController dsController) throws StorageException {
         TableService tableService = new TableService();
-        tableService.setDatabases(FXCollections.observableArrayList());
         tableService.setDatabases(dsController.getDatabases());
         tableService.setDbIndex(dsController.getSelectedIndex());
+        tableService.setTables(FXCollections.observableArrayList());
         return tableService;
     }
 
@@ -100,31 +92,5 @@ public class AppConfig {
         controller.setTableIndex(toController.getTableSelectedIndex());
         controller.setTableService(tableService);
         return controller;
-    }
-
-    @Bean
-    @Scope("prototype")
-    public Database database() throws StorageException {
-        return new DatabaseImpl();
-    }
-
-    @Bean
-    public DatabaseFactory databaseFactory() {
-        return this::database;
-    }
-
-    @Bean
-    @Scope("prototype")
-    public Table table() {
-        try {
-            return new TableImpl();
-        } catch (EntryException | TableException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Bean
-    public TableFactory tableFactory() {
-        return this::table;
     }
 }

@@ -15,7 +15,7 @@ public interface Database {
 
     boolean doesTableExist(String tableName);
 
-    Table createTable(String name, DataType... columnTypes) throws EntryException, TableException;
+    Table createTable(String name, DataType... columnTypes) throws StorageException;
     void deleteTable(String name) throws StorageException;
 
     List<Table> getTables();

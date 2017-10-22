@@ -11,16 +11,16 @@ import java.util.*;
 
 public class DbmsImpl implements Dbms {
 
-    @Override
-    public void setDatabases(Collection<Database> databases) {
-        this.databases = databases;
-    }
-
     private Collection<Database> databases;
     private DatabaseFactory databaseFactory;
 
-    public DbmsImpl() throws StorageException {
+    public DbmsImpl() {
         databaseFactory = DatabaseImpl::new;
+    }
+
+    @Override
+    public void setDatabases(Collection<Database> databases) {
+        this.databases = databases;
     }
 
     public void loadDatabaseFromStorage() throws StorageException {

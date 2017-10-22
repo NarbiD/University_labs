@@ -1,39 +1,26 @@
 package localdbms.service;
 
 import javafx.beans.property.IntegerProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import localdbms.DBMS.database.Database;
-import localdbms.DBMS.exception.EntryException;
-import localdbms.DBMS.exception.TableException;
 import localdbms.DataType;
 import localdbms.DBMS.datatype.constraint.RealConstraint;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.table.Table;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
 
 public class TableService {
 
-    public void setDatabases(ObservableList<Database> databases) {
-        this.databases = databases;
-    }
-
     private ObservableList<Database> databases;
     private ObservableList<Table> tables;
     private IntegerProperty dbIndex;
 
-
-    public ObservableList<Table> getTables() {
-        tables = FXCollections.observableArrayList(databases.get(dbIndex.get()).getTables());
-        return tables;
-    }
-
-    public TableService() {
+    public void initTables() {
+        tables.addAll(databases.get(dbIndex.get()).getTables());
     }
 
     public void deleteTable(int tableIndex) throws StorageException {
@@ -47,25 +34,42 @@ public class TableService {
         table.setTypes(types);
         table.setColumnNames(columnNames);
         table.setConstraint(constraint);
-        if (name.equals("")) {
-            throw new IllegalArgumentException("Required name for the table");
-        } else if (columnNames.isEmpty()) {
-            throw new IllegalArgumentException("Required at least one column");
-        }
+        validateProperties(table);
         tables.add(table);
         db.save();
     }
 
+    private void validateProperties(Table table) {
+        if (table.getName().equals("")) {
+            throw new IllegalArgumentException("Required name for the table");
+        } else if (table.getColumnNames().isEmpty()) {
+            throw new IllegalArgumentException("Required at least one column");
+        }
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public void addRow(int tableIndex, List<Object> values, Optional<BufferedImage> image) throws StorageException {
         Table table = getTable(tableIndex);
-        if (image.isPresent()) {
-            table.addRow(values, image);
-        } else {
-            table.addRow(values);
-        }
+        table.addRow(values, image);
+        saveTables();
+    }
+
+    private void saveTables() throws StorageException {
         databases.get(dbIndex.get()).getTables().clear();
         databases.get(dbIndex.get()).getTables().addAll(tables);
         databases.get(dbIndex.get()).save();
+    }
+
+    public ObservableList<Table> getTables() {
+        return tables;
+    }
+
+    public void setTables(ObservableList<Table> tables) {
+        this.tables = tables;
+    }
+
+    public void setDatabases(ObservableList<Database> databases) {
+        this.databases = databases;
     }
 
     public Table getTable(int tableIndex) {
