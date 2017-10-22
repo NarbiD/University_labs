@@ -8,13 +8,10 @@ import localdbms.DataType;
 import localdbms.DBMS.exception.EntryException;
 import localdbms.DBMS.exception.TableException;
 import org.json.*;
-
 import javax.imageio.ImageIO;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class TableImpl implements Table {
     private RealConstraint constraint;
@@ -36,13 +33,17 @@ public class TableImpl implements Table {
         this.types = Arrays.asList(columnTypes);
         this.columnNames = new ArrayList<>();
         this.constraint = new RealConstraint();
-        loadDataFromFile();
+        try {
+            loadDataFromFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void loadDataFromFile() throws EntryException, TableException {
+    public void loadDataFromFile() throws EntryException, TableException, IOException {
         String rowInFile = new JSONArray().toString();
-        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile;
+        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile;
         if (Tables.isTableExists(this.name, this.location)) {
             readData = readTableFromStorage(this.location + this.name);
         }
@@ -57,17 +58,30 @@ public class TableImpl implements Table {
         if (constraints.length() != 0) {
             this.constraint = new RealConstraint(constraints.getDouble(0), constraints.getDouble(1));
         }
+        JSONArray ByteArrayJson = new JSONArray(s[4]);
         if (this.types.equals(readTypes) || types.isEmpty()) {
             this.types = readTypes;
             this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
+            for (int i = 0; i < entries.size(); i++) {
+                byte[] bytes = JSONtoByteArray((JSONArray)ByteArrayJson.get(i));
+                entries.get(i).setImage(ImageIO.read(new ByteArrayInputStream(bytes)));
+                System.out.println(Arrays.toString(bytes));
+//                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(b);
+//                try {
+//                    entries.get(i).setImage(ImageIO.read(byteArrayInputStream));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+            }
         } else {
             throw new TableException("Expected types " + readData + " but " + this.types + " found");
         }
+
     }
 
     private String readTableFromStorage(String storageLocation) {
         try (BufferedReader reader = new BufferedReader(new FileReader(storageLocation))) {
-            return reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine();
+            return reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine();
         } catch (IOException e) {
             throw new RuntimeException("Can not read table from storage", e);
         }
@@ -83,6 +97,13 @@ public class TableImpl implements Table {
         return entries;
     }
 
+    private byte[] JSONtoByteArray(JSONArray json) {
+        List<Object> ints = json.toList();
+        byte[] b = new byte[ints.size()];
+        IntStream.range(0, ints.size()).forEach(i -> b[i] = (byte) ((int) ints.get(i)));
+        return b;
+    }
+
     @Override
     public boolean isEmpty() {
         return this.entries.isEmpty();
@@ -94,6 +115,16 @@ public class TableImpl implements Table {
             throw new TableException("Expected defined name, location and types");
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
+            List<byte[]> byteArraysWithImages = new ArrayList<>();
+            entries.forEach(entry -> {
+                try {
+                    ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+                    ImageIO.write(entry.getImage(), "png", byteArray);
+                    byteArraysWithImages.add(byteArray.toByteArray());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
             writer.write(new JSONArray(this.columnNames).toString() + "\n");
             writer.write(new JSONArray(this.types).toString() + "\n");
             writer.write(this.getJsonArray().toString() + "\n");
@@ -102,8 +133,11 @@ public class TableImpl implements Table {
                 constraints.put(this.constraint.getMinValue());
                 constraints.put(this.constraint.getMaxValue());
             }
-            writer.write(constraints.toString());
+            writer.write(constraints.toString() + "\n");
+            JSONArray pics = new JSONArray(byteArraysWithImages);
+            writer.write(pics.toString());
             writer.flush();
+
         } catch (IOException e) {
             throw new RuntimeException("Can not write table to storage", e);
         }

@@ -11,15 +11,6 @@ import java.util.*;
 import java.util.List;
 
 public class EntryImpl implements Entry {
-    @Override
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    @Override
-    public void setImage(BufferedImage image) {
-        this.image = image;
-    }
 
     private BufferedImage image;
     private List<DataType> types;
@@ -65,6 +56,17 @@ public class EntryImpl implements Entry {
         }
         return json;
     }
+
+    @Override
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    @Override
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
 
     @Override
     public List<Object> getValues() {

@@ -43,7 +43,11 @@ public class DatabaseImpl implements Database {
                 Table table = tableFactory.getTable();
                 table.setName(entry.getName());
                 table.setLocation(this.location + this.name + File.separator);
-                table.loadDataFromFile();
+                try {
+                    table.loadDataFromFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 tables.add(table);
             }
         }

@@ -8,6 +8,7 @@ import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.exception.TableException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public interface Table {
@@ -27,7 +28,7 @@ public interface Table {
     void sort(int fieldNumber);
 
     void writeToFile() throws StorageException;
-    void loadDataFromFile() throws EntryException, TableException;
+    void loadDataFromFile() throws EntryException, TableException, IOException;
     boolean isEmpty();
 
     void setTypes(List<DataType> types);
