@@ -47,7 +47,6 @@ public class TableService {
         }
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public void addRow(int tableIndex, List<Object> values, BufferedImage image) throws StorageException {
         Table table = getTable(tableIndex);
         table.addRow(values, image);

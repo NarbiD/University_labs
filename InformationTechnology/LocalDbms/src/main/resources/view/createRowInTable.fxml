@@ -7,21 +7,19 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="Stage" prefHeight="190.0" prefWidth="370.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="localdbms.controller.CreateRowInTableController">
+<AnchorPane prefHeight="190.0" prefWidth="370.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="localdbms.controller.CreateRowInTableController">
     <AnchorPane layoutX="-1.0" prefHeight="127.0" prefWidth="370.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <HBox fx:id="SubmissionButtons" alignment="CENTER" layoutX="73.0" layoutY="263.0" spacing="30.0" AnchorPane.bottomAnchor="10.0">
-            <Button fx:id="btnOk" defaultButton="true" layoutX="45.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#submit" prefHeight="25.0" prefWidth="100.0" text="OK" />
-            <Button fx:id="btnCancel" cancelButton="true" layoutX="175.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#close" prefHeight="25.0" prefWidth="100.0" text="Cancel" />
+        <HBox alignment="CENTER" layoutX="73.0" layoutY="263.0" spacing="30.0" AnchorPane.bottomAnchor="10.0">
+            <Button defaultButton="true" layoutX="45.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#submit" prefHeight="25.0" prefWidth="100.0" text="OK" />
+            <Button cancelButton="true" layoutX="175.0" layoutY="71.0" mnemonicParsing="false" onMouseClicked="#close" prefHeight="25.0" prefWidth="100.0" text="Cancel" />
         </HBox>
-      <Group layoutX="15.0" layoutY="15.0" AnchorPane.topAnchor="10.0">
-         <children>
-              <Label prefHeight="15.0" prefWidth="160.0" text="EnterValues:" />
-              <VBox fx:id="Fields" layoutX="5.0" layoutY="28.0" prefWidth="335.0" spacing="5.0">
-                  <HBox spacing="30.0">
-            </HBox>
-              </VBox>
-         </children>
-      </Group>
-      <Button fx:id="btnLoadPic" layoutX="112.0" layoutY="124.0" mnemonicParsing="false" onMouseClicked="#loadImage" prefHeight="25.0" prefWidth="146.0" text="Load picture" AnchorPane.bottomAnchor="53.0" />
+        <Group layoutX="15.0" layoutY="15.0" AnchorPane.topAnchor="10.0">
+            <Label prefHeight="15.0" prefWidth="160.0" text="EnterValues:"/>
+            <VBox fx:id="fields" layoutX="5.0" layoutY="28.0" prefWidth="335.0" spacing="5.0">
+                <HBox spacing="30.0">
+                </HBox>
+            </VBox>
+        </Group>
+      <Button layoutX="112.0" layoutY="124.0" mnemonicParsing="false" onMouseClicked="#loadImage_onClick" prefHeight="25.0" prefWidth="146.0" text="Load picture" AnchorPane.bottomAnchor="53.0" />
     </AnchorPane>
 </AnchorPane>

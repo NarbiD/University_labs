@@ -24,9 +24,9 @@
                  <opaqueInsets>
                      <Insets />
                  </opaqueInsets>
-                 <Button fx:id="btnCreateDatabase" mnemonicParsing="false" onMouseClicked="#createDatabase_onClick" prefHeight="25.0" prefWidth="138.0" text="Create" />
-                 <Button fx:id="btnDeleteDatabase" mnemonicParsing="false" onMouseClicked="#deleteDatabase_onClick" prefHeight="25.0" prefWidth="138.0" text="Delete" />
-                 <Button fx:id="btnSelect" mnemonicParsing="false" onMouseClicked="#selectDatabase_onClick" prefHeight="25.0" prefWidth="138.0" text="Select" />
+                 <Button mnemonicParsing="false" onMouseClicked="#createDatabase_onClick" prefHeight="25.0" prefWidth="138.0" text="Create" />
+                 <Button mnemonicParsing="false" onMouseClicked="#deleteDatabase_onClick" prefHeight="25.0" prefWidth="138.0" text="Delete" />
+                 <Button mnemonicParsing="false" onMouseClicked="#selectDatabase_onClick" prefHeight="25.0" prefWidth="138.0" text="Select" />
              </VBox>
         </AnchorPane>
     </SplitPane>

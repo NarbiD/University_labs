@@ -3,7 +3,6 @@ package localdbms.controller;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -21,32 +20,19 @@ import java.util.List;
 
 public class CreateTableController extends AbstractController{
 
-    public void setTableService(TableService tableService) {
-        this.tableService = tableService;
-    }
-
     private TableService tableService;
 
     @FXML
-    public HBox Constraints;
+    public HBox constraints;
 
     @FXML
-    public VBox Fields;
+    public VBox fields;
 
     @FXML
     public TextField tableNameField;
 
     @FXML
-    public Button btnAddField;
-
-    @FXML
-    public HBox SubmissionButtons;
-
-    @FXML
-    public Button btnCancel;
-
-    @FXML
-    public Button btnOk;
+    public HBox submissionButtons;
 
     public void submit(MouseEvent mouseEvent) {
         try {
@@ -66,8 +52,8 @@ public class CreateTableController extends AbstractController{
         String tableName = tableNameField.getCharacters().toString();
         List<DataType> types = FXCollections.observableArrayList();
         List<String> names = FXCollections.observableArrayList();
-        for (int i = 0; i < Fields.getChildren().size(); i++) {
-            Pair<String, DataType> dataFromLine = getDataFromHBox((HBox)Fields.getChildren().get(i));
+        for (int i = 0; i < fields.getChildren().size(); i++) {
+            Pair<String, DataType> dataFromLine = getDataFromHBox((HBox) fields.getChildren().get(i));
             String name = dataFromLine.getKey();
             DataType type = dataFromLine.getValue();
             if (!shouldBeIgnored(name, type)){
@@ -120,8 +106,8 @@ public class CreateTableController extends AbstractController{
 
     private RealConstraint getConstraintsFromForm() throws IllegalArgumentException{
         RealConstraint constraint;
-        String minValueString = ((TextField) Constraints.getChildren().get(0)).getCharacters().toString();
-        String maxValueString = ((TextField) Constraints.getChildren().get(1)).getCharacters().toString();
+        String minValueString = ((TextField) constraints.getChildren().get(0)).getCharacters().toString();
+        String maxValueString = ((TextField) constraints.getChildren().get(1)).getCharacters().toString();
         if (maxValueString.equals(minValueString) && maxValueString.equals("")) {
             constraint = new RealConstraint();
         } else if (maxValueString.equals("") || minValueString.equals("")){
@@ -147,11 +133,11 @@ public class CreateTableController extends AbstractController{
         hbox.setSpacing(30.0);
         hbox.getChildren().addAll(textField, comboBox);
 
-        Fields.getChildren().add(hbox);
+        fields.getChildren().add(hbox);
     }
 
     private void resizeWindow(MouseEvent mouseEvent) {
-        SubmissionButtons.setLayoutY(SubmissionButtons.getLayoutY());
+        submissionButtons.setLayoutY(submissionButtons.getLayoutY());
         Window window = ((Node)mouseEvent.getSource()).getScene().getWindow();
         window.setHeight(window.getHeight() + 30);
     }
@@ -159,5 +145,9 @@ public class CreateTableController extends AbstractController{
     @FXML
     public void close(MouseEvent mouseEvent) {
         hide(mouseEvent);
+    }
+
+    public void setTableService(TableService tableService) {
+        this.tableService = tableService;
     }
 }

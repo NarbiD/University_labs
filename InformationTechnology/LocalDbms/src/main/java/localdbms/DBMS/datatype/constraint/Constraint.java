@@ -1,10 +1,10 @@
 package localdbms.DBMS.datatype.constraint;
 
 public abstract class Constraint<T extends Comparable<T>> {
-    protected T minValue;
-    protected T maxValue;
+    T minValue;
+    T maxValue;
 
-    public Constraint(T minValue, T maxValue) {
+    Constraint(T minValue, T maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
     }

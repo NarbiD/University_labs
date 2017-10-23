@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
@@ -23,15 +22,6 @@ public class DatabaseOverviewController extends AbstractController {
 
     private IntegerProperty selectedIndex;
     private DatabaseService databaseService;
-
-    @FXML
-    public Button btnCreateDatabase;
-
-    @FXML
-    public Button btnDeleteDatabase;
-
-    @FXML
-    public Button btnSelect;
 
     @FXML
     public TableColumn<Database, String> databases;
@@ -59,7 +49,7 @@ public class DatabaseOverviewController extends AbstractController {
         stage.show();
     }
 
-    public void deleteDatabase_onClick(MouseEvent mouseEvent) {
+    public void deleteDatabase_onClick() {
         selectedIndex.set(databaseView.getSelectionModel().getSelectedIndex());
         if (selectedIndex.get() >= 0) {
             try {
@@ -104,10 +94,6 @@ public class DatabaseOverviewController extends AbstractController {
 
     public void setSelectedIndex(IntegerProperty index) {
         this.selectedIndex = index;
-    }
-
-    public void setDatabases(ObservableList<Database> databases) {
-        databaseService.setDatabases(databases);
     }
 
     public void setDatabaseService(DatabaseService databaseService) {

@@ -150,8 +150,4 @@ public class DatabaseImpl implements Database {
         result = 31 * result + (location != null ? location.hashCode() : 0);
         return result;
     }
-
-    public void setTableFactory(TableFactory tableFactory) {
-        this.tableFactory = tableFactory;
-    }
 }

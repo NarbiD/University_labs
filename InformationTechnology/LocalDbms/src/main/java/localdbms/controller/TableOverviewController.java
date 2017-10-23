@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
@@ -23,7 +22,6 @@ import localdbms.DBMS.entry.Entry;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.table.Table;
 import localdbms.service.TableService;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -41,25 +39,13 @@ public class TableOverviewController extends AbstractController {
     private ImageView imageView;
 
     @FXML
-    public TableView<Object> EntryOverview;
+    public TableView<Table> tableOverview;
 
     @FXML
-    public Button btnSelect;
+    public TableColumn<Table, String> tableColumn;
 
     @FXML
-    public Button btnAddRow;
-
-    @FXML
-    public Button btnDelete;
-
-    @FXML
-    public Button btnCreate;
-
-    @FXML
-    public TableColumn<Table, String> TablesCol;
-
-    @FXML
-    public TableView<Table> TableSelection;
+    public TableView<Object> entryOverview;
 
     @FXML
     public void initialize() throws StorageException, IOException {
@@ -75,18 +61,18 @@ public class TableOverviewController extends AbstractController {
     }
 
     private void initTableView() {
-        TableSelection.getItems().clear();
-        TablesCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        tableOverview.getItems().clear();
+        tableColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
         tableService.initTables();
         tables = tableService.getTables();
-        TableSelection.setItems(tables);
+        tableOverview.setItems(tables);
     }
 
     private void initDynamicImageChange() {
-        EntryOverview.getSelectionModel().selectedItemProperty().addListener(
+        entryOverview.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     Table table = tables.get(tableSelectedIndex.get());
-                    int selectedEntryIndex = EntryOverview.getSelectionModel().getSelectedIndex();
+                    int selectedEntryIndex = entryOverview.getSelectionModel().getSelectedIndex();
                     if (selectedEntryIndex >= 0) {
                         Entry selectedEntry = table.getEntries().get(selectedEntryIndex);
                         changeImage(selectedEntry.getImage());
@@ -113,7 +99,7 @@ public class TableOverviewController extends AbstractController {
     }
 
     public void deleteTable_onClick()  {
-        tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
+        tableSelectedIndex.set(tableOverview.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
             try {
                 tableService.deleteTable(tableSelectedIndex.get());
@@ -130,7 +116,7 @@ public class TableOverviewController extends AbstractController {
     }
 
     public void select_onClick() {
-        tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
+        tableSelectedIndex.set(tableOverview.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
             showEntries(tableService.getTable(tableSelectedIndex.get()));
             imageView.setImage(noImage);
@@ -140,40 +126,40 @@ public class TableOverviewController extends AbstractController {
     }
 
     private void showEntries(Table table) {
-        EntryOverview.getSelectionModel().clearSelection();
-        EntryOverview.getColumns().clear();
-        if (EntryOverview.getColumns().isEmpty()) {
+        entryOverview.getSelectionModel().clearSelection();
+        entryOverview.getColumns().clear();
+        if (entryOverview.getColumns().isEmpty()) {
             table.getColumnNames().forEach(this::addColumn);
             setValueFactories();
         }
         List<Entry> entries = table.getEntries();
         ObservableList<Object> values = FXCollections.observableArrayList();
         entries.forEach(entry -> values.add(FXCollections.observableArrayList(entry.getValues())));
-        EntryOverview.setItems(values);
+        entryOverview.setItems(values);
     }
 
     private void addColumn(String name) {
-        EntryOverview.setEditable(true);
-        EntryOverview.getColumns().add(new TableColumn<Object, String>(name));
+        entryOverview.setEditable(true);
+        entryOverview.getColumns().add(new TableColumn<Object, String>(name));
     }
 
     @SuppressWarnings("unchecked")
     private void setValueFactories() {
-        for (int columnNum = 0; columnNum < EntryOverview.getColumns().size(); columnNum++) {
+        for (int columnNum = 0; columnNum < entryOverview.getColumns().size(); columnNum++) {
             final int finalColumnNum = columnNum;
-            EntryOverview.getColumns().get(finalColumnNum).setCellValueFactory(cell ->
+            entryOverview.getColumns().get(finalColumnNum).setCellValueFactory(cell ->
                     new SimpleObjectProperty(((List<Object>)cell.getValue()).get(finalColumnNum)));
         }
     }
 
     public void addRow_onClick(MouseEvent mouseEvent) {
-        tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
+        tableSelectedIndex.set(tableOverview.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
             Stage stage = new Stage();
             Controller controller = SpringFxmlLoader.load("/view/createRowInTable.fxml");
             Parent root = (Parent) controller.getView();
             stage.setTitle("Create row in table");
-            int columnsAmount = tables.get(TableSelection.getSelectionModel().getSelectedIndex()).getColumnNames().size();
+            int columnsAmount = tables.get(tableOverview.getSelectionModel().getSelectedIndex()).getColumnNames().size();
             stage.setHeight(160.0 + columnsAmount*30.0);
             stage.setMinWidth(370);
             stage.setResizable(false);

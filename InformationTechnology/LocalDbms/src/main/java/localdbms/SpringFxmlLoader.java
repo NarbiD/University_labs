@@ -20,7 +20,6 @@ public class SpringFxmlLoader {
             Controller controller = loader.getController();
             controller.setView(view);
             return controller;
-
         } catch (IOException e) {
             throw new RuntimeException("Can't load resource", e);
         }
