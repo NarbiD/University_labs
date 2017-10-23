@@ -20,12 +20,14 @@ public interface Table {
 
     void addRows(Entry... rows);
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    void addRow(List<Object> values, Optional<BufferedImage> image) throws StorageException;
+    void addRow(List<Object> values, BufferedImage image) throws StorageException;
 
     void sort(int fieldNumber);
 
     void writeToFile() throws StorageException;
+
+    RealConstraint getConstraint();
+
     void loadDataFromFile() throws StorageException, IOException;
     boolean isEmpty();
 

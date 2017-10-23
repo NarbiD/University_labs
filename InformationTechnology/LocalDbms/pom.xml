@@ -6,7 +6,7 @@
 
     <groupId>InformationTechnology</groupId>
     <artifactId>LocalDbms</artifactId>
-    <version>0.8.6-SNAPSHOT</version>
+    <version>0.9</version>
     <packaging>jar</packaging>
 
     <properties>

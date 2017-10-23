@@ -10,7 +10,6 @@ import localdbms.DBMS.table.Table;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.Optional;
 
 
 public class TableService {
@@ -20,6 +19,7 @@ public class TableService {
     private IntegerProperty dbIndex;
 
     public void initTables() {
+        tables.clear();
         tables.addAll(databases.get(dbIndex.get()).getTables());
     }
 
@@ -48,7 +48,7 @@ public class TableService {
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public void addRow(int tableIndex, List<Object> values, Optional<BufferedImage> image) throws StorageException {
+    public void addRow(int tableIndex, List<Object> values, BufferedImage image) throws StorageException {
         Table table = getTable(tableIndex);
         table.addRow(values, image);
         saveTables();

@@ -45,8 +45,7 @@ public class CreateRowInTableController extends AbstractController{
         this.tableService = tableService;
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<BufferedImage> image;
+    private BufferedImage image;
     private TableService tableService;
     private IntegerProperty tableIndex;
 
@@ -78,7 +77,7 @@ public class CreateRowInTableController extends AbstractController{
         try {
             List<Object> values = getObjectsByText(textDataFromFields);
             tableService.addRow(tableIndex.get(), values, image);
-            image = Optional.empty();
+            image = null;
             close(mouseEvent);
         } catch (NumberFormatException | StorageException e) {
             Warning.show(e);
@@ -120,11 +119,11 @@ public class CreateRowInTableController extends AbstractController{
         this.tableIndex = tableIndex;
     }
 
-    public void loadPic(MouseEvent mouseEvent) throws IOException {
+    public void loadImage(MouseEvent mouseEvent) throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open image...");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image File", "*.png"));
         File imagePath = fileChooser.showOpenDialog(((Node) mouseEvent.getSource()).getScene().getWindow());
-        image = Optional.ofNullable(ImageIO.read(imagePath));
+        image = ImageIO.read(imagePath);
     }
 }

@@ -24,18 +24,18 @@ import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.table.Table;
 import localdbms.service.TableService;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 public class TableOverviewController extends AbstractController {
 
     private ObservableList<Table> tables;
-
     private IntegerProperty tableSelectedIndex;
-
     private TableService tableService;
+    private Image noImage;
 
     @FXML
     private ImageView imageView;
@@ -62,11 +62,40 @@ public class TableOverviewController extends AbstractController {
     public TableView<Table> TableSelection;
 
     @FXML
-    public void initialize() throws StorageException {
+    public void initialize() throws StorageException, IOException {
+        initNoImage();
+        initTableView();
+        initDynamicImageChange();
+    }
+
+    private void initNoImage() throws IOException {
+        String noImagePath = new File("").getAbsolutePath() + "/src/main/resources/view/images/NoImage.png";
+        noImage = SwingFXUtils.toFXImage(ImageIO.read(new File(noImagePath)), null);
+        imageView.setImage(noImage);
+    }
+
+    private void initTableView() {
+        TableSelection.getItems().clear();
         TablesCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
         tableService.initTables();
         tables = tableService.getTables();
         TableSelection.setItems(tables);
+    }
+
+    private void initDynamicImageChange() {
+        EntryOverview.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    Table table = tables.get(tableSelectedIndex.get());
+                    int selectedEntryIndex = EntryOverview.getSelectionModel().getSelectedIndex();
+                    if (selectedEntryIndex >= 0) {
+                        Entry selectedEntry = table.getEntries().get(selectedEntryIndex);
+                        changeImage(selectedEntry.getImage());
+                    }
+                });
+    }
+
+    private void changeImage(BufferedImage image) {
+        imageView.setImage(image != null ? SwingFXUtils.toFXImage(image, null) : noImage);
     }
 
     public void createTable_onClick(MouseEvent mouseEvent) {
@@ -104,16 +133,19 @@ public class TableOverviewController extends AbstractController {
         tableSelectedIndex.set(TableSelection.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
             showEntries(tableService.getTable(tableSelectedIndex.get()));
+            imageView.setImage(noImage);
         } else {
             noTableSelectedMessage();
         }
     }
 
     private void showEntries(Table table) {
+        EntryOverview.getSelectionModel().clearSelection();
         EntryOverview.getColumns().clear();
-        table.getColumnNames().forEach(this::addColumn);
-        setValueFactories();
-
+        if (EntryOverview.getColumns().isEmpty()) {
+            table.getColumnNames().forEach(this::addColumn);
+            setValueFactories();
+        }
         List<Entry> entries = table.getEntries();
         ObservableList<Object> values = FXCollections.observableArrayList();
         entries.forEach(entry -> values.add(FXCollections.observableArrayList(entry.getValues())));
@@ -168,15 +200,5 @@ public class TableOverviewController extends AbstractController {
 
     public void setTableService(TableService tableService) {
         this.tableService = tableService;
-    }
-
-    public void loadImage(MouseEvent mouseEvent) throws IOException {
-        Table t = TableSelection.getItems().get(TableSelection.getSelectionModel().getSelectedIndex());
-        Entry entry = t.getEntries().get(EntryOverview.getSelectionModel().getSelectedIndex());
-        Optional<BufferedImage> bufferedImage = Optional.ofNullable(entry.getImage());
-        if (bufferedImage.isPresent()) {
-            Image image = SwingFXUtils.toFXImage(bufferedImage.get(), null);
-            this.imageView.setImage(image);
-        }
     }
 }

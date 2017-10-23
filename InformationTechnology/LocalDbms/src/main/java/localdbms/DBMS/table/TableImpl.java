@@ -16,6 +16,11 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class TableImpl implements Table {
+    @Override
+    public RealConstraint getConstraint() {
+        return constraint;
+    }
+
     private RealConstraint constraint;
     private String location;
     private String name;
@@ -154,12 +159,14 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRow(List<Object> values, Optional<BufferedImage> image) throws StorageException {
+    public void addRow(List<Object> values, BufferedImage image) throws StorageException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
         }
         Entry entry = new EntryImpl(values, types, constraint);
-        image.ifPresent(entry::setImage);
+        if (image != null) {
+            entry.setImage(image);
+        }
         entries.add(entry);
     }
 
