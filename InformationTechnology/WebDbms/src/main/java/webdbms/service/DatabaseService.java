@@ -28,6 +28,11 @@ public class DatabaseService {
         databases.remove(index);
     }
 
+    public void deleteDatabase(Database database) throws StorageException {
+        int dbIndex = databases.indexOf(database);
+        deleteDatabase(dbIndex);
+    }
+
     public void createDatabase(String name) throws StorageException {
         databases.add(dbms.createDatabase(name));
     }
