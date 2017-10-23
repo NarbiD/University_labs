@@ -1,19 +1,21 @@
 package webdbms.service;
 
-import javafx.collections.ObservableList;
 import webdbms.DBMS.Dbms;
 import webdbms.DBMS.database.Database;
+import webdbms.DBMS.database.DatabaseImpl;
 import webdbms.DBMS.exception.StorageException;
+
+import java.util.List;
 
 public class DatabaseService {
     private Dbms dbms;
-    private ObservableList<Database> databases;
+    private List<Database> databases;
 
-    public ObservableList<Database> getDatabases() {
+    public List<Database> getDatabases() {
         return databases;
     }
 
-    public void setDatabases(ObservableList<Database> databases) {
+    public void setDatabases(List<Database> databases) {
         this.databases = databases;
     }
 
@@ -33,6 +35,11 @@ public class DatabaseService {
     public void setDbms(Dbms dbms) {
         this.dbms = dbms;
         databases.addAll(dbms.getAllDatabases());
+    }
+
+    public Database findByName(String name) throws StorageException {
+        Database database = dbms.createDatabase(name);
+        return databases.get(databases.indexOf(database));
     }
 
 }
