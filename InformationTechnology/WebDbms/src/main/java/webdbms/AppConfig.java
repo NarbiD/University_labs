@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import webdbms.DBMS.Dbms;
 import webdbms.DBMS.DbmsImpl;
-import webdbms.DBMS.database.Database;
 import webdbms.controller.*;
 import webdbms.DBMS.exception.StorageException;
 import webdbms.service.DatabaseService;
@@ -37,7 +36,7 @@ public class AppConfig {
     @Autowired
     public DatabaseService databaseService(Dbms dbms) throws StorageException {
         DatabaseService databaseService = new DatabaseService();
-        databaseService.setDatabases(new ArrayList<Database>());
+        databaseService.setDatabases(new ArrayList<>());
         databaseService.setDbms(dbms);
         return databaseService;
     }
@@ -48,6 +47,14 @@ public class AppConfig {
         DatabaseController databaseController = new DatabaseController();
         databaseController.setDatabaseService(dbService);
         return databaseController;
+    }
+
+    @Bean
+    @Autowired
+    public TableController tableController(DatabaseService databaseService) {
+        TableController tableController = new TableController();
+        tableController.setDatabaseService(databaseService);
+        return tableController;
     }
 
 }

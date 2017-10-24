@@ -171,6 +171,11 @@ public class TableImpl implements Table {
     }
 
     @Override
+    public void deleteRow(int rowNumber) {
+        entries.remove(rowNumber);
+    }
+
+    @Override
     public void sort(int fieldNumber) {
         entries.sort(new Comparator<Entry>() {
             @Override
@@ -209,7 +214,7 @@ public class TableImpl implements Table {
 
     @Override
     public void setLocation(String location) {
-        this.location = location;
+        this.location = new File(location).getAbsolutePath() + File.separator;
     }
 
     @Override
@@ -245,17 +250,13 @@ public class TableImpl implements Table {
         TableImpl table = (TableImpl) o;
 
         return (location != null ? location.equals(table.location) : table.location == null) &&
-                (name != null ? name.equals(table.name) : table.name == null) &&
-                (types != null ? types.equals(table.types) : table.types == null) &&
-                (entries != null ? entries.equals(table.entries) : table.entries == null);
+                (name != null ? name.equals(table.name) : table.name == null);
     }
 
     @Override
     public int hashCode() {
         int result = location != null ? location.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (types != null ? types.hashCode() : 0);
-        result = 31 * result + (entries != null ? entries.hashCode() : 0);
         return result;
     }
 

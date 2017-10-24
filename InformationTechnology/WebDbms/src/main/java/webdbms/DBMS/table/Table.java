@@ -21,6 +21,10 @@ public interface Table {
 
     void addRow(List<Object> values, BufferedImage image) throws StorageException;
 
+    default void deleteRow(int rowNumber) {
+        throw new UnsupportedOperationException();
+    }
+
     void sort(int fieldNumber);
 
     void writeToFile() throws StorageException;

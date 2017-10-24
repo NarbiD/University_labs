@@ -1,81 +1,73 @@
 package webdbms.service;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.collections.ObservableList;
 import webdbms.DBMS.database.Database;
+import webdbms.DBMS.database.Databases;
 import webdbms.DBMS.datatype.DataType;
 import webdbms.DBMS.datatype.constraint.RealConstraint;
 import webdbms.DBMS.exception.StorageException;
 import webdbms.DBMS.table.Table;
-
+import webdbms.DBMS.table.TableFactory;
+import webdbms.DBMS.table.TableImpl;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 
 
 public class TableService {
 
-    private ObservableList<Database> databases;
-    private ObservableList<Table> tables;
-    private IntegerProperty dbIndex;
+    private TableFactory tableFactory = TableImpl::new;
+    private Database database;
+
+    public TableService(Database database) {
+        this.database = database;
+    }
 
     public void initTables() {
-        tables.clear();
-        tables.addAll(databases.get(dbIndex.get()).getTables());
+        database.getTables().addAll(database.getTables());
     }
 
     public void deleteTable(int tableIndex) throws StorageException {
-        databases.get(dbIndex.get()).deleteTable(tables.get(tableIndex).getName());
-        tables.remove(tableIndex);
+        database.deleteTable(database.getTables().get(tableIndex).getName());
+        database.getTables().remove(tableIndex);
     }
 
     public void createTable(String name, List<DataType> types, List<String> columnNames, RealConstraint constraint) throws StorageException {
-        Database db = databases.get(dbIndex.get());
+        Database db = database;
         Table table = db.createTable(name);
         table.setTypes(types);
         table.setColumnNames(columnNames);
         table.setConstraint(constraint);
         validateProperties(table);
-        tables.add(table);
+        database.getTables().add(table);
         db.save();
     }
 
     private void validateProperties(Table table) {
         if (table.getName().equals("")) {
             throw new IllegalArgumentException("Required name for the table");
-        } else if (table.getColumnNames().isEmpty()) {
-            throw new IllegalArgumentException("Required at least one column");
         }
     }
 
-    public void addRow(int tableIndex, List<Object> values, BufferedImage image) throws StorageException {
-        Table table = getTable(tableIndex);
-        table.addRow(values, image);
-        saveTables();
-    }
-
     private void saveTables() throws StorageException {
-        databases.get(dbIndex.get()).getTables().clear();
-        databases.get(dbIndex.get()).getTables().addAll(tables);
-        databases.get(dbIndex.get()).save();
+        database.getTables().clear();
+        database.getTables().addAll(database.getTables());
+        database.save();
     }
 
-    public ObservableList<Table> getTables() {
-        return tables;
-    }
-
-    public void setTables(ObservableList<Table> tables) {
-        this.tables = tables;
-    }
-
-    public void setDatabases(ObservableList<Database> databases) {
-        this.databases = databases;
+    public List<Table> getTables() {
+        return database.getTables();
     }
 
     public Table getTable(int tableIndex) {
-        return tables.get(tableIndex);
+        return database.getTables().get(tableIndex);
     }
 
-    public void setDbIndex(IntegerProperty dbIndex) {
-        this.dbIndex = dbIndex;
+    public Table findByName(String name) throws StorageException {
+        String location = Databases.ABS_DEFAULT_LOCATION;
+        Table table = tableFactory.getTable();
+        table.setName(name);
+        table.setLocation(location + database.getName() + File.separator);
+        int tableIndex = database.getTables().indexOf(table);
+        return database.getTables().get(tableIndex);
     }
 }
