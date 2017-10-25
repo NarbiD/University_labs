@@ -6,7 +6,10 @@ import webdbms.DBMS.datatype.TypeManager;
 import webdbms.DBMS.exception.EntryException;
 import org.json.JSONObject;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -60,6 +63,18 @@ public class EntryImpl implements Entry {
     @Override
     public BufferedImage getImage() {
         return image;
+    }
+
+    @Override
+    public byte[] getImageByteArray() throws EntryException {
+        try {
+            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+            if (image != null)
+                ImageIO.write(image,"png", byteStream);
+            return byteStream.toByteArray();
+        } catch (IOException e) {
+            throw new EntryException("Can not read the image");
+        }
     }
 
     @Override
