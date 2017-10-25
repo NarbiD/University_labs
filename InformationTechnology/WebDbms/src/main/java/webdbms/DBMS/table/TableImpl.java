@@ -116,9 +116,17 @@ public class TableImpl implements Table {
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
             List<byte[]> byteArraysWithImages = new ArrayList<>();
-            for (Entry entry : entries) {
-                byteArraysWithImages.add(entry.getImageByteArray());
-            }
+            entries.forEach(entry -> {
+                try {
+                    ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+                    BufferedImage image = entry.getImage();
+                    if (image != null)
+                        ImageIO.write(image,"png", byteArray);
+                    byteArraysWithImages.add(byteArray.toByteArray());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
             writer.write(new JSONArray(this.columnNames).toString() + "\n");
             writer.write(new JSONArray(this.types).toString() + "\n");
             writer.write(this.getJsonArray().toString() + "\n");
