@@ -71,11 +71,13 @@ public class TableOverviewController extends AbstractController {
     private void initDynamicImageChange() {
         entryOverview.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    Table table = tables.get(tableSelectedIndex.get());
-                    int selectedEntryIndex = entryOverview.getSelectionModel().getSelectedIndex();
-                    if (selectedEntryIndex >= 0) {
-                        Entry selectedEntry = table.getEntries().get(selectedEntryIndex);
-                        changeImage(selectedEntry.getImage());
+                    if (tableSelectedIndex.get() >= 0) {
+                        Table table = tables.get(tableSelectedIndex.get());
+                        int selectedEntryIndex = entryOverview.getSelectionModel().getSelectedIndex();
+                        if (selectedEntryIndex >= 0) {
+                            Entry selectedEntry = table.getEntries().get(selectedEntryIndex);
+                            changeImage(selectedEntry.getImage());
+                        }
                     }
                 });
     }
@@ -102,8 +104,10 @@ public class TableOverviewController extends AbstractController {
         tableSelectedIndex.set(tableOverview.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
             try {
+                entryOverview.getColumns().clear();
                 tableService.deleteTable(tableSelectedIndex.get());
-            } catch (StorageException e) {
+                initNoImage();
+            } catch (StorageException | IOException e) {
                 Warning.show(e);
             }
         } else {
