@@ -57,4 +57,11 @@ public class AppConfig {
         return tableController;
     }
 
+    @Bean
+    @Autowired
+    public EntryController entryController(DatabaseService databaseService) {
+        EntryController entryController = new EntryController();
+        entryController.setDatabaseService(databaseService);
+        return entryController;
+    }
 }

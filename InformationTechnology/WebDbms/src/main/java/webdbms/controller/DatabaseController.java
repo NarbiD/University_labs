@@ -3,6 +3,7 @@ package webdbms.controller;
 import org.springframework.web.bind.annotation.*;
 import webdbms.DBMS.database.Database;
 import webdbms.DBMS.exception.StorageException;
+import webdbms.facades.DatabaseFacade;
 import webdbms.service.DatabaseService;
 
 import java.util.Collection;
@@ -14,13 +15,13 @@ public class DatabaseController {
     private DatabaseService databaseService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public Collection<Database> getAllDatabases() throws StorageException {
+    public Collection<Database> getAllDatabases() {
         return databaseService.getDatabases();
     }
 
     @RequestMapping(value = "/{databaseName}", method = RequestMethod.GET)
-    public Database getDatabase(@PathVariable String databaseName) throws StorageException {
-        return databaseService.findByName(databaseName);
+    public DatabaseFacade getDatabase(@PathVariable String databaseName) throws StorageException {
+        return new DatabaseFacade(databaseService.findByName(databaseName));
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
