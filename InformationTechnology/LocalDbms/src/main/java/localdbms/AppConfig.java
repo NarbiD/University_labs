@@ -40,6 +40,7 @@ public class AppConfig {
     }
 
     @Bean
+    @Autowired
     public TableService tableService(DatabaseOverviewController dsController) throws StorageException {
         TableService tableService = new TableService();
         tableService.setDatabases(dsController.getDatabases());
