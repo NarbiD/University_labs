@@ -8,11 +8,10 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 public interface Entry {
+
     List<Object> getValues();
-    BufferedImage getImage();
+    String getImage();
 
-    byte[] getImageByteArray() throws EntryException;
-
-    void setImage(BufferedImage image);
+    void setImage(String image);
     JSONObject getJson();
 }

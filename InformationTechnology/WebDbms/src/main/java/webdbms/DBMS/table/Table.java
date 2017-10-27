@@ -36,7 +36,7 @@ public interface Table {
 
     List<Entry> getEntries();
 
-    void addRow(List<Object> values, BufferedImage image) throws StorageException;
+    void addRow(List<Object> values, String image) throws StorageException;
 
     default void deleteRow(int rowNumber) {
         throw new UnsupportedOperationException();

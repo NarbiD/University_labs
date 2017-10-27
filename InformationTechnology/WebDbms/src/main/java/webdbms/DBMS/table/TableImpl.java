@@ -10,7 +10,6 @@ import webdbms.DBMS.exception.EntryException;
 import webdbms.DBMS.exception.TableException;
 import org.json.*;
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -18,17 +17,12 @@ import java.util.stream.IntStream;
 public class TableImpl implements Table {
 
     private RealConstraint constraint;
-    @Override
-    public String getLocation() {
-        return location;
-    }
-
     private String location;
     private String name;
     private List<DataType> types;
+    private List<String> columnNames;
     private List<Entry> entries;
     private EntryFactory entryFactory;
-    private List<String> columnNames;
 
     public TableImpl() throws StorageException {
         this.entries = new ArrayList<>();
@@ -101,13 +95,12 @@ public class TableImpl implements Table {
         if (constraints.length() != 0) {
             this.constraint = new RealConstraint(constraints.getDouble(0), constraints.getDouble(1));
         }
-        JSONArray ByteArrayJson = new JSONArray(s[4]);
+        JSONArray imageJson = new JSONArray(s[4]);
         if (this.types.equals(readTypes) || types.isEmpty()) {
             this.types = readTypes;
             this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
             for (int i = 0; i < entries.size(); i++) {
-                byte[] bytes = JSONtoByteArray((JSONArray)ByteArrayJson.get(i));
-                this.entries.get(i).setImage(ImageIO.read(new ByteArrayInputStream(bytes)));
+                this.entries.get(i).setImage(imageJson.get(i).toString());
             }
         } else {
             throw new TableException("Expected types " + readTypes + " but " + this.types + " found");
@@ -132,13 +125,6 @@ public class TableImpl implements Table {
         return entries;
     }
 
-    private byte[] JSONtoByteArray(JSONArray json) {
-        List<Object> ints = json.toList();
-        byte[] b = new byte[ints.size()];
-        IntStream.range(0, ints.size()).forEach(i -> b[i] = (byte) ((int) ints.get(i)));
-        return b;
-    }
-
     @Override
     public boolean isEmpty() {
         return this.entries.isEmpty();
@@ -150,10 +136,6 @@ public class TableImpl implements Table {
             throw new TableException("Expected defined name, location and types");
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
-            List<byte[]> byteArraysWithImages = new ArrayList<>();
-            for (Entry entry : entries) {
-                byteArraysWithImages.add(entry.getImageByteArray());
-            }
             writer.write(new JSONArray(this.columnNames).toString() + "\n");
             writer.write(new JSONArray(this.types).toString() + "\n");
             writer.write(this.getJsonArray().toString() + "\n");
@@ -163,10 +145,10 @@ public class TableImpl implements Table {
                 constraints.put(this.constraint.getMaxValue());
             }
             writer.write(constraints.toString() + "\n");
-            JSONArray pics = new JSONArray(byteArraysWithImages);
-            writer.write(pics.toString());
+            JSONArray images = new JSONArray();
+            entries.forEach(entry -> images.put(entry.getImage()));
+            writer.write(images.toString());
             writer.flush();
-
         } catch (IOException e) {
             throw new RuntimeException("Can not write table to storage", e);
         }
@@ -181,7 +163,7 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRow(List<Object> values, BufferedImage image) throws StorageException {
+    public void addRow(List<Object> values, String image) throws StorageException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
         }
@@ -240,6 +222,16 @@ public class TableImpl implements Table {
     }
 
     @Override
+    public String getLocation() {
+        return location;
+    }
+
+    @Override
+    public RealConstraint getConstraint() {
+        return constraint;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TableImpl)) return false;
@@ -255,10 +247,5 @@ public class TableImpl implements Table {
         int result = location != null ? location.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public RealConstraint getConstraint() {
-        return constraint;
     }
 }

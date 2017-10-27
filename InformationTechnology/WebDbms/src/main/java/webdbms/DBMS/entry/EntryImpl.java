@@ -15,7 +15,7 @@ import java.util.List;
 
 public class EntryImpl implements Entry {
 
-    private BufferedImage image;
+    private String image;
     private List<DataType> types;
     private List<Object> values;
 
@@ -57,24 +57,12 @@ public class EntryImpl implements Entry {
     }
 
     @Override
-    public BufferedImage getImage() {
+    public String getImage() {
         return image;
     }
 
     @Override
-    public byte[] getImageByteArray() throws EntryException {
-        try {
-            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-            if (image != null)
-                ImageIO.write(image,"png", byteStream);
-            return byteStream.toByteArray();
-        } catch (IOException e) {
-            throw new EntryException("Can not read the image");
-        }
-    }
-
-    @Override
-    public void setImage(BufferedImage image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
