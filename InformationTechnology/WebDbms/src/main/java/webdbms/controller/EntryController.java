@@ -33,7 +33,7 @@ public class EntryController {
             database.save();
         } catch (StorageException e) {
             throw new InternalServerException(e);
-        } catch (ClassCastException e) {
+        } catch (ClassCastException | NullPointerException e) {
             throw new InvalidRequestBodyException();
         }
     }

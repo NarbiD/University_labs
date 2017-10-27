@@ -51,7 +51,7 @@ public class TableController {
             RealConstraint constraint = getConstraintFromMap((Map) requestBody.get("realIntervalConstraint"));
             List<String> columnNames = getColumnNamesFromObjects((List<Object>) requestBody.get("columnNames"));
             tableService.createTable(databaseName, name, types, columnNames, constraint);
-        } catch (NullPointerException e) {
+        } catch (ClassCastException | NullPointerException e) {
             throw new InvalidRequestBodyException();
         } catch (StorageException e) {
             throw new InternalServerException(e);

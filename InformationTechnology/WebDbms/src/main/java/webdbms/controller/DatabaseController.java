@@ -5,6 +5,8 @@ import webdbms.DBMS.exception.StorageException;
 import webdbms.facades.DatabaseFacade;
 import webdbms.service.DatabaseService;
 import webdbms.service.exception.InternalServerException;
+import webdbms.service.exception.InvalidRequestBodyException;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -34,6 +36,8 @@ public class DatabaseController {
             databaseService.createDatabase(requestBody.get("databaseName"));
         } catch (StorageException e) {
             throw new InternalServerException(e);
+        } catch (ClassCastException | NullPointerException e) {
+            throw new InvalidRequestBodyException();
         }
     }
 
