@@ -2,12 +2,18 @@ package webdbms.controller;
 
 import org.springframework.web.bind.annotation.*;
 import webdbms.DBMS.database.Database;
+import webdbms.DBMS.entry.Entry;
 import webdbms.DBMS.exception.StorageException;
 import webdbms.DBMS.table.Table;
 import webdbms.facades.EntryFacade;
 import webdbms.service.DatabaseService;
 import webdbms.service.TableService;
 import webdbms.service.exception.InternalServerException;
+import webdbms.service.exception.InvalidRequestBodyException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +32,22 @@ public class EntryController {
         try {
             Database database = databaseService.findByName(databaseName);
             Table table = tableService.findByName(databaseName, tableName);
-            table.addRow((List<Object>) requestBody.get("values"), null);
+            BufferedImage image = listObjectsToImage((List<Object>)requestBody.get("imageByteArray"));
+            table.addRow((List<Object>) requestBody.get("values"), image);
             database.save();
         } catch (StorageException e) {
             throw new InternalServerException(e);
+        } catch (ClassCastException | IOException e) {
+            throw new InvalidRequestBodyException();
         }
+    }
+
+    private BufferedImage listObjectsToImage(List<Object> objects) throws IOException {
+        byte[] byteArray = new byte[objects.size()];
+        for (int i = 0; i < objects.size(); i++) {
+            byteArray[i] = (byte)(int)objects.get(i);
+        }
+        return ImageIO.read(new ByteArrayInputStream(byteArray));
     }
 
     @RequestMapping(value = "/{rowNumber}", method = RequestMethod.DELETE)
@@ -38,11 +55,34 @@ public class EntryController {
                           @PathVariable int rowNumber) {
         try {
             Database database = databaseService.findByName(databaseName);
+            List<Entry> entries = tableService.findByName(databaseName, tableName).getEntries();
+            if (!isRowNumberValid(entries.size(), rowNumber)) {
+                throw new InvalidRequestBodyException();
+            }
             tableService.findByName(databaseName, tableName).deleteRow(rowNumber);
             database.save();
         } catch (StorageException e) {
             throw new InternalServerException(e);
         }
+    }
+
+    @RequestMapping(value = "/{rowNumber}", method = RequestMethod.GET)
+    public EntryFacade getRow(@PathVariable String databaseName,
+                              @PathVariable String tableName,
+                              @PathVariable int rowNumber) {
+        try {
+            List<Entry> entries = tableService.findByName(databaseName, tableName).getEntries();
+            if (!isRowNumberValid(entries.size(), rowNumber)) {
+                throw new InvalidRequestBodyException();
+            }
+            return new EntryFacade(entries.get(rowNumber));
+        } catch (StorageException e) {
+            throw new InternalServerException(e);
+        }
+    }
+
+    private boolean isRowNumberValid(int tableSize, int rowNumber){
+        return rowNumber < tableSize && rowNumber >= 0;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
