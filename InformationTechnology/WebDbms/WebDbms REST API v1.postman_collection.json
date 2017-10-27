@@ -1,0 +1,172 @@
+{
+	"info": {
+		"name": "WebDbms REST API v1",
+		"_postman_id": "ba909d39-adc1-c7b1-725c-4a4a35809b1c",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": " Overview of databases",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create database",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"databaseName\": \"Google\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/databases/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete database",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/google",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"google"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get database details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Overview of tables in the database",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create table in the database",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"tableName\": \"guard_salary\",\n\t\"columnTypes\": [\n\t\t\"INTEGER\",\n\t\t\"REAL_INTERVAL\"\n\t\t],\n\t\"columnNames\": [\n\t\t\"month\",\n\t\t\"salary\"\n\t\t],\n\t\"realIntervalConstraint\": {\n\t\t\"minValue\": 200.0,\n\t\t\"maxValue\": 10000.0\n\t}\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete table from the database",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/guard_salary",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						"guard_salary"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
