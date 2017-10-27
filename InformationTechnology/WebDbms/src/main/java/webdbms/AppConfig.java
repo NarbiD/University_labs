@@ -11,8 +11,9 @@ import webdbms.service.DatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import webdbms.service.TableService;
 
-import java.util.ArrayList;
+import java.io.IOException;
 
 @Configuration
 @ComponentScan
@@ -25,7 +26,7 @@ public class AppConfig {
     }
 
     @Bean
-    public Dbms dbms() throws StorageException {
+    public Dbms dbms() throws StorageException, IOException {
         DbmsImpl dbms = new DbmsImpl();
         dbms.setDatabases(FXCollections.observableArrayList());
         dbms.loadDatabaseFromStorage();
@@ -36,9 +37,16 @@ public class AppConfig {
     @Autowired
     public DatabaseService databaseService(Dbms dbms) throws StorageException {
         DatabaseService databaseService = new DatabaseService();
-        databaseService.setDatabases(new ArrayList<>());
         databaseService.setDbms(dbms);
         return databaseService;
+    }
+
+    @Bean
+    @Autowired
+    public TableService tableService(DatabaseService databaseService) throws StorageException {
+        TableService tableService = new TableService();
+        tableService.setDatabaseService(databaseService);
+        return tableService;
     }
 
     @Bean
@@ -51,17 +59,19 @@ public class AppConfig {
 
     @Bean
     @Autowired
-    public TableController tableController(DatabaseService databaseService) {
+    public TableController tableController(DatabaseService databaseService, TableService tableService) {
         TableController tableController = new TableController();
         tableController.setDatabaseService(databaseService);
+        tableController.setTableService(tableService);
         return tableController;
     }
 
     @Bean
     @Autowired
-    public EntryController entryController(DatabaseService databaseService) {
+    public EntryController entryController(DatabaseService databaseService, TableService tableService) {
         EntryController entryController = new EntryController();
         entryController.setDatabaseService(databaseService);
+        entryController.setTableService(tableService);
         return entryController;
     }
 }

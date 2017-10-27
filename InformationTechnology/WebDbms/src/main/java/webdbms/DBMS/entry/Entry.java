@@ -15,5 +15,4 @@ public interface Entry {
 
     void setImage(BufferedImage image);
     JSONObject getJson();
-    List<DataType> getTypes();
 }

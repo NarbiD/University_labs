@@ -13,7 +13,7 @@ public class DatabaseFacade {
         this.database = database;
     }
 
-    public String getName() {
+    public String getDatabaseName() {
         return database.getName();
     }
 

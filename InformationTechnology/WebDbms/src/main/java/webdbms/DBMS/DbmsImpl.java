@@ -7,11 +7,12 @@ import webdbms.DBMS.database.Databases;
 import webdbms.DBMS.exception.StorageException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class DbmsImpl implements Dbms {
 
-    private Collection<Database> databases;
+    private List<Database> databases;
     private DatabaseFactory databaseFactory;
 
     public DbmsImpl() {
@@ -19,11 +20,11 @@ public class DbmsImpl implements Dbms {
     }
 
     @Override
-    public void setDatabases(Collection<Database> databases) {
+    public void setDatabases(List<Database> databases) {
         this.databases = databases;
     }
 
-    public void loadDatabaseFromStorage() throws StorageException {
+    public void loadDatabaseFromStorage() throws StorageException, IOException {
         File[] dirs = new File(Databases.ABS_DEFAULT_LOCATION).listFiles();
         for (File entry : dirs != null ? dirs : new File[0]) {
             if (entry.isDirectory()) {
@@ -36,12 +37,11 @@ public class DbmsImpl implements Dbms {
     }
 
     @Override
-    public Database createDatabase(String name) throws StorageException {
+    public void createDatabase(String name) throws StorageException {
         Database database = databaseFactory.getDatabase();
         database.setName(name);
         database.save();
         databases.add(database);
-        return database;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DbmsImpl implements Dbms {
     }
 
     @Override
-    public Collection<Database> getAllDatabases() {
+    public List<Database> getAllDatabases() {
         return databases;
     }
 }

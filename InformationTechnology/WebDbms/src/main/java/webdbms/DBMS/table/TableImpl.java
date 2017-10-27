@@ -16,12 +16,13 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class TableImpl implements Table {
-    @Override
-    public RealConstraint getConstraint() {
-        return constraint;
-    }
 
     private RealConstraint constraint;
+    @Override
+    public String getLocation() {
+        return location;
+    }
+
     private String location;
     private String name;
     private List<DataType> types;
@@ -30,20 +31,56 @@ public class TableImpl implements Table {
     private List<String> columnNames;
 
     public TableImpl() throws StorageException {
-        this("", "");
-    }
-
-    public TableImpl(String name, String location, DataType... columnTypes) throws StorageException {
-        this.location = location;
-        this.name = name;
-        this.types = Arrays.asList(columnTypes);
+        this.entries = new ArrayList<>();
+        this.types = new ArrayList<>();
         this.columnNames = new ArrayList<>();
         this.constraint = new RealConstraint();
         this.entryFactory = EntryImpl::new;
-        try {
-            loadDataFromFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+    }
+
+    @Override
+    public Builder getBuilder() throws StorageException {
+        return this.new BuilderImpl();
+    }
+
+    class BuilderImpl implements Builder {
+
+        @Override
+        public Builder setName(String name) {
+            TableImpl.this.name = name;
+            return this;
+        }
+
+        @Override
+        public Builder setLocation(String location) {
+            TableImpl.this.location = new File(location).getAbsolutePath() + File.separator;
+            return this;
+        }
+
+        @Override
+        public Builder setTypes(List<DataType> dataTypes) {
+            TableImpl.this.types = dataTypes;
+            return this;
+        }
+
+        @Override
+        public Builder setColumnNames(List<String> names) {
+            TableImpl.this.columnNames = names;
+            return this;
+        }
+
+        @Override
+        public Builder setConstraint(RealConstraint constraint) {
+            TableImpl.this.constraint = constraint;
+            return this;
+        }
+
+        @Override
+        public Table build() throws StorageException {
+            if (name == null || name.equals("") || location == null) {
+                throw new TableException("Required name and location");
+            }
+            return TableImpl.this;
         }
     }
 
@@ -51,14 +88,13 @@ public class TableImpl implements Table {
     public void loadDataFromFile() throws StorageException, IOException {
         String rowInFile = new JSONArray().toString();
         String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile;
-        if (Tables.isTableExists(this.name, this.location)) {
+        if (Tables.doesTableExist(this.name, this.location)) {
             readData = readTableFromStorage(this.location + this.name);
         }
         String[] s = readData.split("\n");
         List<DataType> readTypes = new ArrayList<>();
         for (Object title : new JSONArray(s[0]).toList()) {
-            String t = title.toString();
-            columnNames.add(t);
+            columnNames.add(title.toString());
         }
         new JSONArray(s[1]).toList().forEach(type -> readTypes.add(DataType.valueOf(type.toString())));
         JSONArray constraints = new JSONArray(s[3]);
@@ -74,9 +110,8 @@ public class TableImpl implements Table {
                 this.entries.get(i).setImage(ImageIO.read(new ByteArrayInputStream(bytes)));
             }
         } else {
-            throw new TableException("Expected types " + readData + " but " + this.types + " found");
+            throw new TableException("Expected types " + readTypes + " but " + this.types + " found");
         }
-
     }
 
     private String readTableFromStorage(String storageLocation) {
@@ -146,11 +181,6 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRows(Entry... rows) {
-        entries.addAll(Arrays.asList(rows));
-    }
-
-    @Override
     public void addRow(List<Object> values, BufferedImage image) throws StorageException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
@@ -169,7 +199,7 @@ public class TableImpl implements Table {
 
     @Override
     public void sort(int fieldNumber) {
-        entries.sort(new Comparator<Entry>() {
+        entries.sort(new Comparator<>() {
             @Override
             @SuppressWarnings("unchecked")
             public int compare(Entry entry1, Entry entry2) {
@@ -182,6 +212,11 @@ public class TableImpl implements Table {
                 return (field instanceof Character || field instanceof String) ? field.toString().toLowerCase() : field;
             }
         });
+    }
+
+    @Override
+    public void delete() throws TableException {
+        Tables.delete(name, location);
     }
 
     @Override
@@ -205,36 +240,6 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void setLocation(String location) {
-        this.location = new File(location).getAbsolutePath() + File.separator;
-    }
-
-    @Override
-    public void setTypes(DataType... types) {
-        this.types = Arrays.asList(types);
-    }
-
-    @Override
-    public void setColumnNames(List<String> names) {
-        this.columnNames = names;
-    }
-
-    @Override
-    public void setTypes(List<DataType> types) {
-        this.types = types;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setConstraint(RealConstraint constraint) {
-        this.constraint = constraint;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TableImpl)) return false;
@@ -252,7 +257,8 @@ public class TableImpl implements Table {
         return result;
     }
 
-    public void setEntryFactory(EntryFactory entryFactory) {
-        this.entryFactory = entryFactory;
+    @Override
+    public RealConstraint getConstraint() {
+        return constraint;
     }
 }

@@ -1,5 +1,6 @@
 package webdbms.DBMS.database;
 
+import webdbms.DBMS.datatype.constraint.RealConstraint;
 import webdbms.DBMS.table.TableImpl;
 import webdbms.DBMS.datatype.DataType;
 import webdbms.DBMS.exception.DatabaseException;
@@ -16,8 +17,8 @@ import java.util.List;
 public class DatabaseImpl implements Database {
 
     private String name;
-    private List<Table> tables;
     private String location;
+    private List<Table> tables;
     private TableFactory tableFactory;
 
     public DatabaseImpl() throws StorageException {
@@ -36,18 +37,15 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public void loadTablesFromStorage() throws StorageException {
+    public void loadTablesFromStorage() throws StorageException, IOException {
         File[] files = new File(this.location + this.name).listFiles();
         for (File entry : files != null ? files : new File[0]) {
             if (entry.isFile()) {
-                Table table = tableFactory.getTable();
-                table.setName(entry.getName());
-                table.setLocation(this.location + this.name + File.separator);
-                try {
-                    table.loadDataFromFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Table table = tableFactory.getTable().getBuilder()
+                        .setName(entry.getName())
+                        .setLocation(this.location + this.name + File.separator)
+                        .build();
+                table.loadDataFromFile();
                 tables.add(table);
             }
         }
@@ -73,29 +71,30 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public Table createTable(String name, DataType... columnTypes) throws StorageException {
-        Table table = tableFactory.getTable();
-        table.setName(name);
-        table.setLocation(this.location + this.name + File.separator);
+    public void createTable(String name, List<DataType> types, List<String> columnNames,
+                             RealConstraint constraint) throws StorageException {
+        Table table = tableFactory.getTable().getBuilder()
+                .setName(name)
+                .setLocation(this.location + this.name + File.separator)
+                .setTypes(types)
+                .setColumnNames(columnNames)
+                .setConstraint(constraint)
+                .build();
         if (tables.contains(table)) {
             throw new TableException("Table with the same name already exists");
         }
-        table.setTypes(columnTypes);
         tables.add(table);
-        return table;
-
     }
 
     @Override
-    public void deleteTable(String name) throws TableException {
+    public void deleteTable(String name) throws StorageException {
         String tableLocation = this.location + this.name + File.separator;
-        Tables.delete(name, tableLocation);
-    }
-
-    @Override
-    public boolean doesTableExist(String tableName) {
-        String tableLocation = this.location + this.name + File.separator;
-        return Tables.isTableExists(tableName, tableLocation);
+        Table table = tableFactory.getTable().getBuilder()
+                .setName(name)
+                .setLocation(tableLocation)
+                .build();
+        tables.remove(table);
+        table.delete();
     }
 
     @Override

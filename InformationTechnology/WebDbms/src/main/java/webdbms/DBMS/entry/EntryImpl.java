@@ -35,10 +35,6 @@ public class EntryImpl implements Entry {
         this.values = values;
     }
 
-    public EntryImpl() throws EntryException {
-        this(new ArrayList<>(), new ArrayList<>(), new RealConstraint());
-    }
-
     public EntryImpl(JSONObject json, List<DataType> types, RealConstraint constraint) throws EntryException {
         this(getValuesFromJson(json), types, constraint);
     }
@@ -86,11 +82,6 @@ public class EntryImpl implements Entry {
     @Override
     public List<Object> getValues() {
         return this.values;
-    }
-
-    @Override
-    public List<DataType> getTypes() {
-        return types;
     }
 
     @Override

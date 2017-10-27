@@ -14,7 +14,7 @@ public class TableFacade {
         this.table = table;
     }
 
-    public String getName() {
+    public String getTableName() {
         return table.getName();
     }
 
@@ -22,11 +22,11 @@ public class TableFacade {
         return table.getEntries().size();
     }
 
-    public List<DataType> getTypes() {
+    public List<DataType> getColumnTypes() {
         return table.getTypes();
     }
 
-    public Constraint getRealConstraint() {
+    public Constraint getRealIntervalConstraint() {
         return table.getConstraint();
     }
 }
