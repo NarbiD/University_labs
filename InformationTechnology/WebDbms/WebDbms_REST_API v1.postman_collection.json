@@ -1,6 +1,6 @@
 {
 	"info": {
-		"name": "WebDbms REST API v1",
+		"name": "WebDbms_REST_API v1",
 		"_postman_id": "ba909d39-adc1-c7b1-725c-4a4a35809b1c",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -13,7 +13,15 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": ""
+					"raw": "localhost:8080/databases/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						""
+					]
 				},
 				"description": ""
 			},
@@ -162,6 +170,114 @@
 						"facebook",
 						"tables",
 						"guard_salary"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Overview of rows in the table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/guard_salary/rows/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						"guard_salary",
+						"rows",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create new row in table",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"values\": [\n\t\t4,\n\t\t500.0\n\t\t]\n}\n\t"
+				},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/guard_salary/rows/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						"guard_salary",
+						"rows",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete row from table",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/guard_salary/rows/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						"guard_salary",
+						"rows",
+						"2"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get row details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/guard_salary/rows/0",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						"guard_salary",
+						"rows",
+						"0"
 					]
 				},
 				"description": ""
