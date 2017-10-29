@@ -4,6 +4,7 @@ import webdbms.DBMS.database.Database;
 import webdbms.DBMS.database.DatabaseFactory;
 import webdbms.DBMS.database.DatabaseImpl;
 import webdbms.DBMS.database.Databases;
+import webdbms.DBMS.exception.DatabaseException;
 import webdbms.DBMS.exception.StorageException;
 
 import java.io.File;
@@ -40,6 +41,9 @@ public class DbmsImpl implements Dbms {
     public void createDatabase(String name) throws StorageException {
         Database database = databaseFactory.getDatabase();
         database.setName(name);
+        if (databases.contains(database)) {
+            throw new DatabaseException("Database with the same name already exists");
+        }
         database.save();
         databases.add(database);
     }

@@ -74,4 +74,9 @@ public class AppConfig {
         entryController.setTableService(tableService);
         return entryController;
     }
+
+    @Bean
+    public TypeController typeController() {
+        return new TypeController();
+    }
 }
