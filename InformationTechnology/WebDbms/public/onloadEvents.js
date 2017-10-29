@@ -3,35 +3,63 @@ $(document).ready(function () {
         type: "GET",
         url: "/databases/",
         success: [function (data) {
-            for (var i=0; i<data.length; i++) {
-                var row = $("<tr></tr>");
-                $("<td>" + data[i] + "</td>").appendTo(row).on("click", function () {
-                        clickOnDatabase(this.innerHTML);
-                    });
-                row.appendTo("#databaseList > tbody");
-            }
+            clickOnListItem(data, function () {
+                clickOnDatabase(this.innerHTML);
+            });
         }]
     })
 });
 
+function clickOnListItem(list, action) {
+    for (var i=0; i<list.length; i++) {
+        var row = $("<tr></tr>");
+        $("<td>" + list[i] + "</td>").appendTo(row).on("click", action);
+        row.appendTo("#tableList > tbody");
+    }
+}
+
 function clickOnDatabase(dbName) {
-    $("#tableList").find("tbody > tr:gt(0)").remove();
+    cleanTable("#tableList");
+    cleanTable("#entries");
+    cleanImage();
 
     $.ajax({
         type: "GET",
         url: "/databases/" + dbName + "/tables/",
         success: [function (data) {
-            for (var i=0; i<data.length; i++) {
+            clickOnListItem(data, function () {
+                clickOnTable(dbName, this.innerHTML);
+            });
+        }]
+    })
+}
+
+function clickOnTable(dbName, tableName) {
+    cleanTable("#entries");
+    cleanImage();
+    $.ajax({
+        type: "GET",
+        url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
+        success: [function (data) {
+            for (var i=0; i < data.length; i++) {
+                var values = data[i].values;
                 var row = $("<tr></tr>");
-                $("<td>" + data[i] + "</td>").appendTo(row).on("click", function () {
-                    clickOnTable(this.innerHTML);
-                });
-                row.appendTo("#tableList > tbody");
+                for (var j=0; j < values.length; j++){
+                    $("<td>" + values[j] + "</td>").appendTo(row).on("click", function () {
+                        var k = $(this).parent('tr').index();
+                        $("#image").attr("src", "data:image/png;base64," + data[k-1].image);
+                    });
+                }
+                row.appendTo("#entries > tbody");
             }
         }]
     })
 }
 
-function clickOnTable(tableName) {
+function cleanTable(selector) {
+    $(selector).find("tbody > tr:gt(0)").remove();
+}
 
+function cleanImage() {
+    $("#image").removeAttr("src");
 }
