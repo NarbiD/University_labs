@@ -124,7 +124,9 @@ $(document).ready(function () {
             reader.readAsDataURL(value);
             reader.onload = function () {
                 if($(".createRowFormSection .textOk").length === 0) {
-                    $("input[type=file]").after("<span class=\"textOk\">ok</span>");
+                    var textOk = $("<span class=\"textOk\">ok</span><br>");
+                    textOk.css("color", "green");
+                    $("input[type=file]").after(textOk);
                 }
                 image = reader.result.split(",")[1];
             };
@@ -194,11 +196,12 @@ function sendRow(image) {
 
 
 function addColumnToTableForm(dataTypes) {
-    var columnTypeField = $("<select title=\"type\" class=\"columnType\"></select><br>");
+    var columnTypeField = $("<select title=\"type\" class=\"columnType form-control\"></select><br>");
     for(var typeNumber = 0; typeNumber < dataTypes.length; typeNumber++) {
         $("<option value=" + typeNumber + ">" + dataTypes[typeNumber] + "</option>").appendTo(columnTypeField);
     }
-    var columnNameField = $("<input type=\"text\" class=\"columnName\" title=\"column name\">");
+    var columnNameField = $("<input type=\"text\" class=\"columnName  form-control\" title=\"column name\"" +
+        " placeholder=\"Column name\">");
     var columnProps = $("<div></div>");
     columnProps.append(columnNameField);
     columnProps.append(columnTypeField);
@@ -244,9 +247,6 @@ function clickOnListItem(list, selector, action) {
 }
 
 function clickOnDatabase(dbName) {
-    cleanTable(".tableList");
-    cleanTable(".entriesList");
-    cleanImage();
     hideForm(".createDatabaseFormSection");
     hideForm(".createTableFormSection");
     hideForm(".createRowFormSection");
@@ -259,6 +259,11 @@ function clickOnDatabase(dbName) {
             $(".databaseList").find("td:contains(" + dbName + ")").filter(function() {
                 return $(this).text() === dbName;
             }).parent().addClass("selected");
+
+            cleanTable(".tableList");
+            cleanTable(".entriesList");
+            cleanImage();
+
             clickOnListItem(data, ".tableList", function () {
                 clickOnTable(dbName, this.innerHTML);
             });
@@ -267,9 +272,6 @@ function clickOnDatabase(dbName) {
 }
 
 function clickOnTable(dbName, tableName) {
-    cleanTable(".entriesList");
-    cleanImage();
-    hideForm(".createDatabaseFormSection");
     hideForm(".createTableFormSection");
     hideForm(".createRowFormSection");
 
@@ -277,10 +279,7 @@ function clickOnTable(dbName, tableName) {
         type: "GET",
         url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
         success: [function (data) {
-            $(".tableList").find("tr.selected").removeClass("selected");
-            $(".tableList").find("td:contains(" + tableName + ")").filter(function() {
-                return $(this).text() === tableName;
-            }).parent().addClass("selected");
+            cleanTable(".entriesList");
 
             var numberOfColumns = data[0].values.length;
 
@@ -312,7 +311,6 @@ function clickOnTable(dbName, tableName) {
                 return $(this).text() === tableName;
             }).parent().addClass("selected");
         }]
-
     });
 
     $.ajax({
@@ -370,18 +368,18 @@ function cleanImage() {
 
 function initRowForm(columnNames) {
 
-    $(".createRowFormSection > .fields").html("");
+    $(".createRowFormSection .fields").html("");
     addRowsToForm(columnNames);
 }
 
 function addRowsToForm(columnNames) {
     for (var i = 0; i < columnNames.length; i++) {
-        var columnNameField = $("<span class=\"columnNameField\"></span>");
+        var columnNameField = $("<b class=\"columnNameField\"></b>");
         columnNameField.text(columnNames[i] + ": ");
-        var columnValueField = $("<input type=\"text\" class=\"columnValueField\" title=\"value field\">");
-        var fieldPair = $("<div class=\"rowField\"></div>");
+        var columnValueField = $("<input type=\"text\" class=\"columnValueField form-control\" title=\"value field\">");
+        var fieldPair = $("<div class=\"rowField\"></div><br>");
         fieldPair.append(columnNameField, columnValueField);
-        $(".createRowFormSection > .fields").append(fieldPair);
+        $("input[type=file]").before(fieldPair);
     }
 }
 
@@ -395,11 +393,12 @@ function parseDataFromRowForm() {
 }
 
 function sortByColumnNumber(colNumber, dbName, tableName) {
-    cleanTable(".entriesList");
     $.ajax({
         type: "GET",
         url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
         success: [function (data) {
+            cleanTable(".entriesList");
+
             if (data[0].values !== undefined) {
                 $(".entriesList").find("th").attr("colspan", data[0].values.length);
             }
@@ -422,7 +421,7 @@ function sortByColumnNumber(colNumber, dbName, tableName) {
             var sortButtons = $("<tr></tr>");
             for (var q = 0; q < data[0].values.length; q++){
                 sortButtons.append("<td onclick='sortByColumnNumber(" + q + ", \"" + dbName + "\", \"" + tableName + "\");'>" +
-                    "<input type='button' value='sort'></td>");
+                    "<input type='button' class='' value='sort'></td>");
             }
             cleanImage();
             sortButtons.appendTo(".entriesList > tbody");
