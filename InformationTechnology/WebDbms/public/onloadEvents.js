@@ -379,7 +379,7 @@ function addRowsToForm(columnNames) {
         var columnValueField = $("<input type=\"text\" class=\"columnValueField form-control\" title=\"value field\">");
         var fieldPair = $("<div class=\"rowField\"></div><br>");
         fieldPair.append(columnNameField, columnValueField);
-        $("input[type=file]").before(fieldPair);
+        $(".createRowFormSection .fields").append(fieldPair);
     }
 }
 
