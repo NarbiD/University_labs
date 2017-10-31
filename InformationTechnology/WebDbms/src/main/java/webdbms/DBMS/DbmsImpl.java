@@ -50,10 +50,10 @@ public class DbmsImpl implements Dbms {
 
     @Override
     public void deleteDatabase(String name) throws StorageException {
-        Database database = databaseFactory.getDatabase();
-        database.setName(name);
-        database.delete();
-        databases.remove(database);
+        Database db = databases.stream().filter(database -> name.equals(database.getName())).findAny()
+            .orElseThrow(() -> new DatabaseException("Database does not exist"));
+        db.delete();
+        databases.remove(db);
     }
 
     @Override

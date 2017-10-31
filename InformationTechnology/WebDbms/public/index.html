@@ -66,26 +66,16 @@
         <a id="btnCreateRow" class="button button-create" href="#">Create row</a>
         <a id="btnDeleteRow" class="button button-delete" href="#">Delete row</a>
         <section class="createRowFormSection">
-            <form class="createForm createRowForm">
-                <b>Table name:</b><br>
-                <input type="text" class="tableName" title="table name">
-                <br>
-
-                <b>Columns:</b><br>
-                <button type="button" class="addColumn">Add column</button><br>
-
-                <b>Real interval constraint:</b><br>
-                <b>Min:</b>
-                <input type="text" class="constraintMin" title="constraint min">
-                <b>Max:</b>
-                <input type="text" class="constraintMax" title="constraint max">
-                <br>
-
-                <input type="submit" class="submitButton">
+            <div>
+                <section class="fields"></section>
+                <input type="file" multiple="multiple" accept=".png"><br>
+                <input type="button" class="submitButton" value="Submit">
                 <input type="button" class="cancelButton" value="Cancel">
-            </form>
+            </div>
         </section>
-        <img class="image" src="#">
+        <section class = image-container>
+            <img class="image" src="#">
+        </section>
     </section>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>

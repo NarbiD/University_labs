@@ -26,6 +26,10 @@ public class TableFacade {
         return table.getTypes();
     }
 
+    public List<String> getColumnNames() {
+        return table.getColumnNames();
+    }
+
     public Constraint getRealIntervalConstraint() {
         return table.getConstraint();
     }

@@ -1,5 +1,6 @@
 package webdbms.DBMS.table;
 
+import webdbms.DBMS.datatype.TypeManager;
 import webdbms.DBMS.entry.Entry;
 import webdbms.DBMS.entry.EntryFactory;
 import webdbms.DBMS.entry.EntryImpl;
@@ -166,6 +167,15 @@ public class TableImpl implements Table {
     public void addRow(List<Object> values, String image) throws StorageException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
+        }
+        for (int i = 0; i < values.size(); i++) {
+            if(values.get(i) instanceof String) {
+                try {
+                    values.set(i, TypeManager.parseObjectByType(values.get(i).toString(), types.get(i)));
+                } catch (NumberFormatException e) {
+                    throw new TableException("Invalid value " + values.get(i));
+                }
+            }
         }
         Entry entry = new EntryImpl(values, types, constraint);
         if (image != null) {

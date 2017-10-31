@@ -13,12 +13,12 @@ $(document).ready(function () {
 
     hideForm(".createDatabaseFormSection");
     hideForm(".createTableFormSection");
+    hideForm(".createRowFormSection");
     loadDatabases();
 
     $(".createDatabaseForm").on("submit", function () {
         var outputJson = Object();
         outputJson.databaseName = $(".databaseName").val();
-        outputJson.database = [1,2,3,4,5];
         $.ajax({
             type: "POST",
             url: "/databases/",
@@ -102,19 +102,95 @@ $(document).ready(function () {
             addColumnToTableForm(dataTypes);
         });
 
-        if($(".databaseList").find("tr.selected").length == 1) {
+        if($(".databaseList").find("tr.selected").length === 1) {
             showForm(".createTableFormSection");
         }
     });
 
     $("#btnCreateRow").on("click", function () {
-        // showForm(".create");
+        if($(".tableList").find("tr.selected").length === 1) {
+            showForm(".createRowFormSection");
+        }
     });
 
     $("#btnDeleteRow").on("click", function () {
     });
+
+    var image;
+    $("input[type=file]").on("change", function(){
+        var images = this.files;
+        $.each(images, function(key, value) {
+            var reader = new FileReader();
+            reader.readAsDataURL(value);
+            reader.onload = function () {
+                if($(".createRowFormSection .textOk").length === 0) {
+                    $("input[type=file]").after("<span class=\"textOk\">ok</span>");
+                }
+                image = reader.result.split(",")[1];
+            };
+        });
+    });
+
+    $(".createRowFormSection .submitButton").on("click", function () {
+        sendRow(image);
+    });
 });
 
+function loadEntries(dbName, tableName) {
+    $.ajax({
+        type: "GET",
+        url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
+        success: [function (data) {
+            if (data[0].values !== undefined) {
+                $(".entriesList").find("th").attr("colspan", data[0].values.length);
+            }
+            for (var i = 0; i < data.length; i++) {
+                var values = data[i].values;
+                var row = $("<tr></tr>");
+                for (var j = 0; j < values.length; j++){
+                    $("<td>" + values[j] + "</td>").appendTo(row).on("click", function () {
+                        var k = $(this).parent('tr').index();
+                        $(".image").attr("src", "data:image/png;base64," + data[k-1].image);
+                    });
+                }
+                row.appendTo(".entriesList > tbody");
+            }
+            var sortButtons = $("<tr></tr>");
+            for (var k = 0; k < data[0].values.length; k++){
+                sortButtons.append("<td onclick='sortByColumnNumber(" + k + ", \"" + dbName + "\", \"" + tableName + "\");'>" +
+                    "<input type='button' value='sort'></td>");
+            }
+            cleanImage();
+            sortButtons.appendTo(".entriesList > tbody");
+        }]
+    });
+}
+
+function sendRow(image) {
+    var outputJson = {};
+
+    outputJson.image = image !== undefined ? image : "";
+    outputJson.values = parseDataFromRowForm();
+
+    var dbName = $(".databaseList").find("tr.selected").text();
+    var tableName = $(".tableList").find("tr.selected").text();
+
+    $.ajax({
+        type: "POST",
+        url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(outputJson),
+        processData: false,
+        success: function () {
+            hideForm(".createRowFormSection");
+            cleanTable(".entriesList");
+            loadEntries(dbName, tableName);
+        },
+        error: function (data) {
+            alert(JSON.parse(data.responseText).message.split(":")[1]);
+        }
+    })
+}
 
 
 function addColumnToTableForm(dataTypes) {
@@ -171,6 +247,9 @@ function clickOnDatabase(dbName) {
     cleanTable(".tableList");
     cleanTable(".entriesList");
     cleanImage();
+    hideForm(".createDatabaseFormSection");
+    hideForm(".createTableFormSection");
+    hideForm(".createRowFormSection");
 
     $.ajax({
         type: "GET",
@@ -190,6 +269,9 @@ function clickOnDatabase(dbName) {
 function clickOnTable(dbName, tableName) {
     cleanTable(".entriesList");
     cleanImage();
+    hideForm(".createDatabaseFormSection");
+    hideForm(".createTableFormSection");
+    hideForm(".createRowFormSection");
 
     $.ajax({
         type: "GET",
@@ -200,7 +282,11 @@ function clickOnTable(dbName, tableName) {
                 return $(this).text() === tableName;
             }).parent().addClass("selected");
 
-            $(".entriesList").find("th").attr("colspan", data[0].values.length) ;
+            var numberOfColumns = data[0].values.length;
+
+            if (data[0].values !== undefined) {
+                $(".entriesList").find("th").attr("colspan", numberOfColumns);
+            }
 
             for (var i = 0; i < data.length; i++) {
                 var values = data[i].values;
@@ -213,11 +299,28 @@ function clickOnTable(dbName, tableName) {
                 }
                 row.appendTo(".entriesList > tbody");
             }
+            var sortButtons = $("<tr></tr>");
+            for (var k = 0; k < numberOfColumns; k++){
+                sortButtons.append("<td onclick='sortByColumnNumber(" + k + ", \"" + dbName + "\", \"" + tableName + "\");'>" +
+                    "<input type='button' value='sort'></td>");
+            }
+            cleanImage();
+            sortButtons.appendTo(".entriesList > tbody");
 
             $(".tableList").find("tr.selected").removeClass("selected");
             $(".tableList").find("td:contains(" + tableName + ")").filter(function() {
                 return $(this).text() === tableName;
             }).parent().addClass("selected");
+        }]
+
+    });
+
+    $.ajax({
+        type: "GET",
+        url: "/databases/" + dbName + "/tables/" + tableName + "/",
+        success: [function (data) {
+            var names = data.columnNames;
+            initRowForm(names);
         }]
     })
 }
@@ -229,6 +332,8 @@ function deleteDatabase() {
         url: "/databases/" + dbName,
         success: function () {
             cleanTable(".databaseList");
+            cleanTable(".tableList");
+            cleanTable(".entriesList");
             loadDatabases();
         }
     });
@@ -263,5 +368,64 @@ function cleanImage() {
     $(".image").removeAttr("src");
 }
 
+function initRowForm(columnNames) {
 
+    $(".createRowFormSection > .fields").html("");
+    addRowsToForm(columnNames);
+}
 
+function addRowsToForm(columnNames) {
+    for (var i = 0; i < columnNames.length; i++) {
+        var columnNameField = $("<span class=\"columnNameField\"></span>");
+        columnNameField.text(columnNames[i] + ": ");
+        var columnValueField = $("<input type=\"text\" class=\"columnValueField\" title=\"value field\">");
+        var fieldPair = $("<div class=\"rowField\"></div>");
+        fieldPair.append(columnNameField, columnValueField);
+        $(".createRowFormSection > .fields").append(fieldPair);
+    }
+}
+
+function parseDataFromRowForm() {
+    var fieldsFromForm = $(".createRowFormSection .columnValueField");
+    var values = new Array(fieldsFromForm.length);
+    for (var i = 0; i < fieldsFromForm.length; i++) {
+        values[i] = fieldsFromForm.eq(i).val();
+    }
+    return values;
+}
+
+function sortByColumnNumber(colNumber, dbName, tableName) {
+    cleanTable(".entriesList");
+    $.ajax({
+        type: "GET",
+        url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
+        success: [function (data) {
+            if (data[0].values !== undefined) {
+                $(".entriesList").find("th").attr("colspan", data[0].values.length);
+            }
+
+            data.sort(function (a, b) {
+                return a.values[colNumber] > b.values[colNumber];
+            });
+
+            for (var k = 0; k < data.length; k++) {
+                var values = data[k].values;
+                var row = $("<tr></tr>");
+                for (var j = 0; j < values.length; j++){
+                    $("<td>" + values[j] + "</td>").appendTo(row).on("click", function () {
+                        var s = $(this).parent('tr').index();
+                        $(".image").attr("src", "data:image/png;base64," + data[s-1].image);
+                    });
+                }
+                row.appendTo(".entriesList > tbody");
+            }
+            var sortButtons = $("<tr></tr>");
+            for (var q = 0; q < data[0].values.length; q++){
+                sortButtons.append("<td onclick='sortByColumnNumber(" + q + ", \"" + dbName + "\", \"" + tableName + "\");'>" +
+                    "<input type='button' value='sort'></td>");
+            }
+            cleanImage();
+            sortButtons.appendTo(".entriesList > tbody");
+        }]
+    });
+}
