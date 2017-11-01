@@ -39,7 +39,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"databaseName\": \"Google\"\n}"
+					"raw": "{\n\t\"databaseName\": \"google\"\n}"
 				},
 				"url": {
 					"raw": "localhost:8080/databases/",
@@ -115,6 +115,30 @@
 						"databases",
 						"facebook",
 						"tables",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get table details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/databases/facebook/tables/guard_salary/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"databases",
+						"facebook",
+						"tables",
+						"guard_salary",
 						""
 					]
 				},
