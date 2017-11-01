@@ -20,6 +20,5 @@
                 </HBox>
             </VBox>
         </Group>
-      <Button layoutX="112.0" layoutY="124.0" mnemonicParsing="false" onMouseClicked="#loadImage_onClick" prefHeight="25.0" prefWidth="146.0" text="Load picture" AnchorPane.bottomAnchor="53.0" />
     </AnchorPane>
 </AnchorPane>

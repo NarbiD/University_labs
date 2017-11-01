@@ -5,15 +5,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -22,9 +19,6 @@ import localdbms.DBMS.entry.Entry;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.table.Table;
 import localdbms.service.TableService;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -33,10 +27,6 @@ public class TableOverviewController extends AbstractController {
     private ObservableList<Table> tables;
     private IntegerProperty tableSelectedIndex;
     private TableService tableService;
-    private Image noImage;
-
-    @FXML
-    private ImageView imageView;
 
     @FXML
     public TableView<Table> tableOverview;
@@ -49,15 +39,7 @@ public class TableOverviewController extends AbstractController {
 
     @FXML
     public void initialize() throws StorageException, IOException {
-        initNoImage();
         initTableView();
-        initDynamicImageChange();
-    }
-
-    private void initNoImage() throws IOException {
-        String noImagePath = new File("").getAbsolutePath() + "/src/main/resources/view/images/NoImage.png";
-        noImage = SwingFXUtils.toFXImage(ImageIO.read(new File(noImagePath)), null);
-        imageView.setImage(noImage);
     }
 
     private void initTableView() {
@@ -66,24 +48,6 @@ public class TableOverviewController extends AbstractController {
         tableService.initTables();
         tables = tableService.getTables();
         tableOverview.setItems(tables);
-    }
-
-    private void initDynamicImageChange() {
-        entryOverview.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (tableSelectedIndex.get() >= 0) {
-                        Table table = tables.get(tableSelectedIndex.get());
-                        int selectedEntryIndex = entryOverview.getSelectionModel().getSelectedIndex();
-                        if (selectedEntryIndex >= 0) {
-                            Entry selectedEntry = table.getEntries().get(selectedEntryIndex);
-                            changeImage(selectedEntry.getImage());
-                        }
-                    }
-                });
-    }
-
-    private void changeImage(BufferedImage image) {
-        imageView.setImage(image != null ? SwingFXUtils.toFXImage(image, null) : noImage);
     }
 
     public void createTable_onClick(MouseEvent mouseEvent) {
@@ -106,8 +70,7 @@ public class TableOverviewController extends AbstractController {
             try {
                 entryOverview.getColumns().clear();
                 tableService.deleteTable(tableSelectedIndex.get());
-                initNoImage();
-            } catch (StorageException | IOException e) {
+            } catch (StorageException e) {
                 Warning.show(e);
             }
         } else {
@@ -123,7 +86,6 @@ public class TableOverviewController extends AbstractController {
         tableSelectedIndex.set(tableOverview.getSelectionModel().getSelectedIndex());
         if (tableSelectedIndex.get() >= 0) {
             showEntries(tableService.getTable(tableSelectedIndex.get()));
-            imageView.setImage(noImage);
         } else {
             noTableSelectedMessage();
         }

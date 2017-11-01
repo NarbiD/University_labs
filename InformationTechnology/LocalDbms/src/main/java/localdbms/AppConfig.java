@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
+
 @Configuration
 public class AppConfig {
 
@@ -23,7 +25,7 @@ public class AppConfig {
     }
 
     @Bean
-    public Dbms dbms() throws StorageException {
+    public Dbms dbms() throws StorageException, IOException {
         DbmsImpl dbms = new DbmsImpl();
         dbms.setDatabases(FXCollections.observableArrayList());
         dbms.loadDatabaseFromStorage();

@@ -10,7 +10,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import javafx.util.Pair;
-import localdbms.DBMS.datatype.constraint.RealConstraint;
 import localdbms.DataType;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.service.TableService;
@@ -45,7 +44,7 @@ public class CreateTableController extends AbstractController{
 
     private void createTableByForm() throws IllegalArgumentException, StorageException {
         FromData formData = getDataFromForm();
-        tableService.createTable(formData.tableName, formData.types, formData.names, formData.constraint);
+        tableService.createTable(formData.tableName, formData.types, formData.names);
     }
 
     private FromData getDataFromForm() throws IllegalArgumentException {
@@ -61,21 +60,18 @@ public class CreateTableController extends AbstractController{
                 types.add(type);
             }
         }
-        RealConstraint constraint = getConstraintsFromForm();
-        return new FromData(tableName, names, types, constraint);
+        return new FromData(tableName, names, types);
     }
 
     private static class FromData {
         String tableName;
         List<DataType> types;
         List<String> names;
-        RealConstraint constraint;
 
-        FromData(String tableName, List<String> names, List<DataType> types, RealConstraint constraint) {
+        FromData(String tableName, List<String> names, List<DataType> types) {
             this.tableName = tableName;
             this.names = names;
             this.types = types;
-            this.constraint = constraint;
         }
     }
 
@@ -102,22 +98,6 @@ public class CreateTableController extends AbstractController{
         } else {
             return true;
         }
-    }
-
-    private RealConstraint getConstraintsFromForm() throws IllegalArgumentException{
-        RealConstraint constraint;
-        String minValueString = ((TextField) constraints.getChildren().get(0)).getCharacters().toString();
-        String maxValueString = ((TextField) constraints.getChildren().get(1)).getCharacters().toString();
-        if (maxValueString.equals(minValueString) && maxValueString.equals("")) {
-            constraint = new RealConstraint();
-        } else if (maxValueString.equals("") || minValueString.equals("")){
-            throw new IllegalArgumentException("It is necessary to fill in either both constraint fields in the line, or none");
-        } else {
-            Double minValue = Double.valueOf(minValueString);
-            Double maxValue = Double.valueOf(maxValueString);
-            constraint = new RealConstraint(minValue, maxValue);
-        }
-        return constraint;
     }
 
     public void addField(MouseEvent mouseEvent) {

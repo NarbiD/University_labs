@@ -27,7 +27,7 @@ public class DatabaseService {
     }
 
     public void createDatabase(String name) throws StorageException {
-        databases.add(dbms.createDatabase(name));
+        dbms.createDatabase(name);
     }
 
     public void setDbms(Dbms dbms) {

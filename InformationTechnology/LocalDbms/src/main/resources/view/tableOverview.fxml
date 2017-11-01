@@ -4,7 +4,6 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -30,10 +29,8 @@
     </SplitPane>
     <VBox alignment="BOTTOM_CENTER" layoutY="295.0" prefHeight="128.0" prefWidth="181.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0">
         <Button alignment="TOP_CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#createTable_onClick" prefWidth="150.0" text="Create table" />
-        <Button mnemonicParsing="false" onMouseClicked="#deleteTable_onClick" prefHeight="25.0" prefWidth="150.0" text="Delete table" />
-        <Button mnemonicParsing="false" onMouseClicked="#select_onClick" prefHeight="25.0" prefWidth="150.0" text="Select" />
-        <Button mnemonicParsing="false" onMouseClicked="#addRow_onClick" prefHeight="25.0" prefWidth="150.0" text="Add row" />
+        <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#deleteTable_onClick" prefHeight="25.0" prefWidth="150.0" text="Delete table" />
+        <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#select_onClick" prefHeight="25.0" prefWidth="150.0" text="Select" />
+        <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#addRow_onClick" prefHeight="25.0" prefWidth="150.0" text="Add row" />
     </VBox>
-    <ImageView fx:id="imageView" fitHeight="160.0" fitWidth="150.0" layoutX="15.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="30.0">
-    </ImageView>
 </AnchorPane>

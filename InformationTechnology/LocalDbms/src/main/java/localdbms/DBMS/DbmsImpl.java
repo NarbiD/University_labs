@@ -4,14 +4,17 @@ import localdbms.DBMS.database.Database;
 import localdbms.DBMS.database.DatabaseFactory;
 import localdbms.DBMS.database.DatabaseImpl;
 import localdbms.DBMS.database.Databases;
+import localdbms.DBMS.exception.DatabaseException;
 import localdbms.DBMS.exception.StorageException;
 
 import java.io.File;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 public class DbmsImpl implements Dbms {
 
-    private Collection<Database> databases;
+    private List<Database> databases;
     private DatabaseFactory databaseFactory;
 
     public DbmsImpl() {
@@ -19,11 +22,11 @@ public class DbmsImpl implements Dbms {
     }
 
     @Override
-    public void setDatabases(Collection<Database> databases) {
+    public void setDatabases(List<Database> databases) {
         this.databases = databases;
     }
 
-    public void loadDatabaseFromStorage() throws StorageException {
+    public void loadDatabaseFromStorage() throws StorageException, IOException {
         File[] dirs = new File(Databases.ABS_DEFAULT_LOCATION).listFiles();
         for (File entry : dirs != null ? dirs : new File[0]) {
             if (entry.isDirectory()) {
@@ -36,20 +39,22 @@ public class DbmsImpl implements Dbms {
     }
 
     @Override
-    public Database createDatabase(String name) throws StorageException {
+    public void createDatabase(String name) throws StorageException {
         Database database = databaseFactory.getDatabase();
         database.setName(name);
+        if (databases.contains(database)) {
+            throw new DatabaseException("Database with the same name already exists");
+        }
         database.save();
         databases.add(database);
-        return database;
     }
 
     @Override
     public void deleteDatabase(String name) throws StorageException {
-        Database database = databaseFactory.getDatabase();
-        database.setName(name);
-        database.delete();
-        databases.remove(database);
+        Database db = databases.stream().filter(database -> name.equals(database.getName())).findAny()
+            .orElseThrow(() -> new DatabaseException("Database does not exist"));
+        db.delete();
+        databases.remove(db);
     }
 
     @Override
@@ -63,7 +68,7 @@ public class DbmsImpl implements Dbms {
     }
 
     @Override
-    public Collection<Database> getAllDatabases() {
+    public List<Database> getAllDatabases() {
         return databases;
     }
 }

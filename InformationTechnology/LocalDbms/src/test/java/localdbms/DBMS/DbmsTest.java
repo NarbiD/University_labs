@@ -16,21 +16,18 @@ import java.util.Optional;
 public class DbmsTest {
 
     private DatabaseFactory databaseFactory;
-    private Iterator<String> namesIterator;
 
     @Before
     public void init() throws StorageException {
-        int NAME_LENGTH = 8;
         databaseFactory = DatabaseImpl::new;
-        namesIterator = SequenceGenerator.getStringGenerator(NAME_LENGTH).distinct().iterator();
     }
 
     @Test
     public void createDbmsWhenFewDatabasesExists() throws StorageException {
         Database db1 = databaseFactory.getDatabase();
         Database db2 = databaseFactory.getDatabase();
-        db1.setName(namesIterator.next());
-        db2.setName(namesIterator.next());
+        db1.setName("db1");
+        db2.setName("db2");
         db1.save();
         db2.save();
         Dbms dbms = new DbmsImpl();
@@ -43,7 +40,7 @@ public class DbmsTest {
     public void deleteDatabase() throws StorageException {
         Dbms dbms = new DbmsImpl();
         dbms.setDatabases(new ArrayList<>());
-        String dbName = namesIterator.next();
+        String dbName = "db1";
         dbms.createDatabase(dbName);
         Assert.assertTrue(dbms.getDatabase(dbName).isPresent());
         dbms.deleteDatabase(dbName);
@@ -55,7 +52,7 @@ public class DbmsTest {
         Dbms dbms = new DbmsImpl();
         dbms.setDatabases(new ArrayList<>());
 
-        String dbName = namesIterator.next();
+        String dbName = "db1";
         dbms.createDatabase(dbName);
         Assert.assertTrue(dbms.getDatabase(dbName).isPresent());
     }

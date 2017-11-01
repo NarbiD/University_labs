@@ -1,27 +1,24 @@
 package localdbms.DBMS.database;
 
-import localdbms.DataType;
-import localdbms.DBMS.table.Table;
-import localdbms.DBMS.exception.EntryException;
 import localdbms.DBMS.exception.StorageException;
-import localdbms.DBMS.exception.TableException;
+import localdbms.DBMS.table.Table;
+import localdbms.DataType;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface Database {
 
-    void save() throws StorageException;
-    void delete() throws StorageException;
-
-    boolean doesTableExist(String tableName);
-
-    Table createTable(String name, DataType... columnTypes) throws StorageException;
-    void deleteTable(String name) throws StorageException;
-
-    List<Table> getTables();
-
     String getName();
     void setName(String name) throws StorageException;
 
-    void loadTablesFromStorage() throws StorageException;
+    void save() throws StorageException;
+    void delete() throws StorageException;
+
+    Table createTable(String name, List<DataType> types, List<String> columnNames) throws StorageException;
+
+    void deleteTable(String name) throws StorageException;
+    List<Table> getTables();
+
+    void loadTablesFromStorage() throws StorageException, IOException;
 }

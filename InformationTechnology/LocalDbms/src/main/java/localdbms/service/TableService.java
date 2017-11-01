@@ -3,12 +3,10 @@ package localdbms.service;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.ObservableList;
 import localdbms.DBMS.database.Database;
-import localdbms.DataType;
-import localdbms.DBMS.datatype.constraint.RealConstraint;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.table.Table;
+import localdbms.DataType;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 
@@ -28,12 +26,9 @@ public class TableService {
         tables.remove(tableIndex);
     }
 
-    public void createTable(String name, List<DataType> types, List<String> columnNames, RealConstraint constraint) throws StorageException {
+    public void createTable(String name, List<DataType> types, List<String> columnNames) throws StorageException {
         Database db = databases.get(dbIndex.get());
-        Table table = db.createTable(name);
-        table.setTypes(types);
-        table.setColumnNames(columnNames);
-        table.setConstraint(constraint);
+        Table table = db.createTable(name, types, columnNames);
         validateProperties(table);
         tables.add(table);
         db.save();
@@ -47,9 +42,9 @@ public class TableService {
         }
     }
 
-    public void addRow(int tableIndex, List<Object> values, BufferedImage image) throws StorageException {
+    public void addRow(int tableIndex, List<Object> values) throws StorageException {
         Table table = getTable(tableIndex);
-        table.addRow(values, image);
+        table.addRow(values);
         saveTables();
     }
 

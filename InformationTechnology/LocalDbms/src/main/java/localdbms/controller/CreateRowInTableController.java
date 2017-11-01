@@ -8,22 +8,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import localdbms.DataType;
 import localdbms.DBMS.table.Table;
 import localdbms.DBMS.datatype.TypeManager;
 import localdbms.DBMS.exception.StorageException;
 import localdbms.service.TableService;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreateRowInTableController extends AbstractController{
 
-    private BufferedImage image;
     private TableService tableService;
     private IntegerProperty tableIndex;
 
@@ -57,8 +51,7 @@ public class CreateRowInTableController extends AbstractController{
         List<String> textDataFromFields = getDataFromForm();
         try {
             List<Object> values = getObjectsByText(textDataFromFields);
-            tableService.addRow(tableIndex.get(), values, image);
-            image = null;
+            tableService.addRow(tableIndex.get(), values);
             close(mouseEvent);
         } catch (NumberFormatException | StorageException e) {
             Warning.show(e);
@@ -90,14 +83,6 @@ public class CreateRowInTableController extends AbstractController{
             }
         }
         return parsedObjects;
-    }
-
-    public void loadImage_onClick(MouseEvent mouseEvent) throws IOException {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open image...");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image File", "*.png"));
-        File imagePath = fileChooser.showOpenDialog(((Node) mouseEvent.getSource()).getScene().getWindow());
-        image = ImageIO.read(imagePath);
     }
 
     public void close(MouseEvent mouseEvent) {

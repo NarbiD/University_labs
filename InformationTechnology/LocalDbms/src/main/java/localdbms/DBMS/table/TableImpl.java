@@ -1,82 +1,97 @@
 package localdbms.DBMS.table;
 
+import localdbms.DataType;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import localdbms.DBMS.datatype.TypeManager;
 import localdbms.DBMS.entry.Entry;
 import localdbms.DBMS.entry.EntryFactory;
 import localdbms.DBMS.entry.EntryImpl;
-import localdbms.DBMS.datatype.constraint.RealConstraint;
-import localdbms.DBMS.exception.StorageException;
-import localdbms.DataType;
 import localdbms.DBMS.exception.EntryException;
+import localdbms.DBMS.exception.StorageException;
 import localdbms.DBMS.exception.TableException;
-import org.json.*;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+
 import java.io.*;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class TableImpl implements Table {
-    @Override
-    public RealConstraint getConstraint() {
-        return constraint;
-    }
 
-    private RealConstraint constraint;
     private String location;
     private String name;
     private List<DataType> types;
+    private List<String> columnNames;
     private List<Entry> entries;
     private EntryFactory entryFactory;
-    private List<String> columnNames;
 
     public TableImpl() throws StorageException {
-        this("", "");
+        this.entries = new ArrayList<>();
+        this.types = new ArrayList<>();
+        this.columnNames = new ArrayList<>();
+        this.entryFactory = EntryImpl::new;
     }
 
-    public TableImpl(String name, String location, DataType... columnTypes) throws StorageException {
-        this.location = location;
-        this.name = name;
-        this.types = Arrays.asList(columnTypes);
-        this.columnNames = new ArrayList<>();
-        this.constraint = new RealConstraint();
-        this.entryFactory = EntryImpl::new;
-        try {
-            loadDataFromFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+    @Override
+    public Builder getBuilder() throws StorageException {
+        return this.new BuilderImpl();
+    }
+
+    class BuilderImpl implements Builder {
+
+        @Override
+        public Builder setName(String name) {
+            TableImpl.this.name = name;
+            return this;
+        }
+
+        @Override
+        public Builder setLocation(String location) {
+            TableImpl.this.location = new File(location).getAbsolutePath() + File.separator;
+            return this;
+        }
+
+        @Override
+        public Builder setTypes(List<DataType> dataTypes) {
+            TableImpl.this.types = dataTypes;
+            return this;
+        }
+
+        @Override
+        public Builder setColumnNames(List<String> names) {
+            TableImpl.this.columnNames = names;
+            return this;
+        }
+
+        @Override
+        public Table build() throws StorageException {
+            if (name == null || name.equals("") || location == null) {
+                throw new TableException("Required name and location");
+            }
+            return TableImpl.this;
         }
     }
 
     @Override
     public void loadDataFromFile() throws StorageException, IOException {
         String rowInFile = new JSONArray().toString();
-        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile;
-        if (Tables.isTableExists(this.name, this.location)) {
+        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile;
+        if (Tables.doesTableExist(this.name, this.location)) {
             readData = readTableFromStorage(this.location + this.name);
         }
         String[] s = readData.split("\n");
         List<DataType> readTypes = new ArrayList<>();
         for (Object title : new JSONArray(s[0]).toList()) {
-            String t = title.toString();
-            columnNames.add(t);
+            columnNames.add(title.toString());
         }
         new JSONArray(s[1]).toList().forEach(type -> readTypes.add(DataType.valueOf(type.toString())));
-        JSONArray constraints = new JSONArray(s[3]);
-        if (constraints.length() != 0) {
-            this.constraint = new RealConstraint(constraints.getDouble(0), constraints.getDouble(1));
-        }
-        JSONArray ByteArrayJson = new JSONArray(s[4]);
+
         if (this.types.equals(readTypes) || types.isEmpty()) {
             this.types = readTypes;
             this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
-            for (int i = 0; i < entries.size(); i++) {
-                byte[] bytes = JSONtoByteArray((JSONArray)ByteArrayJson.get(i));
-                this.entries.get(i).setImage(ImageIO.read(new ByteArrayInputStream(bytes)));
-            }
         } else {
-            throw new TableException("Expected types " + readData + " but " + this.types + " found");
+            throw new TableException("Expected types " + readTypes + " but " + this.types + " found");
         }
-
     }
 
     private String readTableFromStorage(String storageLocation) {
@@ -91,17 +106,10 @@ public class TableImpl implements Table {
         List<Entry> entries = new ArrayList<>();
         for (Object json : jsonArray) {
             JSONObject jsonObject = (JSONObject)json;
-            Entry entry = entryFactory.getEntryFromJson(jsonObject, types, constraint);
+            Entry entry = entryFactory.getEntryFromJson(jsonObject, types);
             entries.add(entry);
         }
         return entries;
-    }
-
-    private byte[] JSONtoByteArray(JSONArray json) {
-        List<Object> ints = json.toList();
-        byte[] b = new byte[ints.size()];
-        IntStream.range(0, ints.size()).forEach(i -> b[i] = (byte) ((int) ints.get(i)));
-        return b;
     }
 
     @Override
@@ -115,31 +123,10 @@ public class TableImpl implements Table {
             throw new TableException("Expected defined name, location and types");
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
-            List<byte[]> byteArraysWithImages = new ArrayList<>();
-            entries.forEach(entry -> {
-                try {
-                    ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-                    BufferedImage image = entry.getImage();
-                    if (image != null)
-                        ImageIO.write(image,"png", byteArray);
-                    byteArraysWithImages.add(byteArray.toByteArray());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
             writer.write(new JSONArray(this.columnNames).toString() + "\n");
             writer.write(new JSONArray(this.types).toString() + "\n");
             writer.write(this.getJsonArray().toString() + "\n");
-            JSONArray constraints = new JSONArray();
-            if (constraint.isDefined()) {
-                constraints.put(this.constraint.getMinValue());
-                constraints.put(this.constraint.getMaxValue());
-            }
-            writer.write(constraints.toString() + "\n");
-            JSONArray pics = new JSONArray(byteArraysWithImages);
-            writer.write(pics.toString());
             writer.flush();
-
         } catch (IOException e) {
             throw new RuntimeException("Can not write table to storage", e);
         }
@@ -154,20 +141,26 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRows(Entry... rows) {
-        entries.addAll(Arrays.asList(rows));
-    }
-
-    @Override
-    public void addRow(List<Object> values, BufferedImage image) throws StorageException {
+    public void addRow(List<Object> values) throws StorageException {
         if (values.size() != types.size()) {
             throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
         }
-        Entry entry = new EntryImpl(values, types, constraint);
-        if (image != null) {
-            entry.setImage(image);
+        for (int i = 0; i < values.size(); i++) {
+            if(values.get(i) instanceof String) {
+                try {
+                    values.set(i, TypeManager.parseObjectByType(values.get(i).toString(), types.get(i)));
+                } catch (NumberFormatException e) {
+                    throw new TableException("Invalid value " + values.get(i));
+                }
+            }
         }
+        Entry entry = new EntryImpl(values, types);
         entries.add(entry);
+    }
+
+    @Override
+    public void deleteRow(int rowNumber) {
+        entries.remove(rowNumber);
     }
 
     @Override
@@ -185,6 +178,11 @@ public class TableImpl implements Table {
                 return (field instanceof Character || field instanceof String) ? field.toString().toLowerCase() : field;
             }
         });
+    }
+
+    @Override
+    public void delete() throws TableException {
+        Tables.delete(name, location);
     }
 
     @Override
@@ -208,33 +206,8 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    @Override
-    public void setTypes(DataType... types) {
-        this.types = Arrays.asList(types);
-    }
-
-    @Override
-    public void setColumnNames(List<String> names) {
-        this.columnNames = names;
-    }
-
-    @Override
-    public void setTypes(List<DataType> types) {
-        this.types = types;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setConstraint(RealConstraint constraint) {
-        this.constraint = constraint;
+    public String getLocation() {
+        return location;
     }
 
     @Override
@@ -245,21 +218,13 @@ public class TableImpl implements Table {
         TableImpl table = (TableImpl) o;
 
         return (location != null ? location.equals(table.location) : table.location == null) &&
-                (name != null ? name.equals(table.name) : table.name == null) &&
-                (types != null ? types.equals(table.types) : table.types == null) &&
-                (entries != null ? entries.equals(table.entries) : table.entries == null);
+                (name != null ? name.equals(table.name) : table.name == null);
     }
 
     @Override
     public int hashCode() {
         int result = location != null ? location.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (types != null ? types.hashCode() : 0);
-        result = 31 * result + (entries != null ? entries.hashCode() : 0);
         return result;
-    }
-
-    public void setEntryFactory(EntryFactory entryFactory) {
-        this.entryFactory = entryFactory;
     }
 }
