@@ -2,8 +2,7 @@ package localdbms.service;
 
 import javafx.collections.ObservableList;
 import localdbms.DBMS.Dbms;
-import localdbms.DBMS.database.Database;
-import localdbms.DBMS.exception.StorageException;
+import localdbms.DBMS.Database;
 
 public class DatabaseService {
     private Dbms dbms;
@@ -21,13 +20,13 @@ public class DatabaseService {
     public DatabaseService() {
     }
 
-    public void deleteDatabase(int index) throws StorageException {
+    public void deleteDatabase(int index) throws Exception {
         databases.get(index).delete();
         databases.remove(index);
     }
 
-    public void createDatabase(String name) throws StorageException {
-        dbms.createDatabase(name);
+    public void createDatabase(String name) throws Exception {
+        databases.add(dbms.createDatabase(name));
     }
 
     public void setDbms(Dbms dbms) {

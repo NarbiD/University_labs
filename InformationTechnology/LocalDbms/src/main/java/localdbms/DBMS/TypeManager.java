@@ -1,4 +1,4 @@
-package localdbms.DBMS.datatype;
+package localdbms.DBMS;
 
 import localdbms.DataType;
 

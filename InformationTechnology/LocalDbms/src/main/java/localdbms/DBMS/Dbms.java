@@ -1,17 +1,55 @@
 package localdbms.DBMS;
 
-import localdbms.DBMS.database.Database;
-import localdbms.DBMS.exception.StorageException;
-
-import java.io.IOException;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-public interface Dbms {
-    void setDatabases(List<Database> databases);
-    void loadDatabaseFromStorage() throws StorageException, IOException;
-    void createDatabase(String name) throws StorageException;
-    void deleteDatabase(String name) throws StorageException;
-    Optional<Database> getDatabase(String name);
-    List<Database> getAllDatabases();
+public class Dbms {
+
+    private List<Database> databases;
+
+    public void setDatabases(List<Database> databases) {
+        this.databases = databases;
+    }
+
+    public void loadDatabaseFromStorage() throws Exception {
+        File[] dirs = new File(Database.LOCATION).listFiles();
+        for (File entry : dirs != null ? dirs : new File[0]) {
+            if (entry.isDirectory()) {
+                Database database = new Database(entry.getName());
+                database.loadTablesFromStorage();
+                databases.add(database);
+            }
+        }
+    }
+
+    public Database createDatabase(String name) throws Exception {
+        Database database = new Database(name);
+        if (databases.contains(database)) {
+            throw new Exception("Database with the same name already exists");
+        }
+        database.save();
+        databases.add(database);
+        return database;
+    }
+
+    public void deleteDatabase(String name) throws Exception {
+        Database db = databases.stream().filter(database -> name.equals(database.getName())).findAny()
+            .orElseThrow(() -> new Exception("Database does not exist"));
+        db.delete();
+        databases.remove(db);
+    }
+
+    public Optional<Database> getDatabase(String name) {
+        for (Database db : databases) {
+            if (name.equals(db.getName())){
+                return Optional.of(db);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public List<Database> getAllDatabases() {
+        return databases;
+    }
 }

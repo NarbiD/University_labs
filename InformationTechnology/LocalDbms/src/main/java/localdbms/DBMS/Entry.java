@@ -1,28 +1,26 @@
-package localdbms.DBMS.entry;
+package localdbms.DBMS;
 
 import localdbms.DataType;
 import org.json.JSONObject;
-import localdbms.DBMS.datatype.TypeManager;
-import localdbms.DBMS.exception.EntryException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
-public class EntryImpl implements Entry {
+public class Entry {
 
     private List<DataType> types;
     private List<Object> values;
 
-    public EntryImpl(List<Object> values, List<DataType> types) throws EntryException {
+    public Entry(List<Object> values, List<DataType> types) throws Exception {
         if (types.size() != values.size()) {
-            throw new EntryException("Expected types.size() == values.size() but types size == " +
+            throw new Exception("Expected types.size() == values.size() but types size == " +
                     types.size() + " and values.size() == " + values.size() + " found");
         }
         for (int column = 0; column < values.size(); column++) {
             if (!TypeManager.instanceOf(values.get(column), types.get(column))) {
-                throw new EntryException("Invalid type in table cell. Expected type " + types.get(column) +
+                throw new Exception("Invalid type in table cell. Expected type " + types.get(column) +
                         " in column " + (column+1) + " but value " + values.get(column) +
                         " (" + values.get(column).getClass() + ") found");
             }
@@ -31,7 +29,7 @@ public class EntryImpl implements Entry {
         this.values = values;
     }
 
-    public EntryImpl(JSONObject json, List<DataType> types) throws EntryException {
+    public Entry(JSONObject json, List<DataType> types) throws Exception {
         this(getValuesFromJson(json), types);
     }
 
@@ -43,7 +41,6 @@ public class EntryImpl implements Entry {
         return localValues;
     }
 
-    @Override
     public JSONObject getJson() {
         JSONObject json = new JSONObject();
         for (Integer column = 0; column < this.values.size(); column++) {
@@ -52,24 +49,21 @@ public class EntryImpl implements Entry {
         return json;
     }
 
-    @Override
     public List<Object> getValues() {
         return this.values;
     }
 
-    @Override
     public String toString() {
-        return "EntryImpl{" +
+        return "Entry{" +
                 "types=" + types +
                 ", values=" + values +
                 '}';
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EntryImpl)) return false;
-        EntryImpl entry = (EntryImpl) o;
+        if (!(o instanceof Entry)) return false;
+        Entry entry = (Entry) o;
 
         boolean typesIsEqual = types != null ? types.equals(entry.types) : entry.types == null;
         boolean valuesIsEqual = values != null ? values.equals(entry.values) : entry.values == null;
@@ -77,7 +71,6 @@ public class EntryImpl implements Entry {
         return typesIsEqual && valuesIsEqual;
     }
 
-    @Override
     public int hashCode() {
         int result = types != null ? types.hashCode() : 0;
         result = 31 * result + (values != null ? values.hashCode() : 0);

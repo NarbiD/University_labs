@@ -12,13 +12,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import localdbms.DBMS.Database;
 import localdbms.SpringFxmlLoader;
-import localdbms.DBMS.database.Database;
-import localdbms.DBMS.exception.StorageException;
 import localdbms.service.DatabaseService;
 
 
-public class DatabaseOverviewController extends AbstractController {
+public class DatabaseOverviewController extends Controller {
 
     private IntegerProperty selectedIndex;
     private DatabaseService databaseService;
@@ -30,7 +29,7 @@ public class DatabaseOverviewController extends AbstractController {
     public TableView<Database> databaseView;
 
     @FXML
-    public void initialize() throws StorageException {
+    public void initialize() throws Exception {
         databases.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
         databaseView.setItems(databaseService.getDatabases());
     }
@@ -54,7 +53,7 @@ public class DatabaseOverviewController extends AbstractController {
         if (selectedIndex.get() >= 0) {
             try {
                 databaseService.deleteDatabase(selectedIndex.get());
-            } catch (StorageException e) {
+            } catch (Exception e) {
                 Warning.show(e);
             }
         } else {

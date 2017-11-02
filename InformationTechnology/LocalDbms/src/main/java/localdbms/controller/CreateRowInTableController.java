@@ -8,15 +8,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import localdbms.DBMS.Table;
 import localdbms.DataType;
-import localdbms.DBMS.table.Table;
-import localdbms.DBMS.datatype.TypeManager;
-import localdbms.DBMS.exception.StorageException;
+import localdbms.DBMS.TypeManager;
 import localdbms.service.TableService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateRowInTableController extends AbstractController{
+public class CreateRowInTableController extends Controller{
 
     private TableService tableService;
     private IntegerProperty tableIndex;
@@ -53,7 +52,7 @@ public class CreateRowInTableController extends AbstractController{
             List<Object> values = getObjectsByText(textDataFromFields);
             tableService.addRow(tableIndex.get(), values);
             close(mouseEvent);
-        } catch (NumberFormatException | StorageException e) {
+        } catch (Exception e) {
             Warning.show(e);
         }
     }

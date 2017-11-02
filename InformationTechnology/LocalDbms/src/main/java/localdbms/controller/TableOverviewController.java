@@ -14,17 +14,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import localdbms.DBMS.Entry;
+import localdbms.DBMS.Table;
 import localdbms.SpringFxmlLoader;
-import localdbms.DBMS.entry.Entry;
-import localdbms.DBMS.exception.StorageException;
-import localdbms.DBMS.table.Table;
 import localdbms.service.TableService;
-import java.io.IOException;
 import java.util.List;
 
-public class TableOverviewController extends AbstractController {
+public class TableOverviewController extends Controller {
 
-    private ObservableList<Table> tables;
     private IntegerProperty tableSelectedIndex;
     private TableService tableService;
 
@@ -38,7 +35,7 @@ public class TableOverviewController extends AbstractController {
     public TableView<Object> entryOverview;
 
     @FXML
-    public void initialize() throws StorageException, IOException {
+    public void initialize() throws Exception {
         initTableView();
     }
 
@@ -46,8 +43,7 @@ public class TableOverviewController extends AbstractController {
         tableOverview.getItems().clear();
         tableColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
         tableService.initTables();
-        tables = tableService.getTables();
-        tableOverview.setItems(tables);
+        tableOverview.setItems(tableService.getTables());
     }
 
     public void createTable_onClick(MouseEvent mouseEvent) {
@@ -70,7 +66,7 @@ public class TableOverviewController extends AbstractController {
             try {
                 entryOverview.getColumns().clear();
                 tableService.deleteTable(tableSelectedIndex.get());
-            } catch (StorageException e) {
+            } catch (Exception e) {
                 Warning.show(e);
             }
         } else {
@@ -125,7 +121,7 @@ public class TableOverviewController extends AbstractController {
             Controller controller = SpringFxmlLoader.load("/view/createRowInTable.fxml");
             Parent root = (Parent) controller.getView();
             stage.setTitle("Create row in table");
-            int columnsAmount = tables.get(tableOverview.getSelectionModel().getSelectedIndex()).getColumnNames().size();
+            int columnsAmount = tableService.getTables().get(tableOverview.getSelectionModel().getSelectedIndex()).getColumnNames().size();
             stage.setHeight(160.0 + columnsAmount*30.0);
             stage.setMinWidth(370);
             stage.setResizable(false);
@@ -136,10 +132,6 @@ public class TableOverviewController extends AbstractController {
         } else {
             noTableSelectedMessage();
         }
-    }
-
-    public void setTables(ObservableList<Table> tables) {
-        this.tables = tables;
     }
 
     public IntegerProperty getTableSelectedIndex() {

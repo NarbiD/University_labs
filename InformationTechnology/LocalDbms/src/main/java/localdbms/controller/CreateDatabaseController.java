@@ -3,10 +3,9 @@ package localdbms.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import localdbms.DBMS.exception.StorageException;
 import localdbms.service.DatabaseService;
 
-public class CreateDatabaseController extends AbstractController {
+public class CreateDatabaseController extends Controller {
 
     private DatabaseService databaseService;
 
@@ -14,10 +13,10 @@ public class CreateDatabaseController extends AbstractController {
     public TextField textField;
 
     @FXML
-    public void submit(MouseEvent mouseEvent) throws StorageException {
+    public void submit(MouseEvent mouseEvent) throws Exception {
         try {
             databaseService.createDatabase(textField.getCharacters().toString());
-        } catch (StorageException e) {
+        } catch (Exception e) {
             Warning.show(e);
         }
         close(mouseEvent);

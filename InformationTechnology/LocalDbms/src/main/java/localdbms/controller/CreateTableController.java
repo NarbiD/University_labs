@@ -11,18 +11,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import javafx.util.Pair;
 import localdbms.DataType;
-import localdbms.DBMS.exception.StorageException;
 import localdbms.service.TableService;
 
 import java.util.List;
 
 
-public class CreateTableController extends AbstractController{
+public class CreateTableController extends Controller{
 
     private TableService tableService;
-
-    @FXML
-    public HBox constraints;
 
     @FXML
     public VBox fields;
@@ -37,12 +33,12 @@ public class CreateTableController extends AbstractController{
         try {
             createTableByForm();
             close(mouseEvent);
-        } catch (StorageException | IllegalArgumentException e) {
+        } catch (Exception e) {
             Warning.show(e);
         }
     }
 
-    private void createTableByForm() throws IllegalArgumentException, StorageException {
+    private void createTableByForm() throws Exception {
         FromData formData = getDataFromForm();
         tableService.createTable(formData.tableName, formData.types, formData.names);
     }

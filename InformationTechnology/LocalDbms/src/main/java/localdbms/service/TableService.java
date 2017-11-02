@@ -2,9 +2,8 @@ package localdbms.service;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.ObservableList;
-import localdbms.DBMS.database.Database;
-import localdbms.DBMS.exception.StorageException;
-import localdbms.DBMS.table.Table;
+import localdbms.DBMS.Database;
+import localdbms.DBMS.Table;
 import localdbms.DataType;
 
 import java.util.List;
@@ -21,16 +20,17 @@ public class TableService {
         tables.addAll(databases.get(dbIndex.get()).getTables());
     }
 
-    public void deleteTable(int tableIndex) throws StorageException {
+    public void deleteTable(int tableIndex) throws Exception {
         databases.get(dbIndex.get()).deleteTable(tables.get(tableIndex).getName());
         tables.remove(tableIndex);
     }
 
-    public void createTable(String name, List<DataType> types, List<String> columnNames) throws StorageException {
+    public void createTable(String name, List<DataType> types, List<String> columnNames) throws Exception {
         Database db = databases.get(dbIndex.get());
-        Table table = db.createTable(name, types, columnNames);
+        Table table = new Table(name, db.getName(), types, columnNames);
         validateProperties(table);
         tables.add(table);
+        db.addTable(table);
         db.save();
     }
 
@@ -42,13 +42,13 @@ public class TableService {
         }
     }
 
-    public void addRow(int tableIndex, List<Object> values) throws StorageException {
+    public void addRow(int tableIndex, List<Object> values) throws Exception {
         Table table = getTable(tableIndex);
         table.addRow(values);
         saveTables();
     }
 
-    private void saveTables() throws StorageException {
+    private void saveTables() throws Exception {
         databases.get(dbIndex.get()).getTables().clear();
         databases.get(dbIndex.get()).getTables().addAll(tables);
         databases.get(dbIndex.get()).save();
