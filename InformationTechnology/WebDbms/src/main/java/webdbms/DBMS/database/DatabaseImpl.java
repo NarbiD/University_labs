@@ -25,11 +25,11 @@ public class DatabaseImpl implements Database {
         this("");
     }
 
-    public DatabaseImpl(String name) throws StorageException {
+    private DatabaseImpl(String name) throws StorageException {
         this(name, Databases.ABS_DEFAULT_LOCATION);
     }
 
-    public DatabaseImpl(String name, String location) throws StorageException {
+    private DatabaseImpl(String name, String location) throws StorageException {
         this.name = name;
         this.location = location;
         this.tables = new ArrayList<>();
