@@ -19,8 +19,9 @@ public class Bootstrap extends Application {
         Parent root = (Parent) controller.getView();
         stage.setTitle("Local DBMS");
         stage.setMinHeight(300);
-        stage.setMinWidth(520);
-        stage.setScene(new Scene(root, 540, 300));
+        stage.setMinWidth(500);
+        Scene scene = new Scene(root, 500, 300);
+        stage.setScene(scene);
         stage.show();
     }
 }

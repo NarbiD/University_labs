@@ -68,6 +68,7 @@ public class AppConfig {
     public TableOverviewController tableOverviewController(TableService tableService) throws Exception {
         TableOverviewController controller = new TableOverviewController();
         controller.setTableSelectedIndex(new SimpleIntegerProperty());
+        controller.setEntrySelectedIndex(new SimpleIntegerProperty());
         controller.setTableService(tableService);
         return controller;
     }
@@ -76,6 +77,27 @@ public class AppConfig {
     @Autowired
     public CreateTableController createTableController(TableService tableService) throws Exception {
         CreateTableController controller = new CreateTableController();
+        controller.setTableService(tableService);
+        return controller;
+    }
+
+    @Bean
+    @Autowired
+    public SearchController searchController(
+            TableOverviewController toController, TableService tableService) throws Exception {
+        SearchController controller = new SearchController();
+        controller.setTableIndex(toController.getTableSelectedIndex());
+        controller.setTableService(tableService);
+        return controller;
+    }
+
+    @Bean
+    @Autowired
+    public EditRowController editRowController(
+            TableOverviewController toController, TableService tableService) throws Exception {
+        EditRowController controller = new EditRowController();
+        controller.setTableIndex(toController.getTableSelectedIndex());
+        controller.setEntryIndex(toController.getEntrySelectedIndex());
         controller.setTableService(tableService);
         return controller;
     }

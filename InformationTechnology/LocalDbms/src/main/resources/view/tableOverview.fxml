@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="844.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="localdbms.controller.TableOverviewController">
-    <SplitPane dividerPositions="0.30218068535825543" layoutX="187.0" layoutY="92.0" prefHeight="400.0" prefWidth="634.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-            <TableView fx:id="tableOverview" layoutX="3.0" layoutY="61.0" prefHeight="398.0" prefWidth="206.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<AnchorPane prefHeight="449.0" prefWidth="844.0" stylesheets="@/view/styles.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="localdbms.controller.TableOverviewController">
+    <SplitPane dividerPositions="0.34834123222748814" layoutX="187.0" layoutY="92.0" prefHeight="400.0" prefWidth="664.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="399.0" prefWidth="403.0">
+            <TableView fx:id="tableOverview" layoutX="3.0" layoutY="61.0" prefHeight="399.0" prefWidth="290.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <columns>
                     <TableColumn fx:id="tableColumn" prefWidth="75.0" text="Tables" />
                 </columns>
@@ -27,10 +28,22 @@
             </TableView>
         </AnchorPane>
     </SplitPane>
-    <VBox alignment="BOTTOM_CENTER" layoutY="295.0" prefHeight="128.0" prefWidth="181.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0">
-        <Button alignment="TOP_CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#createTable_onClick" prefWidth="150.0" text="Create table" />
-        <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#deleteTable_onClick" prefHeight="25.0" prefWidth="150.0" text="Delete table" />
-        <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#select_onClick" prefHeight="25.0" prefWidth="150.0" text="Select" />
-        <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#addRow_onClick" prefHeight="25.0" prefWidth="150.0" text="Add row" />
-    </VBox>
+    <Group layoutX="14.0" layoutY="408.0" AnchorPane.bottomAnchor="8.0">
+        <HBox>
+            <Button alignment="TOP_CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT"
+                    onMouseClicked="#createTable_onClick" prefHeight="33.0" prefWidth="131.0" text="Create table"/>
+            <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#deleteTable_onClick"
+                    prefHeight="33.0" prefWidth="131.0" text="Delete table"/>
+        </HBox>
+    </Group>
+    <Group layoutX="340.0" layoutY="408.0" AnchorPane.bottomAnchor="8.0">
+        <HBox>
+            <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#addRow_onClick" prefHeight="25.0"
+                    prefWidth="150.0" text="Add row"/>
+            <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#editRow" prefHeight="25.0"
+                    prefWidth="150.0" text="Edit row"/>
+            <Button alignment="TOP_CENTER" mnemonicParsing="false" onMouseClicked="#search_onClick" prefHeight="25.0"
+                    prefWidth="150.0" text="Search rows"/>
+        </HBox>
+    </Group>
 </AnchorPane>

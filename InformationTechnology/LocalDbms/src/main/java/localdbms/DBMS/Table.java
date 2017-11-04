@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Table {
 
+    private IntegerInvlConstraint constraint;
     private String location;
     private String name;
     private List<DataType> types;
@@ -17,10 +18,10 @@ public class Table {
     private List<Entry> entries;
 
     public Table(String name, String dbName) throws Exception {
-        this(name, dbName, new ArrayList<>(), new ArrayList<>());
+        this(name, dbName, new ArrayList<>(), new ArrayList<>(), new IntegerInvlConstraint());
     }
 
-    public Table(String name, String dbName, List<DataType> types, List<String> columnNames) throws Exception {
+    public Table(String name, String dbName, List<DataType> types, List<String> columnNames, IntegerInvlConstraint constraint) throws Exception {
         if (name.equals("")) {
             throw new Exception("Required table name");
         }
@@ -28,33 +29,41 @@ public class Table {
         this.entries = new ArrayList<>();
         this.types = types;
         this.columnNames = columnNames;
-        location = Database.LOCATION + dbName + File.separator;
+        this.constraint = constraint;
+        this.location = Database.LOCATION + dbName + File.separator;
     }
 
-    public void loadDataFromFile() throws Exception {
-        String rowInFile = new JSONArray().toString();
-        String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile;
+    @SuppressWarnings("unchecked")
+    void loadDataFromFile() throws Exception {
         if (Table.doesTableExist(this.name, this.location)) {
-            readData = readTableFromStorage(this.location + this.name);
-        }
-        String[] s = readData.split("\n");
-        List<DataType> readTypes = new ArrayList<>();
-        for (Object title : new JSONArray(s[0]).toList()) {
-            columnNames.add(title.toString());
-        }
-        new JSONArray(s[1]).toList().forEach(type -> readTypes.add(DataType.valueOf(type.toString())));
+            try {
+                JSONObject readData = readJsonFromFile(this.location + this.name);
+                List<DataType> readTypes = new ArrayList<>();
+                ((JSONArray) readData.get("columnNames")).toList().forEach(o -> columnNames.add(o.toString()));
+                ((JSONArray) readData.get("columnTypes")).forEach(type -> readTypes.add(DataType.valueOf(type.toString())));
 
-        if (this.types.equals(readTypes) || types.isEmpty()) {
-            this.types = readTypes;
-            this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
-        } else {
-            throw new Exception("Expected types " + readTypes + " but " + this.types + " found");
+                if (this.types.equals(readTypes) || types.isEmpty()) {
+                    this.types = readTypes;
+                    this.entries = getEntriesFromJson((JSONArray) readData.get("entries"), readTypes);
+                    for (int i = 0; i < entries.size(); i++) {
+                        this.entries.get(i).setFile(((JSONArray) readData.get("files")).get(i).toString());
+                    }
+                } else {
+                    throw new Exception("Expected types " + readTypes + " but " + this.types + " found");
+                }
+                JSONArray constraints = (JSONArray) readData.get("constraint");
+                if (constraints.length() != 0) {
+                    this.constraint = new IntegerInvlConstraint(constraints.getInt(0), constraints.getInt(1));
+                }
+            } catch (ClassCastException | NullPointerException e) {
+                throw new Exception("Unsupported file format", e);
+            }
         }
     }
 
-    private String readTableFromStorage(String storageLocation) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(storageLocation))) {
-            return reader.readLine() + '\n' + reader.readLine() + '\n' + reader.readLine();
+    private JSONObject readJsonFromFile(String fileLocation) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileLocation))) {
+            return new JSONObject(reader.readLine());
         } catch (IOException e) {
             throw new RuntimeException("Can not read table from storage", e);
         }
@@ -64,21 +73,34 @@ public class Table {
         List<Entry> entries = new ArrayList<>();
         for (Object json : jsonArray) {
             JSONObject jsonObject = (JSONObject)json;
-            Entry entry = new Entry(jsonObject, types);
+            Entry entry = new Entry(jsonObject, types, constraint);
             entries.add(entry);
         }
         return entries;
     }
 
-    public void writeToFile() throws Exception {
-        if (this.name.equals("") || this.location.equals("") ) {
-            throw new Exception("Expected defined name, location and types");
+    void writeToFile() throws Exception {
+        if (this.name.equals("") ) {
+            throw new Exception("Expected defined name");
         }
+        JSONObject outputJson = new JSONObject();
+        outputJson.put("columnNames", this.columnNames);
+        outputJson.put("columnTypes", this.types);
+        outputJson.put("entries", this.getJsonArray());
+        JSONArray constraints = new JSONArray();
+        if (constraint.isDefined()) {
+            constraints.put(this.constraint.getMinValue());
+            constraints.put(this.constraint.getMaxValue());
+        }
+        outputJson.put("constraint", constraints);
+        JSONArray files = new JSONArray();
+        entries.forEach(entry -> {
+            String file = entry.getFile();
+            files.put(file != null ? file : "");
+        });
+        outputJson.put("files", files);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
-            writer.write(new JSONArray(this.columnNames).toString() + "\n");
-            writer.write(new JSONArray(this.types).toString() + "\n");
-            writer.write(this.getJsonArray().toString() + "\n");
-            writer.flush();
+            outputJson.write(writer);
         } catch (IOException e) {
             throw new RuntimeException("Can not write table to storage", e);
         }
@@ -92,7 +114,15 @@ public class Table {
         return jsonArray;
     }
 
-    public void addRow(List<Object> values) throws Exception {
+    public void addRow(List<Object> values, String file) throws Exception {
+        if (isValuesValid(values)) {
+            Entry entry = new Entry(values, types, constraint);
+            entry.setFile(file != null ? file : "");
+            entries.add(entry);
+        }
+    }
+
+    private boolean isValuesValid(List<Object> values) throws Exception {
         if (values.size() != types.size()) {
             throw new Exception("Expected " + types.size() + " values but " + values.size() + " found");
         }
@@ -105,15 +135,22 @@ public class Table {
                 }
             }
         }
-        Entry entry = new Entry(values, types);
-        entries.add(entry);
+        return true;
+    }
+
+    public void setRow(int entryIndex, List<Object> values, String file) throws Exception {
+        if (isValuesValid(values)) {
+            Entry entry = new Entry(values, types, constraint);
+            entry.setFile(file != null ? file : "");
+            entries.set(entryIndex, entry);
+        }
     }
 
     public void deleteRow(int rowNumber) {
         entries.remove(rowNumber);
     }
 
-    public void delete() throws Exception {
+    void delete() throws Exception {
         Table.delete(name, location);
     }
 
@@ -149,12 +186,12 @@ public class Table {
         return result;
     }
 
-    static boolean doesTableExist(String name, String location) {
+    private static boolean doesTableExist(String name, String location) {
         File table = new File(location + name);
         return table.isFile();
     }
 
-    public static void delete(String name, String location) throws Exception {
+    static void delete(String name, String location) throws Exception {
         if (doesTableExist(name, location)) {
             File table  = new File(location + name);
             if(!table.delete()) {

@@ -1,5 +1,5 @@
 package localdbms;
 
 public enum DataType {
-    CHAR, INTEGER, REAL
+    CHAR, INTEGER, INTEGER_INVL, REAL
 }

@@ -13,13 +13,15 @@ public class Entry {
     private List<DataType> types;
     private List<Object> values;
 
-    public Entry(List<Object> values, List<DataType> types) throws Exception {
+    private String file;
+
+    public Entry(List<Object> values, List<DataType> types, IntegerInvlConstraint constraint) throws Exception {
         if (types.size() != values.size()) {
             throw new Exception("Expected types.size() == values.size() but types size == " +
                     types.size() + " and values.size() == " + values.size() + " found");
         }
         for (int column = 0; column < values.size(); column++) {
-            if (!TypeManager.instanceOf(values.get(column), types.get(column))) {
+            if (!TypeManager.instanceOf(values.get(column), types.get(column), constraint)) {
                 throw new Exception("Invalid type in table cell. Expected type " + types.get(column) +
                         " in column " + (column+1) + " but value " + values.get(column) +
                         " (" + values.get(column).getClass() + ") found");
@@ -29,15 +31,18 @@ public class Entry {
         this.values = values;
     }
 
-    public Entry(JSONObject json, List<DataType> types) throws Exception {
-        this(getValuesFromJson(json), types);
+    public Entry(JSONObject json, List<DataType> types, IntegerInvlConstraint constraint) throws Exception {
+        this(getValuesFromJson(json, types), types, constraint);
     }
 
-    private static List<Object> getValuesFromJson(JSONObject json) {
+    private static List<Object> getValuesFromJson(JSONObject json, List<DataType> types) {
         List<Object> localValues = new ArrayList<>();
         TreeMap<String, Object> jsonMap = new TreeMap<>(Comparator.comparing(Integer::valueOf));
         jsonMap.putAll(json.toMap());
         jsonMap.forEach((key, value) -> localValues.add(value));
+        for (int i = 0; i < localValues.size(); i++) {
+            localValues.set(i, TypeManager.parseObjectByType(localValues.get(i).toString(), types.get(i)));
+        }
         return localValues;
     }
 
@@ -75,5 +80,14 @@ public class Entry {
         int result = types != null ? types.hashCode() : 0;
         result = 31 * result + (values != null ? values.hashCode() : 0);
         return result;
+    }
+
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
     }
 }

@@ -7,7 +7,7 @@
             fx:controller="localdbms.controller.CreateDatabaseController">
    <AnchorPane layoutX="-1.0" prefHeight="110.0" prefWidth="300.0">
       <TextField fx:id="textField" layoutX="15.0" layoutY="35.0" prefHeight="25.0" prefWidth="280.0"/>
-      <HBox alignment="CENTER" layoutX="40.0" layoutY="75.0" spacing="30.0">
+      <HBox stylesheets="@/view/styles.css" alignment="CENTER" layoutX="40.0" layoutY="75.0" spacing="30.0">
          <Button defaultButton="true" layoutX="45.0" layoutY="70.0" mnemonicParsing="false"
                  prefHeight="25.0" prefWidth="100.0" text="OK" onMouseClicked="#submit"/>
          <Button cancelButton="true" layoutX="175.0" layoutY="70.0" mnemonicParsing="false"

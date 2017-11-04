@@ -9,6 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import localdbms.DBMS.Entry;
 import localdbms.DBMS.Table;
 import localdbms.DataType;
 import localdbms.DBMS.TypeManager;
@@ -18,11 +19,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateRowInTableController extends Controller{
+public class EditRowController extends Controller{
 
     private String file;
     private TableService tableService;
     private IntegerProperty tableIndex;
+    private IntegerProperty entryIndex;
 
     @FXML
     public VBox fields;
@@ -30,17 +32,19 @@ public class CreateRowInTableController extends Controller{
     @FXML
     public void initialize() {
         Table table = tableService.getTable(tableIndex.get());
+        Entry entry = table.getEntries().get(entryIndex.get());
         for (int i = 0; i < table.getColumnNames().size(); i++) {
-            addField(table.getColumnNames().get(i), table.getTypes().get(i));
+            addField(table.getColumnNames().get(i), table.getTypes().get(i), entry.getValues().get(i));
         }
     }
 
-    private void addField(String name, DataType type) {
+    private void addField(String name, DataType type, Object value) {
         Label fieldName = new Label(name);
         fieldName.setPrefSize(180.0, 25.0);
 
         TextField textField = new TextField();
         textField.setPromptText(type.toString());
+        textField.textProperty().setValue(value.toString());
         textField.setPrefSize(195.0, 25.0);
 
         HBox hbox = new HBox();
@@ -54,7 +58,8 @@ public class CreateRowInTableController extends Controller{
         List<String> textDataFromFields = getDataFromForm();
         try {
             List<Object> values = getObjectsByText(textDataFromFields);
-            tableService.addRow(tableIndex.get(), values, this.file);
+            String oldFile = tableService.getTable(tableIndex.get()).getEntries().get(entryIndex.get()).getFile();
+            tableService.setRow(entryIndex.get(), tableIndex.get(), values, file != null ? file : oldFile);
             file = null;
             close(mouseEvent);
         } catch (Exception e) {
@@ -113,5 +118,9 @@ public class CreateRowInTableController extends Controller{
 
     public void setTableService(TableService tableService) {
         this.tableService = tableService;
+    }
+
+    public void setEntryIndex(IntegerProperty entryIndex) {
+        this.entryIndex = entryIndex;
     }
 }
