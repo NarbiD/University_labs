@@ -191,7 +191,7 @@ public class TableImpl implements Table {
 
     @Override
     public void sort(int fieldNumber) {
-        entries.sort(new Comparator<>() {
+        entries.sort(new Comparator<Entry>() {
             @Override
             @SuppressWarnings("unchecked")
             public int compare(Entry entry1, Entry entry2) {
