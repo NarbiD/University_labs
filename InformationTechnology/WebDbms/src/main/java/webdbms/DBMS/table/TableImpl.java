@@ -10,10 +10,8 @@ import webdbms.DBMS.datatype.DataType;
 import webdbms.DBMS.exception.EntryException;
 import webdbms.DBMS.exception.TableException;
 import org.json.*;
-import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class TableImpl implements Table {
 

@@ -1,6 +1,5 @@
 package webdbms;
 
-import javafx.collections.FXCollections;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import webdbms.DBMS.Dbms;
@@ -14,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import webdbms.service.TableService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Configuration
 @ComponentScan
@@ -28,7 +28,7 @@ public class AppConfig {
     @Bean
     public Dbms dbms() throws StorageException, IOException {
         DbmsImpl dbms = new DbmsImpl();
-        dbms.setDatabases(FXCollections.observableArrayList());
+        dbms.setDatabases(new ArrayList<>());
         dbms.loadDatabaseFromStorage();
         return dbms;
     }
