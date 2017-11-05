@@ -1,6 +1,6 @@
 package webdbms.facades;
 
-import webdbms.DBMS.database.Database;
+import webdbms.DBMS.Database;
 
 import java.util.ArrayList;
 import java.util.List;

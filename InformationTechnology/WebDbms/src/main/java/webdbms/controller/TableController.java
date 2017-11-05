@@ -1,16 +1,18 @@
 package webdbms.controller;
 
 import org.springframework.web.bind.annotation.*;
-import webdbms.DBMS.datatype.DataType;
-import webdbms.DBMS.datatype.constraint.RealConstraint;
-import webdbms.DBMS.exception.StorageException;
-import webdbms.DBMS.table.Table;
+import webdbms.DBMS.DataType;
+import webdbms.DBMS.Entry;
+import webdbms.DBMS.IntegerInvlConstraint;
+import webdbms.DBMS.Table;
 import webdbms.facades.DatabaseFacade;
+import webdbms.facades.EntryFacade;
 import webdbms.facades.TableFacade;
 import webdbms.service.DatabaseService;
 import webdbms.service.TableService;
 import webdbms.service.exception.InternalServerException;
 import webdbms.service.exception.InvalidRequestBodyException;
+
 import java.util.*;
 
 @RestController
@@ -25,9 +27,19 @@ public class TableController {
         try {
             return new DatabaseFacade(databaseService.findByName(databaseName))
                     .getTableNames();
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
+    }
+
+
+    @RequestMapping(value = "/{tableName}/query", method = RequestMethod.GET)
+    public List<EntryFacade> search(@PathVariable String databaseName,
+                              @PathVariable String tableName,
+                              @RequestParam(value = "search", required = false) String rowTemplate) throws Exception {
+        List<EntryFacade> entries = new ArrayList<>();
+        tableService.search(databaseName, tableName, rowTemplate).forEach(entry -> entries.add(new EntryFacade(entry)));
+        return entries;
     }
 
     @RequestMapping(value = "/{tableName}", method = RequestMethod.GET)
@@ -36,7 +48,7 @@ public class TableController {
         try {
             Table table = tableService.findByName(databaseName, tableName);
             return new TableFacade(table);
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }
@@ -48,12 +60,12 @@ public class TableController {
         try {
             String name = requestBody.get("tableName").toString();
             List<DataType> types = getTypesFromObjects((List<Object>) requestBody.get("columnTypes"));
-            RealConstraint constraint = getConstraintFromMap((Map) requestBody.get("realIntervalConstraint"));
+            IntegerInvlConstraint constraint = getConstraintFromMap((Map) requestBody.get("realIntervalConstraint"));
             List<String> columnNames = getColumnNamesFromObjects((List<Object>) requestBody.get("columnNames"));
             tableService.createTable(databaseName, name, types, columnNames, constraint);
         } catch (ClassCastException | NullPointerException e) {
             throw new InvalidRequestBodyException();
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }
@@ -64,10 +76,8 @@ public class TableController {
         return types;
     }
 
-    private RealConstraint getConstraintFromMap(Map<String, Object> map) {
-        double minValue = map.get("maxValue") instanceof Integer ? (int)map.get("maxValue") : (double)map.get("maxValue");
-        double maxValue = map.get("minValue") instanceof Integer ? (int)map.get("minValue") : (double)map.get("minValue");
-        return new RealConstraint(minValue, maxValue);
+    private IntegerInvlConstraint getConstraintFromMap(Map<String, Object> map) {
+        return new IntegerInvlConstraint((int)map.get("minValue"), (int)map.get("maxValue"));
     }
 
     private List<String> getColumnNamesFromObjects(List<Object> objects) {
@@ -81,7 +91,7 @@ public class TableController {
                             @PathVariable String tableName) {
         try {
             tableService.deleteTable(databaseName, tableName);
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }

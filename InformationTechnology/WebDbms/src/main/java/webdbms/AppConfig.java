@@ -3,16 +3,13 @@ package webdbms;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import webdbms.DBMS.Dbms;
-import webdbms.DBMS.DbmsImpl;
 import webdbms.controller.*;
-import webdbms.DBMS.exception.StorageException;
 import webdbms.service.DatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import webdbms.service.TableService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 @Configuration
@@ -26,8 +23,8 @@ public class AppConfig {
     }
 
     @Bean
-    public Dbms dbms() throws StorageException, IOException {
-        DbmsImpl dbms = new DbmsImpl();
+    public Dbms dbms() throws Exception {
+        Dbms dbms = new Dbms();
         dbms.setDatabases(new ArrayList<>());
         dbms.loadDatabaseFromStorage();
         return dbms;
@@ -35,7 +32,7 @@ public class AppConfig {
 
     @Bean
     @Autowired
-    public DatabaseService databaseService(Dbms dbms) throws StorageException {
+    public DatabaseService databaseService(Dbms dbms) throws Exception {
         DatabaseService databaseService = new DatabaseService();
         databaseService.setDbms(dbms);
         return databaseService;
@@ -43,7 +40,7 @@ public class AppConfig {
 
     @Bean
     @Autowired
-    public TableService tableService(DatabaseService databaseService) throws StorageException {
+    public TableService tableService(DatabaseService databaseService) throws Exception {
         TableService tableService = new TableService();
         tableService.setDatabaseService(databaseService);
         return tableService;

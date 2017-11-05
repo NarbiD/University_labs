@@ -1,8 +1,8 @@
 package webdbms.service;
 
 import webdbms.DBMS.Dbms;
-import webdbms.DBMS.database.Database;
-import webdbms.DBMS.exception.StorageException;
+import webdbms.DBMS.Database;
+
 import webdbms.service.exception.DatabaseNotFoundException;
 
 import java.util.ArrayList;
@@ -15,11 +15,11 @@ public class DatabaseService {
     public DatabaseService() {
     }
 
-    public void deleteDatabase(String name) throws StorageException {
+    public void deleteDatabase(String name) throws Exception {
         dbms.deleteDatabase(name);
     }
 
-    public void createDatabase(String name) throws StorageException {
+    public void createDatabase(String name) throws Exception {
         dbms.createDatabase(name);
     }
 
@@ -29,7 +29,7 @@ public class DatabaseService {
         return databaseNames;
     }
 
-    public Database findByName(String name) throws StorageException {
+    public Database findByName(String name) throws Exception {
         return dbms.getAllDatabases().stream()
                 .filter(db -> name.equals(db.getName())).findAny()
                 .orElseThrow(() -> new DatabaseNotFoundException(name));

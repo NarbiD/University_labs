@@ -1,9 +1,6 @@
 package webdbms.facades;
 
-import webdbms.DBMS.entry.Entry;
-import webdbms.DBMS.exception.EntryException;
-
-import java.util.Arrays;
+import webdbms.DBMS.Entry;
 import java.util.List;
 
 public class EntryFacade {
@@ -18,7 +15,7 @@ public class EntryFacade {
         return entry.getValues();
     }
 
-    public String getImage() throws EntryException {
-        return entry.getImage();
+    public String getFile() throws Exception {
+        return entry.getFile();
     }
 }

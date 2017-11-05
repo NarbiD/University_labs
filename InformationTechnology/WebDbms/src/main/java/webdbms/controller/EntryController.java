@@ -1,10 +1,9 @@
 package webdbms.controller;
 
 import org.springframework.web.bind.annotation.*;
-import webdbms.DBMS.database.Database;
-import webdbms.DBMS.entry.Entry;
-import webdbms.DBMS.exception.StorageException;
-import webdbms.DBMS.table.Table;
+import webdbms.DBMS.Database;
+import webdbms.DBMS.Entry;
+import webdbms.DBMS.Table;
 import webdbms.facades.EntryFacade;
 import webdbms.service.DatabaseService;
 import webdbms.service.TableService;
@@ -28,12 +27,10 @@ public class EntryController {
         try {
             Database database = databaseService.findByName(databaseName);
             Table table = tableService.findByName(databaseName, tableName);
-            String image = requestBody.get("image").toString();
-            table.addRow((List<Object>) requestBody.get("values"), image);
+            String file = requestBody.get("file").toString();
+            table.addRow((List<Object>) requestBody.get("values"), file);
             database.save();
-        } catch (StorageException e) {
-            throw new InternalServerException(e);
-        } catch (ClassCastException | NullPointerException e) {
+        } catch (Exception e) {
             throw new InvalidRequestBodyException();
         }
     }
@@ -49,7 +46,7 @@ public class EntryController {
             }
             tableService.findByName(databaseName, tableName).deleteRow(rowNumber);
             database.save();
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }
@@ -64,7 +61,7 @@ public class EntryController {
                 throw new InvalidRequestBodyException();
             }
             return new EntryFacade(entries.get(rowNumber));
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }
@@ -81,7 +78,7 @@ public class EntryController {
             tableService.findByName(databaseName, tableName)
                 .getEntries().forEach(entry -> entries.add(new EntryFacade(entry)));
             return entries;
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }

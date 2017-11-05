@@ -1,7 +1,6 @@
 package webdbms.controller;
 
 import org.springframework.web.bind.annotation.*;
-import webdbms.DBMS.exception.StorageException;
 import webdbms.facades.DatabaseFacade;
 import webdbms.service.DatabaseService;
 import webdbms.service.exception.InternalServerException;
@@ -25,7 +24,7 @@ public class DatabaseController {
     public DatabaseFacade getDatabase(@PathVariable String databaseName) {
         try {
             return new DatabaseFacade(databaseService.findByName(databaseName));
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }
@@ -34,9 +33,7 @@ public class DatabaseController {
     public void createDatabase(@RequestBody Map<String, String> requestBody) {
         try {
             databaseService.createDatabase(requestBody.get("databaseName"));
-        } catch (StorageException e) {
-            throw new InternalServerException(e);
-        } catch (ClassCastException | NullPointerException e) {
+        } catch (Exception e) {
             throw new InvalidRequestBodyException();
         }
     }
@@ -45,7 +42,7 @@ public class DatabaseController {
     public void deleteDatabase(@PathVariable String databaseName) {
         try {
             databaseService.deleteDatabase(databaseName);
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new InternalServerException(e);
         }
     }

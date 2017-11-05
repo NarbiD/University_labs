@@ -1,8 +1,8 @@
 package webdbms.facades;
 
-import webdbms.DBMS.datatype.DataType;
-import webdbms.DBMS.datatype.constraint.Constraint;
-import webdbms.DBMS.table.Table;
+import webdbms.DBMS.DataType;
+import webdbms.DBMS.IntegerInvlConstraint;
+import webdbms.DBMS.Table;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class TableFacade {
         return table.getColumnNames();
     }
 
-    public Constraint getRealIntervalConstraint() {
+    public IntegerInvlConstraint getRealIntervalConstraint() {
         return table.getConstraint();
     }
 }
