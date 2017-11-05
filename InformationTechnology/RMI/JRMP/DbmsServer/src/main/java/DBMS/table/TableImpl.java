@@ -83,7 +83,7 @@ public class TableImpl extends UnicastRemoteObject implements Table {
         }
     }
 
-    private List<Entry> getEntriesFromJson(JSONArray jsonArray, List<DataType> types) throws IOException, RemoteException {
+    private List<Entry> getEntriesFromJson(JSONArray jsonArray, List<DataType> types) throws IOException {
         List<Entry> entries = new ArrayList<>();
         for (Object json : jsonArray) {
             JSONObject jsonObject = (JSONObject)json;
@@ -248,7 +248,4 @@ public class TableImpl extends UnicastRemoteObject implements Table {
         return result;
     }
 
-    public void setEntryFactory(EntryFactory entryFactory) {
-        this.entryFactory = entryFactory;
-    }
 }

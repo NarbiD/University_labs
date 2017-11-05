@@ -24,5 +24,5 @@ public interface Database extends Serializable, Remote {
     String getName()throws RemoteException;
     void setName(String name) throws IOException;
 
-    void loadTablesFromStorage() throws IOException, RemoteException;
+    void loadTablesFromStorage() throws IOException;
 }

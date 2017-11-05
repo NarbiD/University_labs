@@ -28,7 +28,7 @@ public class DbmsImpl extends UnicastRemoteObject implements Dbms {
         this.databases = databases;
     }
 
-    public void loadDatabaseFromStorage() throws IOException, RemoteException {
+    public void loadDatabaseFromStorage() throws IOException {
         File[] dirs = new File(Databases.ABS_DEFAULT_LOCATION).listFiles();
         for (File entry : dirs != null ? dirs : new File[0]) {
             if (entry.isDirectory()) {
@@ -41,7 +41,7 @@ public class DbmsImpl extends UnicastRemoteObject implements Dbms {
     }
 
     @Override
-    public Database createDatabase(String name) throws IOException, RemoteException {
+    public Database createDatabase(String name) throws IOException{
         Database database = databaseFactory.getDatabase();
         database.setName(name);
         if (databases.contains(database)) {
@@ -53,7 +53,7 @@ public class DbmsImpl extends UnicastRemoteObject implements Dbms {
     }
 
     @Override
-    public void deleteDatabase(String name) throws IOException, RemoteException {
+    public void deleteDatabase(String name) throws IOException {
         Database database = databaseFactory.getDatabase();
         database.setName(name);
         database.delete();

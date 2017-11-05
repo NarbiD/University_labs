@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface Dbms extends Remote, Serializable {
     void setDatabases(Collection<Database> databases) throws RemoteException;
-    void loadDatabaseFromStorage() throws IOException, RemoteException;
-    Database createDatabase(String name) throws IOException, RemoteException;
-    void deleteDatabase(String name) throws IOException, RemoteException;
+    void loadDatabaseFromStorage() throws IOException;
+    Database createDatabase(String name) throws IOException;
+    void deleteDatabase(String name) throws IOException;
     Optional<Database> getDatabase(String name) throws RemoteException;
     Collection<Database> getAllDatabases() throws RemoteException;
 }

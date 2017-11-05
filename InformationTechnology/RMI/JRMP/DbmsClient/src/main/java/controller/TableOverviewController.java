@@ -51,7 +51,7 @@ public class TableOverviewController extends AbstractController {
     public TableView<Object> entryOverview;
 
     @FXML
-    public void initialize() throws IOException, IOException {
+    public void initialize() throws IOException {
         initNoImage();
         initTableView();
         initDynamicImageChange();

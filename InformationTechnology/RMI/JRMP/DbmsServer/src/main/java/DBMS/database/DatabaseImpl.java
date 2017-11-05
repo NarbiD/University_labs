@@ -32,7 +32,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public void loadTablesFromStorage() throws IOException, RemoteException {
+    public void loadTablesFromStorage() throws IOException {
         File[] files = new File(this.location + this.name).listFiles();
         for (File entry : files != null ? files : new File[0]) {
             if (entry.isFile()) {
@@ -50,7 +50,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public void setName(String name) throws IOException, RemoteException {
+    public void setName(String name) throws IOException {
         if (this.name == null || this.name.equals("")) {
             this.name = name;
         } else {
@@ -69,7 +69,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public Table createTable(String name, DataType... columnTypes) throws IOException, RemoteException {
+    public Table createTable(String name, DataType... columnTypes) throws IOException {
         Table table = new TableImpl();
         table.setName(name);
         table.setLocation(this.location + this.name + File.separator);
@@ -83,7 +83,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public void deleteTable(String name) throws IOException, RemoteException {
+    public void deleteTable(String name) throws IOException {
         String tableLocation = this.location + this.name + File.separator;
         Tables.delete(name, tableLocation);
     }
@@ -95,7 +95,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public void save() throws IOException, RemoteException {
+    public void save() throws IOException {
         if (name.equals("")) {
             throw new IOException("No name is given for the database");
         }
@@ -109,7 +109,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public void delete() throws IOException, IOException,  RemoteException {
+    public void delete() throws IOException {
         if (Databases.doesDatabaseExist(this.name, this.location)) {
             File path = new File(this.location + this.name);
             for (Table table : this.tables) {

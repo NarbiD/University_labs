@@ -24,11 +24,11 @@ public interface Table extends Serializable, Remote {
 
     void sort(int fieldNumber) throws RuntimeException, RemoteException;
 
-    void writeToFile() throws IOException, RemoteException;
+    void writeToFile() throws IOException;
 
     RealConstraint getConstraint() throws RemoteException;
 
-    void loadDataFromFile() throws IOException, RemoteException;
+    void loadDataFromFile() throws IOException;
     boolean isEmpty() throws RemoteException;
 
     void setTypes(List<DataType> types) throws RemoteException;

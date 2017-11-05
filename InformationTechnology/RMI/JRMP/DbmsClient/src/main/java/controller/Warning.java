@@ -6,7 +6,7 @@ import javafx.scene.control.Alert;
 class Warning {
     private Warning() {}
 
-    static void show (String message, Throwable throwable) {
+    static void show(String message, Throwable throwable) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(Alert.AlertType.WARNING.toString());
         alert.setHeaderText(message);
