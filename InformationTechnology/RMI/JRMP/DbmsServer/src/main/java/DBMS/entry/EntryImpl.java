@@ -3,27 +3,27 @@ package DBMS.entry;
 import common.DataType;
 import DBMS.datatype.constraint.RealConstraint;
 import DBMS.datatype.TypeManager;
-import DBMS.exception.EntryException;
 import org.json.JSONObject;
 
-import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.List;
 
-public class EntryImpl implements Entry {
+public class EntryImpl extends UnicastRemoteObject implements Entry {
 
-    private BufferedImage image;
+    private String image;
     private List<DataType> types;
     private List<Object> values;
 
-    public EntryImpl(List<Object> values, List<DataType> types, RealConstraint constraint) throws EntryException {
+    public EntryImpl(List<Object> values, List<DataType> types, RealConstraint constraint) throws IOException {
         if (types.size() != values.size()) {
-            throw new EntryException("Expected types.size() == values.size() but types size == " +
+            throw new IOException("Expected types.size() == values.size() but types size == " +
                     types.size() + " and values.size() == " + values.size() + " found");
         }
         for (int column = 0; column < values.size(); column++) {
             if (!TypeManager.instanceOf(values.get(column), types.get(column), constraint)) {
-                throw new EntryException("Invalid type in table cell: expected type " + types.get(column) +
+                throw new IOException("Invalid type in table cell: expected type " + types.get(column) +
                         " in column " + (column+1) + " but value " + values.get(column) +
                         " (" + values.get(column).getClass() + ") found");
             }
@@ -32,11 +32,11 @@ public class EntryImpl implements Entry {
         this.values = values;
     }
 
-    public EntryImpl() throws EntryException {
+    public EntryImpl() throws IOException {
         this(new ArrayList<>(), new ArrayList<>(), new RealConstraint());
     }
 
-    public EntryImpl(JSONObject json, List<DataType> types, RealConstraint constraint) throws EntryException {
+    public EntryImpl(JSONObject json, List<DataType> types, RealConstraint constraint) throws IOException {
         this(getValuesFromJson(json), types, constraint);
     }
 
@@ -58,12 +58,12 @@ public class EntryImpl implements Entry {
     }
 
     @Override
-    public BufferedImage getImage() {
+    public String getImage() {
         return image;
     }
 
     @Override
-    public void setImage(BufferedImage image) {
+    public void setImage(String image) {
         this.image = image;
     }
 

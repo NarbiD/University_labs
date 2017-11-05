@@ -1,8 +1,8 @@
 package DBMS.table;
 
-import DBMS.exception.StorageException;
+import java.io.IOException;
 
 @FunctionalInterface
 public interface TableFactory {
-    Table getTable() throws StorageException;
+    Table getTable() throws IOException;
 }

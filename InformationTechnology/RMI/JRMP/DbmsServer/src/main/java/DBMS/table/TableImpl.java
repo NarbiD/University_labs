@@ -4,18 +4,14 @@ import DBMS.entry.Entry;
 import DBMS.entry.EntryFactory;
 import DBMS.entry.EntryImpl;
 import DBMS.datatype.constraint.RealConstraint;
-import DBMS.exception.StorageException;
 import common.DataType;
-import DBMS.exception.EntryException;
-import DBMS.exception.TableException;
 import org.json.*;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.stream.IntStream;
 
-public class TableImpl implements Table {
+public class TableImpl extends UnicastRemoteObject implements Table {
     @Override
     public RealConstraint getConstraint() {
         return constraint;
@@ -29,17 +25,17 @@ public class TableImpl implements Table {
     private EntryFactory entryFactory;
     private List<String> columnNames;
 
-    public TableImpl() throws StorageException {
+    public TableImpl() throws IOException {
         this("", "");
     }
 
-    public TableImpl(String name, String location, DataType... columnTypes) throws StorageException {
+    public TableImpl(String name, String location, DataType... columnTypes) throws IOException {
         this.location = location;
         this.name = name;
         this.types = Arrays.asList(columnTypes);
         this.columnNames = new ArrayList<>();
         this.constraint = new RealConstraint();
-        this.entryFactory = EntryImpl::new;
+        this.entryFactory = (EntryFactory & Serializable) EntryImpl::new;
         try {
             loadDataFromFile();
         } catch (IOException e) {
@@ -48,7 +44,7 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void loadDataFromFile() throws StorageException, IOException {
+    public void loadDataFromFile() throws IOException {
         String rowInFile = new JSONArray().toString();
         String readData = rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile + '\n' + rowInFile;
         if (Tables.isTableExists(this.name, this.location)) {
@@ -70,11 +66,11 @@ public class TableImpl implements Table {
             this.types = readTypes;
             this.entries = getEntriesFromJson(new JSONArray(s[2]), readTypes);
             for (int i = 0; i < entries.size(); i++) {
-                byte[] bytes = JSONtoByteArray((JSONArray)ByteArrayJson.get(i));
-                this.entries.get(i).setImage(ImageIO.read(new ByteArrayInputStream(bytes)));
+                String bytes = ByteArrayJson.get(i).toString();
+                this.entries.get(i).setImage(bytes);
             }
         } else {
-            throw new TableException("Expected types " + readData + " but " + this.types + " found");
+            throw new IOException("Expected types " + readData + " but " + this.types + " found");
         }
 
     }
@@ -87,7 +83,7 @@ public class TableImpl implements Table {
         }
     }
 
-    private List<Entry> getEntriesFromJson(JSONArray jsonArray, List<DataType> types) throws EntryException {
+    private List<Entry> getEntriesFromJson(JSONArray jsonArray, List<DataType> types) throws IOException, RemoteException {
         List<Entry> entries = new ArrayList<>();
         for (Object json : jsonArray) {
             JSONObject jsonObject = (JSONObject)json;
@@ -97,36 +93,17 @@ public class TableImpl implements Table {
         return entries;
     }
 
-    private byte[] JSONtoByteArray(JSONArray json) {
-        List<Object> ints = json.toList();
-        byte[] b = new byte[ints.size()];
-        IntStream.range(0, ints.size()).forEach(i -> b[i] = (byte) ((int) ints.get(i)));
-        return b;
-    }
-
     @Override
     public boolean isEmpty() {
         return this.entries.isEmpty();
     }
 
     @Override
-    public void writeToFile() throws StorageException {
+    public void writeToFile() throws IOException {
         if (this.name.equals("") || this.location.equals("") ) {
-            throw new TableException("Expected defined name, location and types");
+            throw new IOException("Expected defined name, location and types");
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.location + this.name))) {
-            List<byte[]> byteArraysWithImages = new ArrayList<>();
-            entries.forEach(entry -> {
-                try {
-                    ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-                    BufferedImage image = entry.getImage();
-                    if (image != null)
-                        ImageIO.write(image,"png", byteArray);
-                    byteArraysWithImages.add(byteArray.toByteArray());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
             writer.write(new JSONArray(this.columnNames).toString() + "\n");
             writer.write(new JSONArray(this.types).toString() + "\n");
             writer.write(this.getJsonArray().toString() + "\n");
@@ -136,7 +113,15 @@ public class TableImpl implements Table {
                 constraints.put(this.constraint.getMaxValue());
             }
             writer.write(constraints.toString() + "\n");
-            JSONArray pics = new JSONArray(byteArraysWithImages);
+            List<String> images = new ArrayList<>();
+            entries.forEach(entry -> {
+                try {
+                    images.add(entry.getImage());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            });
+            JSONArray pics = new JSONArray(images);
             writer.write(pics.toString());
             writer.flush();
 
@@ -145,7 +130,7 @@ public class TableImpl implements Table {
         }
     }
 
-    private JSONArray getJsonArray() throws EntryException {
+    private JSONArray getJsonArray() throws IOException {
         JSONArray jsonArray = new JSONArray();
         for (Entry entry : this.entries) {
             jsonArray.put(entry.getJson());
@@ -159,9 +144,9 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void addRow(List<Object> values, BufferedImage image) throws StorageException {
+    public void addRow(List<Object> values, String image) throws IOException {
         if (values.size() != types.size()) {
-            throw new TableException("Expected " + types.size() + " values but " + values.size() + " found");
+            throw new IOException("Expected " + types.size() + " values but " + values.size() + " found");
         }
         Entry entry = new EntryImpl(values, types, constraint);
         if (image != null) {
@@ -176,11 +161,15 @@ public class TableImpl implements Table {
             @Override
             @SuppressWarnings("unchecked")
             public int compare(Entry entry1, Entry entry2) {
-                Comparable cmp1 = getComparableElement(entry1);
-                Comparable cmp2 = getComparableElement(entry2);
-                return cmp1.compareTo(cmp2);
+                try {
+                    Comparable cmp1 = getComparableElement(entry1);
+                    Comparable cmp2 = getComparableElement(entry2);
+                    return cmp1.compareTo(cmp2);
+                } catch (RemoteException e){
+                    throw new RuntimeException(e);
+                }
             }
-            private Comparable getComparableElement(Entry entry) {
+            private Comparable getComparableElement(Entry entry) throws RemoteException {
                 Comparable field = (Comparable)entry.getValues().get(fieldNumber);
                 return (field instanceof Character || field instanceof String) ? field.toString().toLowerCase() : field;
             }
@@ -213,7 +202,7 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void setTypes(DataType... types) {
+    public void setTypes(DataType... types) throws RemoteException {
         this.types = Arrays.asList(types);
     }
 
@@ -223,7 +212,7 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void setTypes(List<DataType> types) {
+    public void setTypes(List<DataType> types) throws RemoteException {
         this.types = types;
     }
 
@@ -233,8 +222,8 @@ public class TableImpl implements Table {
     }
 
     @Override
-    public void setConstraint(RealConstraint constraint) {
-        this.constraint = constraint;
+    public void setConstraint(double min, double max) throws RemoteException {
+        this.constraint = new RealConstraint(min, max);
     }
 
     @Override

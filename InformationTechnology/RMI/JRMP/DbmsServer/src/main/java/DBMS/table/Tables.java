@@ -1,8 +1,7 @@
 package DBMS.table;
 
-import DBMS.exception.TableException;
-
 import java.io.File;
+import java.io.IOException;
 
 public class Tables {
 
@@ -11,11 +10,11 @@ public class Tables {
         return table.isFile();
     }
 
-    public static void delete(String name, String location) throws TableException {
+    public static void delete(String name, String location) throws IOException {
         if (isTableExists(name, location)) {
             File table  = new File(location + name);
             if(!table.delete()) {
-                throw new TableException("Can not delete table from storage");
+                throw new IOException("Can not delete table from storage");
             }
         }
     }

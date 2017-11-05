@@ -2,45 +2,41 @@ package DBMS.database;
 
 import DBMS.table.TableImpl;
 import common.DataType;
-import DBMS.exception.DatabaseException;
-import DBMS.exception.StorageException;
-import DBMS.exception.TableException;
 import DBMS.table.Table;
-import DBMS.table.TableFactory;
 import DBMS.table.Tables;
 
 import java.io.*;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseImpl implements Database {
+public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     private String name;
     private List<Table> tables;
     private String location;
-    private TableFactory tableFactory;
 
-    public DatabaseImpl() throws StorageException {
+    public DatabaseImpl() throws IOException {
         this("");
     }
 
-    public DatabaseImpl(String name) throws StorageException {
+    public DatabaseImpl(String name) throws IOException {
         this(name, Databases.ABS_DEFAULT_LOCATION);
     }
 
-    public DatabaseImpl(String name, String location) throws StorageException {
+    public DatabaseImpl(String name, String location) throws IOException {
         this.name = name;
         this.location = location;
         this.tables = new ArrayList<>();
-        this.tableFactory = TableImpl::new;
     }
 
     @Override
-    public void loadTablesFromStorage() throws StorageException {
+    public void loadTablesFromStorage() throws IOException, RemoteException {
         File[] files = new File(this.location + this.name).listFiles();
         for (File entry : files != null ? files : new File[0]) {
             if (entry.isFile()) {
-                Table table = tableFactory.getTable();
+                Table table = new TableImpl();
                 table.setName(entry.getName());
                 table.setLocation(this.location + this.name + File.separator);
                 try {
@@ -54,31 +50,31 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public void setName(String name) throws DatabaseException {
+    public void setName(String name) throws IOException, RemoteException {
         if (this.name == null || this.name.equals("")) {
             this.name = name;
         } else {
-            throw new DatabaseException("You can not rename the database");
+            throw new IOException("You can not rename the database");
         }
     }
 
     @Override
-    public List<Table> getTables() {
+    public List<Table> getTables()throws RemoteException {
         return tables;
     }
 
     @Override
-    public String getName() {
+    public String getName()throws RemoteException {
         return this.name;
     }
 
     @Override
-    public Table createTable(String name, DataType... columnTypes) throws StorageException {
-        Table table = tableFactory.getTable();
+    public Table createTable(String name, DataType... columnTypes) throws IOException, RemoteException {
+        Table table = new TableImpl();
         table.setName(name);
         table.setLocation(this.location + this.name + File.separator);
         if (tables.contains(table)) {
-            throw new TableException("Table with the same name already exists");
+            throw new IOException("Table with the same name already exists");
         }
         table.setTypes(columnTypes);
         tables.add(table);
@@ -87,25 +83,25 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public void deleteTable(String name) throws TableException {
+    public void deleteTable(String name) throws IOException, RemoteException {
         String tableLocation = this.location + this.name + File.separator;
         Tables.delete(name, tableLocation);
     }
 
     @Override
-    public boolean doesTableExist(String tableName) {
+    public boolean doesTableExist(String tableName)throws RemoteException {
         String tableLocation = this.location + this.name + File.separator;
         return Tables.isTableExists(tableName, tableLocation);
     }
 
     @Override
-    public void save() throws StorageException {
+    public void save() throws IOException, RemoteException {
         if (name.equals("")) {
-            throw new DatabaseException("No name is given for the database");
+            throw new IOException("No name is given for the database");
         }
         File path = new File(this.location + this.name);
         if (!Databases.doesDatabaseExist(name) && !path.mkdir()) {
-            throw new DatabaseException("Can not create database on storage");
+            throw new IOException("Can not create database on storage");
         }
         for (Table table : tables) {
             table.writeToFile();
@@ -113,17 +109,17 @@ public class DatabaseImpl implements Database {
     }
 
     @Override
-    public void delete() throws DatabaseException, TableException {
+    public void delete() throws IOException, IOException,  RemoteException {
         if (Databases.doesDatabaseExist(this.name, this.location)) {
             File path = new File(this.location + this.name);
             for (Table table : this.tables) {
                 Tables.delete(table.getName(), this.location + this.name + File.separator);
             }
             if (!path.delete()) {
-                throw new DatabaseException("Can not delete database from storage");
+                throw new IOException("Can not delete database from storage");
             }
         } else {
-            throw new DatabaseException("Database does not exist on storage");
+            throw new IOException("Database does not exist on storage");
         }
     }
 

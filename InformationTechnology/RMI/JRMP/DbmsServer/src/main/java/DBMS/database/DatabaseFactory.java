@@ -1,8 +1,8 @@
 package DBMS.database;
 
-import DBMS.exception.StorageException;
+import java.io.IOException;
 
 @FunctionalInterface
 public interface DatabaseFactory {
-    Database getDatabase() throws StorageException;
+    Database getDatabase() throws IOException;
 }
