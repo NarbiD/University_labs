@@ -292,7 +292,6 @@ function clickOnTable(dbName, tableName) {
                 var numberOfColumns = data[0].values.length;
             }
 
-
             if (data.length !== 0 || data[0] !== undefined) {
                 $(".entriesList").find("th").attr("colspan", numberOfColumns);
             }
@@ -302,6 +301,9 @@ function clickOnTable(dbName, tableName) {
                 var row = $("<tr></tr>");
                 for (var j = 0; j < values.length; j++){
                     $("<td>" + values[j] + "</td>").appendTo(row).on("click", function () {
+                        $(".entriesList").find("tr.selected").removeClass("selected");
+                        $(this).parent().addClass("selected");
+
                         var k = $(this).parent('tr').index();
                         $(".image").attr("src", "data:image/png;base64," + data[k-1].image);
                     });
@@ -387,7 +389,7 @@ function addRowsToForm(columnNames) {
         var columnNameField = $("<b class=\"columnNameField\"></b>");
         columnNameField.text(columnNames[i] + ": ");
         var columnValueField = $("<input type=\"text\" class=\"columnValueField form-control\" title=\"value field\">");
-        var fieldPair = $("<div class=\"rowField\"></div><br>");
+        var fieldPair = $("<div class=\"rowField\"></div>");
         fieldPair.append(columnNameField, columnValueField);
         $(".createRowFormSection .fields").append(fieldPair);
     }
@@ -413,41 +415,44 @@ function sortByColumnNumber(colNumber, dbName, tableName) {
                 return a.values[colNumber] > b.values[colNumber];
             });
 
-            var rows = _buildRows();
-            var sortButtons = _buildSortButtons();
+            var rows = _buildRows(data);
+            var sortButtons = _buildSortButtons(data[0].values.length);
             var table = $(".entriesList > tbody");
             cleanImage();
             _resizeHeader(data[0].values.length);
-            table.append(rows);
+            for (var i = 0; i < rows.length; i++) {
+                table.append(rows[i]);
+            }
             table.append(sortButtons);
         }]
     });
 
     function _resizeHeader(size) {
-        if (data[0].values !== undefined) {
-            $(".entriesList").find("th").attr("colspan", size);
-        }
+        $(".entriesList").find("th").attr("colspan", size);
     }
 
-    function _buildRows() {
-        var rows = $("");
+    function _buildRows(data) {
+        var rows = [data.length];
         for (var k = 0; k < data.length; k++) {
             var values = data[k].values;
             var row = $("<tr></tr>");
             for (var j = 0; j < values.length; j++){
                 $("<td>" + values[j] + "</td>").appendTo(row).on("click", function () {
-                    var s = $(this).parent('tr').index();
-                    $(".image").attr("src", "data:image/png;base64," + data[s-1].image);
+                    $(".entriesList").find("tr.selected").removeClass("selected");
+                    $(this).parent().addClass("selected");
+
+                    var k = $(this).parent('tr').index();
+                    $(".image").attr("src", "data:image/png;base64," + data[k-1].image);
                 });
             }
-            rows.append(row);
+            rows[k] = (row);
         }
         return rows;
     }
 
-    function _buildSortButtons() {
+    function _buildSortButtons(columnsAmount) {
         var sortButtons = $("<tr></tr>");
-        for (var q = 0; q < data[0].values.length; q++){
+        for (var q = 0; q < columnsAmount; q++){
             sortButtons.append("<td onclick='sortByColumnNumber(" + q + ", \"" + dbName + "\", \"" + tableName + "\");'>" +
                 "<input type='button' class='' value='sort'></td>");
         }
