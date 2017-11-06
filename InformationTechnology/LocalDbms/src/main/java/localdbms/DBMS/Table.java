@@ -170,6 +170,10 @@ public class Table {
         return this.types;
     }
 
+    public IntegerInvlConstraint getConstraint() {
+        return this.constraint;
+    }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Table)) return false;

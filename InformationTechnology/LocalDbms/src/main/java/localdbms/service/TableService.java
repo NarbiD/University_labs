@@ -27,19 +27,18 @@ public class TableService {
         tables.remove(tableIndex);
     }
 
-    public List<Integer> search(int tableIndex, List<Object> objects) {
-        List<Integer> entriesNums = new ArrayList<>();
-        List<Entry> entries = tables.get(tableIndex).getEntries();
-        for (int j = 0; j < entries.size(); j++) {
-            Entry entry = entries.get(j);
+    public List<Entry> search(int tableIndex, List<Object> objects) {
+        List<Entry> matchedEntries = new ArrayList<>();
+        List<Entry> allEntries = tables.get(tableIndex).getEntries();
+        for (Entry entry : allEntries) {
             if (isValuesEquals(entry.getValues(), objects)) {
-                entriesNums.add(j);
+                matchedEntries.add(entry);
             }
         }
-        return entriesNums;
+        return matchedEntries;
     }
 
-    public boolean isValuesEquals(List<Object> v1, List<Object> v2) {
+    private boolean isValuesEquals(List<Object> v1, List<Object> v2) {
         for (int i = 0; i < v1.size(); i++) {
             boolean cnd1 =  v1.get(i).equals(v2.get(i) instanceof Character ?(v2.get(i)).toString():v2.get(i));
             if (!(cnd1 || v2.get(i) == null)) {

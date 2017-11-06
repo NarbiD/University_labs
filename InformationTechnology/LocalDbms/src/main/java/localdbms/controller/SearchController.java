@@ -37,13 +37,9 @@ public class SearchController extends Controller {
         List<String> textDataFromFields = getDataFromForm();
         try {
             List<Object> values = getObjectsByText(textDataFromFields);
-            List<Integer> entryNums = tableService.search(tableIndex.get(), values);
-            List<Entry> entriesForShow = new ArrayList<>();
-            for (Integer entryNum : entryNums) {
-                entriesForShow.add(tableService.getTable(tableIndex.get()).getEntries().get(entryNum));
-            }
+            List<Entry> matchedEntries = tableService.search(tableIndex.get(), values);
             ObservableList<Object> valuesForShow = FXCollections.observableArrayList();
-            entriesForShow.forEach(entry -> valuesForShow.add(FXCollections.observableArrayList(entry.getValues())));
+            matchedEntries.forEach(entry -> valuesForShow.add(FXCollections.observableArrayList(entry.getValues())));
             showResult(valuesForShow);
         } catch (Exception e) {
             Warning.show(e);
