@@ -65,8 +65,11 @@ public class TableController {
     }
 
     private RealConstraint getConstraintFromMap(Map<String, Object> map) {
-        double minValue = map.get("maxValue") instanceof Integer ? (int)map.get("maxValue") : (double)map.get("maxValue");
-        double maxValue = map.get("minValue") instanceof Integer ? (int)map.get("minValue") : (double)map.get("minValue");
+        if (map.get("maxValue") == null && map.get("minValue") == null) {
+            return new RealConstraint();
+        }
+        double maxValue = map.get("maxValue") instanceof Integer ? (int)map.get("maxValue") : (double)map.get("maxValue");
+        double minValue = map.get("minValue") instanceof Integer ? (int)map.get("minValue") : (double)map.get("minValue");
         return new RealConstraint(minValue, maxValue);
     }
 

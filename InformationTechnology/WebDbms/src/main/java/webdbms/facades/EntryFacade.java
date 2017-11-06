@@ -3,7 +3,6 @@ package webdbms.facades;
 import webdbms.DBMS.entry.Entry;
 import webdbms.DBMS.exception.EntryException;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class EntryFacade {
