@@ -16,7 +16,7 @@ $(document).ready(function () {
     hideForm(".createRowFormSection");
     loadDatabases();
 
-    $(".createDatabaseForm").on("submit", function () {
+    $(".createDatabaseForm").find(".submitButton").on("click", function () {
         createDatabase($(".databaseName").val());
     });
 
@@ -40,7 +40,7 @@ $(document).ready(function () {
         })
     }
 
-    $(".createTableForm").on("submit", function () {
+    $(".createTableForm").find(".submitButton").on("click", function () {
         createTable($(".databaseList").find("tr.selected").find("td").text(), $(".tableName").val())
     });
 
@@ -120,9 +120,6 @@ $(document).ready(function () {
         }
     });
 
-    $("#btnDeleteRow").on("click", function () {
-    });
-
     var image;
     $("input[type=file]").on("change", function(){
         var images = this.files;
@@ -143,6 +140,7 @@ $(document).ready(function () {
     $(".createRowFormSection .submitButton").on("click", function () {
         sendRow(image);
     });
+
 });
 
 function loadEntries(dbName, tableName) {
@@ -158,6 +156,9 @@ function loadEntries(dbName, tableName) {
                 var row = $("<tr></tr>");
                 for (var j = 0; j < values.length; j++){
                     $("<td>" + values[j] + "</td>").appendTo(row).on("click", function () {
+                        $(".entriesList").find("tr.selected").removeClass("selected");
+                        $(this).parent().addClass("selected");
+
                         var k = $(this).parent('tr').index();
                         $(".image").attr("src", "data:image/png;base64," + data[k-1].image);
                     });
