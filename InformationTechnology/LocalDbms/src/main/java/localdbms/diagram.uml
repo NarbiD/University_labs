@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="80.49999999999991" y="1685.0">localdbms.DBMS.Dbms</node>
+    <node x="79.99999999999991" y="1319.0">localdbms.DBMS.Database</node>
+    <node x="21.5" y="357.0">localdbms.DBMS.Entry</node>
+    <node x="28.499999999999915" y="689.0">localdbms.DBMS.Table</node>
+    <node x="145.0" y="212.0">localdbms.DBMS.TypeManager</node>
+    <node x="14.07755102040818" y="0.0">localdbms.DBMS.IntegerInvlConstraint</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="localdbms.DBMS.Dbms" target="localdbms.DBMS.Database">
+      <point x="0.0" y="-92.0" />
+      <point x="0.0" y="158.0" />
+    </edge>
+    <edge source="localdbms.DBMS.Table" target="localdbms.DBMS.Database">
+      <point x="146.25" y="290.0" />
+      <point x="369.7499999999999" y="1294.0" />
+      <point x="331.1249999999999" y="1294.0" />
+      <point x="107.625" y="-158.0" />
+    </edge>
+    <edge source="localdbms.DBMS.Table" target="localdbms.DBMS.Entry">
+      <point x="55.71428571428572" y="-290.0" />
+      <point x="279.21428571428567" y="649.0" />
+      <point x="358.16666666666663" y="649.0" />
+      <point x="134.66666666666663" y="136.0" />
+    </edge>
+    <edge source="localdbms.DBMS.Entry" target="localdbms.DBMS.TypeManager">
+      <point x="101.0" y="-136.0" />
+      <point x="324.5" y="332.0" />
+      <point x="242.0" y="332.0" />
+      <point x="-97.0" y="47.5" />
+    </edge>
+    <edge source="localdbms.DBMS.Table" target="localdbms.DBMS.IntegerInvlConstraint">
+      <point x="-111.42857142857133" y="-290.0" />
+      <point x="112.07142857142858" y="659.0" />
+      <point x="11.0" y="659.0" />
+      <point x="11.0" y="192.0" />
+      <point x="80.97755102040816" y="192.0" />
+      <point x="-44.60000000000002" y="81.0" />
+    </edge>
+    <edge source="localdbms.DBMS.Entry" target="localdbms.DBMS.IntegerInvlConstraint">
+      <point x="-101.0" y="-136.0" />
+      <point x="122.5" y="192.0" />
+      <point x="125.57755102040817" y="192.0" />
+      <point x="-1.4210854715202004E-14" y="81.0" />
+    </edge>
+    <edge source="localdbms.DBMS.Table" target="localdbms.DBMS.TypeManager">
+      <point x="111.42857142857144" y="-290.0" />
+      <point x="334.92857142857133" y="659.0" />
+      <point x="436.0" y="659.0" />
+      <point x="96.99999999999999" y="47.5" />
+    </edge>
+    <edge source="localdbms.DBMS.Database" target="localdbms.DBMS.Table">
+      <point x="-107.625" y="-158.0" />
+      <point x="115.87499999999991" y="1294.0" />
+      <point x="77.24999999999991" y="1294.0" />
+      <point x="-146.25" y="290.0" />
+    </edge>
+    <edge source="localdbms.DBMS.TypeManager" target="localdbms.DBMS.IntegerInvlConstraint">
+      <point x="0.0" y="-47.5" />
+      <point x="339.0" y="192.0" />
+      <point x="170.17755102040815" y="192.0" />
+      <point x="44.599999999999966" y="81.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.1" x="426.86111111111103" y="1279.6666666666652" />
+  <SelectedNodes>
+    <node>localdbms.DBMS.Table</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
