@@ -30,7 +30,7 @@ public class TableFacade {
         return table.getColumnNames();
     }
 
-    public IntegerInvlConstraint getRealIntervalConstraint() {
+    public IntegerInvlConstraint getIntegerInvlConstraint() {
         return table.getConstraint();
     }
 }

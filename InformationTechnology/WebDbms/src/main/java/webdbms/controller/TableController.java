@@ -60,7 +60,7 @@ public class TableController {
         try {
             String name = requestBody.get("tableName").toString();
             List<DataType> types = getTypesFromObjects((List<Object>) requestBody.get("columnTypes"));
-            IntegerInvlConstraint constraint = getConstraintFromMap((Map) requestBody.get("realIntervalConstraint"));
+            IntegerInvlConstraint constraint = getConstraintFromMap((Map) requestBody.get("integerInvlConstraint"));
             List<String> columnNames = getColumnNamesFromObjects((List<Object>) requestBody.get("columnNames"));
             tableService.createTable(databaseName, name, types, columnNames, constraint);
         } catch (ClassCastException | NullPointerException e) {
@@ -77,7 +77,11 @@ public class TableController {
     }
 
     private IntegerInvlConstraint getConstraintFromMap(Map<String, Object> map) {
-        return new IntegerInvlConstraint((int)map.get("minValue"), (int)map.get("maxValue"));
+        if (map.get("minValue") != null && map.get("maxValue") != null) {
+            return new IntegerInvlConstraint((int) map.get("minValue"), (int) map.get("maxValue"));
+        } else {
+            return new IntegerInvlConstraint();
+        }
     }
 
     private List<String> getColumnNamesFromObjects(List<Object> objects) {
