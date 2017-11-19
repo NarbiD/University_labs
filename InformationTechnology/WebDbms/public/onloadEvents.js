@@ -19,7 +19,7 @@
 
         forms.hide(".createDatabaseFormSection");
         forms.hide(".createTableFormSection");
-        forms.hide(".createRowFormSection");
+        forms.hide(".rowFormSection");
 
         actions.load.databases();
 
@@ -32,10 +32,6 @@
 
         $(".createTableForm .submitButton").on("click", function () {
             actions.create.table($(".databaseList tr.selected > td").text(), dataTypes)
-        });
-
-        $(".createRowFormSection .submitButton").on("click", function () {
-            actions.create.row(file);
         });
 
         $(".cancelButton").on("click", function () {
@@ -73,7 +69,28 @@
 
         $("#btnCreateRow").on("click", function () {
             if($(".tableList tr.selected").length === 1) {
-                forms.show(".createRowFormSection");
+                forms.show(".rowFormSection");
+                $(".rowFormSection .submitButton").bind("click", function () {
+                    actions.create.row(file);
+                });
+            }
+        });
+
+        $("#btnSearch").on("click", function () {
+            if($(".tableList tr.selected").length === 1) {
+                forms.show(".rowFormSection");
+                var submitButton = $(".rowFormSection .submitButton");
+                submitButton.unbind("click");
+                submitButton.bind("click", function () {
+                    var dbName = $(".databaseList").find("tr.selected").text();
+                    var tableName = $(".tableList").find("tr.selected").text();
+                    var fieldsFromForm = $(".rowFormSection .columnValueField");
+                    var values = new Array(fieldsFromForm.length);
+                    for (var i = 0; i < fieldsFromForm.length; i++) {
+                        values[i] = fieldsFromForm.eq(i).val();
+                    }
+                    actions.load.rows(dbName, tableName, values);
+                });
             }
         });
 
@@ -164,7 +181,7 @@
                     data: JSON.stringify(outputJson),
                     processData: false,
                     success: function () {
-                        forms.hide(".createRowFormSection");
+                        forms.hide(".rowFormSection");
                         forms.cleanList(".entriesList");
 
                         actions.load.rows(dbName, tableName);
@@ -175,7 +192,7 @@
                 });
 
                 function _parseDataFromForm() {
-                    var fieldsFromForm = $(".createRowFormSection .columnValueField");
+                    var fieldsFromForm = $(".rowFormSection .columnValueField");
                     var values = new Array(fieldsFromForm.length);
                     for (var i = 0; i < fieldsFromForm.length; i++) {
                         values[i] = fieldsFromForm.eq(i).val();
@@ -246,7 +263,7 @@
 
                 function _actionOnClick(dbName) {
                     forms.hide(".createTableFormSection");
-                    forms.hide(".createRowFormSection");
+                    forms.hide(".rowFormSection");
 
                     $(".databaseList tr.selected").removeClass("selected");
                     $(".databaseList td:contains(" + dbName + ")").filter(function() {
@@ -280,7 +297,7 @@
                 });
 
                 function _actionOnClick(dbName, tableName) {
-                    forms.hide(".createRowFormSection");
+                    forms.hide(".rowFormSection");
 
 
                     $.ajax({
@@ -306,23 +323,31 @@
                 }
             },
 
-            rows: function (dbName, tableName) {
+            rows: function (dbName, tableName, filter) {
+                var params = "";
+                if(filter !== undefined) {
+                    for (var v = 0; v < filter.length; v++) {
+                        params += (filter[v] !== "" ? filter[v] : "*") +
+                            (v !== filter.length-1 ? ":" : "");
+                    }
+                }
                 $.ajax({
                     type: "GET",
-                    url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
+                    url: ("/databases/" + dbName + "/tables/" + tableName) +
+                        (params !== "" ? "/query?search=" + params : "/rows/"),
                     success: [function (data) {
+                        forms.cleanList(".entriesList");
 
                         if (data.length > 0 && data[0].values !== undefined) {
                             $(".entriesList").find("th").attr("colspan", data[0].values.length);
+                            _resizeHeader(data[0].values.length);
 
                             var rows = _buildRows(data);
                             var table = $(".entriesList > tbody");
 
-                            forms.cleanList(".entriesList");
-
-                            _resizeHeader(data[0].values.length);
                             table.append(rows);
                         }
+
                     }],
                     error: function (data) {
                         showErrorMessage(data);
@@ -357,7 +382,7 @@
                 $.each(files, function(key, value) {
                     var reader = new FileReader();
                     reader.onload = function () {
-                        if($(".createRowFormSection .textOk").length === 0) {
+                        if($(".rowFormSection .textOk").length === 0) {
                             var textOk = $("<span class='textOk'>ok<br></span>");
                             textOk.css("color", "green");
                             $("input[type=file]").after(textOk);
@@ -393,7 +418,7 @@
             },
 
             rowForm: function (columnNames) {
-                $(".createRowFormSection .fields").html("");
+                $(".rowFormSection .fields").html("");
                 forms.addFields.rowForm(columnNames);
             }
         },
@@ -424,7 +449,7 @@
                         "title='value field'>");
                     var fieldPair = $("<div class='rowField'></div>");
                     fieldPair.append(columnNameField, columnValueField);
-                    $(".createRowFormSection .fields").append(fieldPair);
+                    $(".rowFormSection .fields").append(fieldPair);
                 }
             }
         }
