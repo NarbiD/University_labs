@@ -1,4 +1,5 @@
 (function() {
+
     $(document).ready(function () {
         var dataTypes;
         var image;
@@ -11,7 +12,7 @@
                 forms.init.tableForm(dataTypes, 2);
             }],
             error: function (data) {
-                alert(JSON.parse(data.responseText).message.split(":")[1]);
+                showErrorMessage(data);
             }
         });
 
@@ -65,13 +66,13 @@
                 forms.addFields.tableForm(dataTypes);
             });
 
-            if($(".databaseList").find("tr.selected").length === 1) {
+            if($(".databaseList tr.selected").length === 1) {
                 forms.show(".createTableFormSection");
             }
         });
 
         $("#btnCreateRow").on("click", function () {
-            if($(".tableList").find("tr.selected").length === 1) {
+            if($(".tableList tr.selected").length === 1) {
                 forms.show(".createRowFormSection");
             }
         });
@@ -93,7 +94,7 @@
                         actions.load.databases();
                     },
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 })
             },
@@ -111,32 +112,38 @@
                         actions.load.tables(dbName);
                     },
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 });
 
                 function _parseDataFromForm() {
-                    var outputJson = Object();
-                    outputJson.tableName = $(".tableName").val();
-                    var columnNames = $(".createTableForm .columnName").filter(function() {
+                    var namesFromForm = $(".createTableForm .columnName").filter(function() {
                         return $(this).val() !== "";
                     });
-                    outputJson.columnNames = new Array(columnNames.length);
-                    for (var i = 0; i < columnNames.length; i++) {
-                        outputJson.columnNames[i] = columnNames.eq(i).val() + "";
+                    var typeFromForm = $(".createTableForm .columnType");
+
+                    var columnNames = new Array(namesFromForm.length);
+                    var columnTypes = new Array(namesFromForm.length);
+
+                    for (var i = 0; i < namesFromForm.length; i++) {
+                        columnNames[i] = namesFromForm.eq(i).val() + "";
                     }
-                    outputJson.columnTypes = new Array(outputJson.columnNames.length);
-                    var columnTypes = $(".createTableForm .columnType");
-                    for (var j = 0; j < columnTypes.length; j++) {
-                        if (columnNames.eq(j).val() !== undefined) {
-                            outputJson.columnTypes[j] = dataTypes[columnTypes.eq(j).val()];
+
+                    for (var j = 0; j < typeFromForm.length; j++) {
+                        if (namesFromForm.eq(j).val() !== undefined) {
+                            columnTypes[j] = dataTypes[typeFromForm.eq(j).val()];
                         }
                     }
-                    var constraint = {};
-                    constraint.minValue = parseInt($(".constraintMin").val());
-                    constraint.maxValue = parseInt($(".constraintMax").val());
-                    outputJson.realIntervalConstraint = constraint;
-                    return outputJson;
+
+                    return {
+                        tableName: $(".tableName").val(),
+                        columnNames: columnNames,
+                        columnTypes: columnTypes,
+                        realIntervalConstraint: {
+                            minValue: parseInt($(".constraintMin").val()),
+                            maxValue: parseInt($(".constraintMax").val())
+                        }
+                    };
                 }
             },
 
@@ -162,7 +169,7 @@
                         actions.load.rows(dbName, tableName);
                     },
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 });
 
@@ -191,7 +198,7 @@
                         actions.load.databases();
                     },
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 });
             },
@@ -209,7 +216,7 @@
                         actions.load.tables(dbName);
                     },
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 });
             },
@@ -232,7 +239,7 @@
                         }
                     }],
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 });
 
@@ -267,7 +274,7 @@
                         }
                     }],
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 });
 
@@ -292,7 +299,7 @@
                             forms.init.rowForm(names);
                         }],
                         error: function (data) {
-                            alert(JSON.parse(data.responseText).message.split(":")[1]);
+                            showErrorMessage(data);
                         }
                     })
                 }
@@ -325,7 +332,7 @@
                         }
                     }],
                     error: function (data) {
-                        alert(JSON.parse(data.responseText).message.split(":")[1]);
+                        showErrorMessage(data);
                     }
                 });
 
@@ -403,9 +410,7 @@
         },
         init: {
             tableForm: function (dataTypes, columnAmount) {
-                for (var i = 0; i < columnAmount; i++) {
-                    forms.addFields.tableForm(dataTypes);
-                }
+                forms.addFields.tableForm(dataTypes, columnAmount);
             },
 
             rowForm: function (columnNames) {
@@ -415,18 +420,21 @@
         },
 
         addFields: {
-            tableForm: function (dataTypes) {
-                var columnTypeField = $("<select title='type' class='columnType form-control'></select><br>");
-                for(var typeNumber = 0; typeNumber < dataTypes.length; typeNumber++) {
-                    $("<option value=" + typeNumber + ">" + dataTypes[typeNumber] + "</option>")
-                        .appendTo(columnTypeField);
+            tableForm: function (dataTypes, columnAmount) {
+                for (var i = 0; i < columnAmount; i++) {
+                    var columnTypeField = $("<select title='type' class='columnType form-control'>" +
+                        "</select><br>");
+                    for (var typeNumber = 0; typeNumber < dataTypes.length; typeNumber++) {
+                        $("<option value=" + typeNumber + ">" + dataTypes[typeNumber] + "</option>")
+                            .appendTo(columnTypeField);
+                    }
+                    var columnNameField = $("<input type='text' class='columnName  form-control' " +
+                        "title='column name' placeholder='Column name'>");
+                    var columnProps = $("<div></div>");
+                    columnProps.append(columnNameField);
+                    columnProps.append(columnTypeField);
+                    $(".addColumn").before(columnProps);
                 }
-                var columnNameField = $("<input type='text' class='columnName  form-control' " +
-                    "title='column name' placeholder='Column name'>");
-                var columnProps = $("<div></div>");
-                columnProps.append(columnNameField);
-                columnProps.append(columnTypeField);
-                $(".addColumn").before(columnProps);
             },
 
             rowForm: function (columnNames) {
@@ -442,4 +450,8 @@
             }
         }
     };
+
+    function showErrorMessage(response) {
+        alert(JSON.parse(response.responseText).message.split(":")[1]);
+    }
 })();
