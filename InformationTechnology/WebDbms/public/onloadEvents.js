@@ -1,8 +1,9 @@
 (function() {
 
+    var image;
+
     $(document).ready(function () {
         var dataTypes;
-        var image;
 
         $.ajax({
             type: "GET",
@@ -42,7 +43,7 @@
         });
 
         $("input[type=file]").on("change", function(){
-            image = actions.load.image(this.files);
+            actions.load.image(this.files);
         });
 
         //
@@ -383,7 +384,7 @@
                             textOk.css("color", "green");
                             $("input[type=file]").after(textOk);
                         }
-                        return reader.result.split(",")[1];
+                        image = reader.result.split(",")[1];
                     };
                 });
             }
