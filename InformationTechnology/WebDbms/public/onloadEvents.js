@@ -61,14 +61,13 @@
         });
 
         $("#btnCreateTable").on("click", function () {
-
-            $(".addColumn").on("click", function () {
-                forms.addFields.tableForm(dataTypes);
-            });
-
             if($(".databaseList tr.selected").length === 1) {
                 forms.show(".createTableFormSection");
             }
+        });
+
+        $(".addColumn").on("click", function () {
+            forms.addFields.tableForm(dataTypes, 1);
         });
 
         $("#btnCreateRow").on("click", function () {
