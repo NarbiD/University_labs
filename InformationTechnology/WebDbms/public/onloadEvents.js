@@ -1,8 +1,9 @@
 (function() {
 
+    var file;
+
     $(document).ready(function () {
         var dataTypes;
-        var file;
 
         $.ajax({
             type: "GET",
@@ -42,7 +43,7 @@
         });
 
         $("input[type=file]").on("change", function(){
-            file = actions.load.file(this.files);
+            actions.load.file(this.files);
         });
 
         //
@@ -343,7 +344,7 @@
                                 $(this).parent().addClass("selected");
 
                                 var k = $(this).parent('tr').index();
-                                $(".file").append(data[k-1].file);
+                                $(".file").val(data[k-1].file);
                             });
                         }
                         rows[k] = (row);
@@ -355,15 +356,15 @@
             file: function (files) {
                 $.each(files, function(key, value) {
                     var reader = new FileReader();
-                    reader.readAsDataURL(value);
                     reader.onload = function () {
                         if($(".createRowFormSection .textOk").length === 0) {
                             var textOk = $("<span class='textOk'>ok<br></span>");
                             textOk.css("color", "green");
                             $("input[type=file]").after(textOk);
                         }
-                        return reader.result.split(",")[1];
+                        file = reader.result;
                     };
+                    reader.readAsText(value);
                 });
             }
         }
@@ -384,7 +385,7 @@
         },
 
         cleanFile: function () {
-            $(".file").empty();
+            $(".file").val("");
         },
         init: {
             tableForm: function (dataTypes, columnAmount) {
