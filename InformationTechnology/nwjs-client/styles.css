@@ -1,0 +1,7 @@
+body {
+    background-color: #FBFBFF;
+}
+
+tbody > .selected {
+    background-color: #EEEEF2;
+}
