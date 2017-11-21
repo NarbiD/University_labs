@@ -95,4 +95,19 @@ public class Database {
         File path = new File(location + name);
         return path.isDirectory();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Database database = (Database) o;
+
+        return name != null ? name.equals(database.name) : database.name == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
 }
