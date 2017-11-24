@@ -1,0 +1,11 @@
+body {
+    background-color: #FBFBFF;
+}
+
+tbody > .selected {
+    background-color: #EEEEF2;
+}
+
+.button {
+    width: 49%;
+}
