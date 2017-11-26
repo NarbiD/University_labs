@@ -1,21 +1,18 @@
+import static java.lang.Thread.sleep;
+
 public class Main {
     public static void main(String[] args) {
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 100_000; i++) {
+            int finalI = i;
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    test();
-                }
-
-                double test() {
-                    double var;
-                    while (true) {
-                        var = Math.sqrt(1);
-                        if (var == 2) {
-                            break;
-                        }
+                    try {
+                        sleep(30_000);
+//                        System.out.println(finalI);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    return var;
                 }
             });
             thread.start();
