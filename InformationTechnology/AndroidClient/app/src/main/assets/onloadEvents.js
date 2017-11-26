@@ -1,0 +1,461 @@
+(function() {
+
+    var file;
+
+    $(document).ready(function () {
+        var dataTypes;
+
+        $.ajax({
+            type: "GET",
+            url: "/types/",
+            success: [function (data) {
+                dataTypes = data;
+                forms.init.tableForm(dataTypes, 2);
+            }],
+            error: function (data) {
+                showErrorMessage(data);
+            }
+        });
+
+        forms.hide(".createDatabaseFormSection");
+        forms.hide(".createTableFormSection");
+        forms.hide(".rowFormSection");
+
+        actions.load.databases();
+
+        //
+        // Events
+
+        $(".createDatabaseForm .submitButton").on("click", function () {
+            actions.create.database($(".databaseName").val());
+        });
+
+        $(".createTableForm .submitButton").on("click", function () {
+            actions.create.table($(".databaseList tr.selected > td").text(), dataTypes)
+        });
+
+        $(".cancelButton").on("click", function () {
+            forms.hide("." + this.parentNode.parentNode.className);
+        });
+
+        $("input[type=file]").on("change", function(){
+            actions.load.file(this.files);
+        });
+
+        //
+        // Buttons
+
+        $("#btnCreateDatabase").on("click", function () {
+            forms.show(".createDatabaseFormSection");
+        });
+
+        $("#btnDeleteDatabase").on("click", function () {
+            actions.delete.database();
+        });
+
+        $("#btnDeleteTable").on("click", function () {
+            actions.delete.table();
+        });
+
+        $("#btnCreateTable").on("click", function () {
+            if($(".databaseList tr.selected").length === 1) {
+                forms.show(".createTableFormSection");
+            }
+        });
+
+        $(".addColumn").on("click", function () {
+            forms.addFields.tableForm(dataTypes, 1);
+        });
+
+        $("#btnCreateRow").on("click", function () {
+            if($(".tableList tr.selected").length === 1) {
+                forms.show(".rowFormSection");
+                $(".rowFormSection .submitButton").bind("click", function () {
+                    actions.create.row(file);
+                });
+            }
+        });
+
+        $("#btnSearch").on("click", function () {
+            if($(".tableList tr.selected").length === 1) {
+                forms.show(".rowFormSection");
+                var submitButton = $(".rowFormSection .submitButton");
+                submitButton.unbind("click");
+                submitButton.bind("click", function () {
+                    var dbName = $(".databaseList").find("tr.selected").text();
+                    var tableName = $(".tableList").find("tr.selected").text();
+                    var fieldsFromForm = $(".rowFormSection .columnValueField");
+                    var values = new Array(fieldsFromForm.length);
+                    for (var i = 0; i < fieldsFromForm.length; i++) {
+                        values[i] = fieldsFromForm.eq(i).val();
+                    }
+                    actions.load.rows(dbName, tableName, values);
+                });
+            }
+        });
+
+    });
+
+    var actions = {
+        create: {
+            database: function (dbName) {
+                $.ajax({
+                    type: "POST",
+                    url: "/databases/",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({ databaseName: dbName }),
+                    processData: false,
+                    success: function () {
+                        forms.hide(".createDatabaseFormSection");
+                        forms.cleanList(".databaseList");
+
+                        actions.load.databases();
+                    },
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                })
+            },
+
+            table: function (dbName, dataTypes) {
+                $.ajax({
+                    type: "POST",
+                    url: "/databases/" + dbName + "/tables/",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(_parseDataFromForm()),
+                    processData: false,
+                    success: function () {
+                        forms.hide(".createTableFormSection");
+                        forms.cleanList(".tableList");
+                        actions.load.tables(dbName);
+                    },
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                });
+
+                function _parseDataFromForm() {
+                    var namesFromForm = $(".createTableForm .columnName").filter(function() {
+                        return $(this).val() !== "";
+                    });
+                    var typeFromForm = $(".createTableForm .columnType");
+
+                    var columnNames = new Array(namesFromForm.length);
+                    var columnTypes = new Array(namesFromForm.length);
+
+                    for (var i = 0; i < namesFromForm.length; i++) {
+                        columnNames[i] = namesFromForm.eq(i).val() + "";
+                    }
+
+                    for (var j = 0; j < typeFromForm.length; j++) {
+                        if (namesFromForm.eq(j).val() !== undefined) {
+                            columnTypes[j] = dataTypes[typeFromForm.eq(j).val()];
+                        }
+                    }
+
+                    return {
+                        tableName: $(".tableName").val(),
+                        columnNames: columnNames,
+                        columnTypes: columnTypes,
+                        integerInvlConstraint: {
+                            minValue: parseInt($(".constraintMin").val()),
+                            maxValue: parseInt($(".constraintMax").val())
+                        }
+                    };
+                }
+            },
+
+            row: function (file) {
+                var outputJson = {};
+
+                outputJson.file = file !== undefined ? file : "";
+                outputJson.values = _parseDataFromForm();
+
+                var dbName = $(".databaseList").find("tr.selected").text();
+                var tableName = $(".tableList").find("tr.selected").text();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/databases/" + dbName + "/tables/" + tableName + "/rows/",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(outputJson),
+                    processData: false,
+                    success: function () {
+                        forms.hide(".rowFormSection");
+                        forms.cleanList(".entriesList");
+
+                        actions.load.rows(dbName, tableName);
+                    },
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                });
+
+                function _parseDataFromForm() {
+                    var fieldsFromForm = $(".rowFormSection .columnValueField");
+                    var values = new Array(fieldsFromForm.length);
+                    for (var i = 0; i < fieldsFromForm.length; i++) {
+                        values[i] = fieldsFromForm.eq(i).val();
+                    }
+                    return values;
+                }
+            }
+        },
+
+        delete: {
+            database: function () {
+                var dbName = $(".databaseList").find("tr.selected > td").text();
+                $.ajax({
+                    type: "DELETE",
+                    url: "/databases/" + dbName,
+                    success: function () {
+                        forms.cleanList(".databaseList");
+                        forms.cleanList(".tableList");
+                        forms.cleanList(".entriesList");
+
+                        actions.load.databases();
+                    },
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                });
+            },
+
+            table: function () {
+                var dbName = $(".databaseList").find("tr.selected > td").text();
+                var tableName = $(".tableList").find("tr.selected > td").text();
+                $.ajax({
+                    type: "DELETE",
+                    url: "/databases/" + dbName + "/tables/" + tableName,
+                    success: function () {
+                        forms.cleanList(".tableList");
+                        forms.cleanList(".entriesList");
+
+                        actions.load.tables(dbName);
+                    },
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                });
+            },
+
+            row: function () { }
+        },
+
+        load: {
+            databases: function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/databases/",
+                    success: [function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var row = $("<tr></tr>");
+                            $("<td>" + data[i] + "</td>").appendTo(row).on("click", function () {
+                                _actionOnClick(this.innerHTML)
+                            });
+                            row.appendTo(".databaseList" + " > tbody");
+                        }
+                    }],
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                });
+
+                function _actionOnClick(dbName) {
+                    forms.hide(".createTableFormSection");
+                    forms.hide(".rowFormSection");
+
+                    $(".databaseList tr.selected").removeClass("selected");
+                    $(".databaseList td:contains(" + dbName + ")").filter(function() {
+                        return $(this).text() === dbName;
+                    }).parent().addClass("selected");
+
+                    forms.cleanList(".tableList");
+                    forms.cleanList(".entriesList");
+
+                    actions.load.tables(dbName);
+                }
+            },
+
+            tables: function (dbName) {
+
+                $.ajax({
+                    type: "GET",
+                    url: "/databases/" + dbName + "/tables/",
+                    success: [function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var row = $("<tr></tr>");
+                            $("<td>" + data[i] + "</td>").appendTo(row).on("click", function () {
+                                _actionOnClick(dbName, this.innerHTML)
+                            });
+                            row.appendTo(".tableList" + " > tbody");
+                        }
+                    }],
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                });
+
+                function _actionOnClick(dbName, tableName) {
+                    forms.hide(".rowFormSection");
+
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/databases/" + dbName + "/tables/" + tableName + "/",
+                        success: [function (data) {
+                            $(".tableList tr.selected").removeClass("selected");
+                            $(".tableList td:contains(" + tableName + ")").filter(function() {
+                                return $(this).text() === tableName;
+                            }).parent().addClass("selected");
+
+                            forms.cleanList(".entriesList");
+
+                            actions.load.rows(dbName, tableName);
+
+                            var names = data.columnNames;
+                            forms.init.rowForm(names);
+                        }],
+                        error: function (data) {
+                            showErrorMessage(data);
+                        }
+                    })
+                }
+            },
+
+            rows: function (dbName, tableName, filter) {
+                var params = "";
+                if(filter !== undefined) {
+                    for (var v = 0; v < filter.length; v++) {
+                        params += (filter[v] !== "" ? filter[v] : "*") +
+                            (v !== filter.length-1 ? ":" : "");
+                    }
+                }
+                $.ajax({
+                    type: "GET",
+                    url: ("/databases/" + dbName + "/tables/" + tableName) +
+                        (params !== "" ? "/query?search=" + params : "/rows/"),
+                    success: [function (data) {
+                        forms.cleanList(".entriesList");
+
+                        if (data.length > 0 && data[0].values !== undefined) {
+                            $(".entriesList").find("th").attr("colspan", data[0].values.length);
+                            _resizeHeader(data[0].values.length);
+
+                            var rows = _buildRows(data);
+                            var table = $(".entriesList > tbody");
+
+                            table.append(rows);
+                        }
+
+                    }],
+                    error: function (data) {
+                        showErrorMessage(data);
+                    }
+                });
+
+                function _resizeHeader(size) {
+                    $(".entriesList").find("th").attr("colspan", size);
+                }
+
+                function _buildRows(data) {
+                    var rows = [data.length];
+                    for (var k = 0; k < data.length; k++) {
+                        var values = data[k].values;
+                        var row = $("<tr></tr>");
+                        for (var j = 0; j < values.length; j++){
+                            $("<td>" + values[j] + "</td>").appendTo(row).on("click", function () {
+                                $(".entriesList").find("tr.selected").removeClass("selected");
+                                $(this).parent().addClass("selected");
+
+                                var k = $(this).parent('tr').index();
+                                $(".file").val(data[k-1].file);
+                            });
+                        }
+                        rows[k] = (row);
+                    }
+                    return rows;
+                }
+            },
+
+            file: function (files) {
+                $.each(files, function(key, value) {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        if($(".rowFormSection .textOk").length === 0) {
+                            var textOk = $("<span class='textOk'>ok<br></span>");
+                            textOk.css("color", "green");
+                            $("input[type=file]").after(textOk);
+                        }
+                        file = reader.result;
+                    };
+                    reader.readAsText(value);
+                });
+            }
+        }
+    };
+
+    var forms = {
+        show: function (selector) {
+            $(selector).css("display", "block");
+        },
+
+        hide: function (selector) {
+            $(selector).css("display", "none");
+        },
+
+        cleanList: function (selector) {
+            $(selector).find("tbody > tr:gt(0)").remove();
+            forms.cleanFile();
+        },
+
+        cleanFile: function () {
+            $(".file").val("");
+        },
+        init: {
+            tableForm: function (dataTypes, columnAmount) {
+                forms.addFields.tableForm(dataTypes, columnAmount);
+            },
+
+            rowForm: function (columnNames) {
+                $(".rowFormSection .fields").html("");
+                forms.addFields.rowForm(columnNames);
+            }
+        },
+
+        addFields: {
+            tableForm: function (dataTypes, columnAmount) {
+                for (var i = 0; i < columnAmount; i++) {
+                    var columnTypeField = $("<select title='type' class='columnType form-control'>" +
+                        "</select><br>");
+                    for (var typeNumber = 0; typeNumber < dataTypes.length; typeNumber++) {
+                        $("<option value=" + typeNumber + ">" + dataTypes[typeNumber] + "</option>")
+                            .appendTo(columnTypeField);
+                    }
+                    var columnNameField = $("<input type='text' class='columnName  form-control' " +
+                        "title='column name' placeholder='Column name'>");
+                    var columnProps = $("<div></div>");
+                    columnProps.append(columnNameField);
+                    columnProps.append(columnTypeField);
+                    $(".addColumn").before(columnProps);
+                }
+            },
+
+            rowForm: function (columnNames) {
+                for (var i = 0; i < columnNames.length; i++) {
+                    var columnNameField = $("<b class='columnNameField'></b>");
+                    columnNameField.text(columnNames[i] + ": ");
+                    var columnValueField = $("<input type='text' class='columnValueField form-control' " +
+                        "title='value field'>");
+                    var fieldPair = $("<div class='rowField'></div>");
+                    fieldPair.append(columnNameField, columnValueField);
+                    $(".rowFormSection .fields").append(fieldPair);
+                }
+            }
+        }
+    };
+
+    function showErrorMessage(response) {
+        alert(JSON.parse(response.responseText).message.split(":")[1]);
+    }
+})();
