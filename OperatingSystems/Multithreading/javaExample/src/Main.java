@@ -5,7 +5,7 @@ import static java.lang.Thread.sleep;
 
 public class Main {
     private final static int DEFAULT_THREAD_NUM = 50_000;
-    private final static int DEFAULT_SLEEP_TIME = 20_000;
+    private final static int DEFAULT_SLEEP_TIME = 40_000;
 
     public static void main(String[] args) throws InterruptedException {
 
