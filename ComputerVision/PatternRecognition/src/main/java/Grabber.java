@@ -13,10 +13,14 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
 import org.bytedeco.javacv.*;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
 import java.nio.IntBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.bytedeco.javacpp.opencv_objdetect.*;
@@ -27,6 +31,7 @@ public class Grabber {
     Frame frame;
     opencv_face.FaceRecognizer faceRecognizer;
     Map<Integer, String> associations = new HashMap<>();
+    List<String> persons = new ArrayList();
 
     int count = 0;
 
@@ -47,10 +52,15 @@ public class Grabber {
         classifier = new CvHaarClassifierCascade(cvLoad(("C:\\Users\\ignas\\OneDrive\\Programming\\University_labs\\ComputerVision\\PatternRecognition\\src\\main\\resources\\haarcascade_frontalface_default.xml")));
     }
 
-    void showFrame(String windowName) throws FrameGrabber.Exception {
+    void readPersonList() throws IOException {
+        Files.lines(Paths.get("C:\\Users\\ignas\\OneDrive\\Programming\\University_labs\\ComputerVision\\PatternRecognition\\src\\main\\resources\\persons.txt"), StandardCharsets.UTF_8).forEach(person -> persons.add(person));
+    }
+
+    void showFrame(String windowName) throws IOException {
         CanvasFrame canvasFrame = new CanvasFrame(windowName);
         canvasFrame.setCanvasSize(frame.imageWidth, frame.imageHeight);
-        train();
+        //train();
+        //readPersonList();
         while(canvasFrame.isVisible() && (frame = grabber.grab()) != null) {
             image = converter.convert(frame);
 
@@ -115,16 +125,16 @@ public class Grabber {
                 IplImage obj = getSubImageFromIpl(image, rect.x(), rect.y(), rect.width(), rect.height());
                 obj = resizeImage(obj, 100, 100);
 
+                //IplImage grayImage = IplImage.create(obj.width(),obj.height(),  IPL_DEPTH_8U, 1);
+                //cvCvtColor(obj, grayImage, CV_BGR2GRAY);
+                //int label = faceRecognizer.predict_label(cvarrToMat(grayImage));
+                //System.out.println(persons.get(label));
+                //IplImage img = cvLoadImage("C:\\Users\\ignas\\OneDrive\\Programming\\University_labs\\ComputerVision\\PatternRecognition\\src\\main\\resources\\img\\" + associations.get(label), CV_LOAD_IMAGE_GRAYSCALE);
+
+
                 IplImage grayImage = IplImage.create(obj.width(),obj.height(),  IPL_DEPTH_8U, 1);
                 cvCvtColor(obj, grayImage, CV_BGR2GRAY);
-                int label = faceRecognizer.predict_label(cvarrToMat(grayImage));
-                System.out.println(label);
-                IplImage img = cvLoadImage("C:\\Users\\ignas\\OneDrive\\Programming\\University_labs\\ComputerVision\\PatternRecognition\\src\\main\\resources\\img\\" + associations.get(label), CV_LOAD_IMAGE_GRAYSCALE);
-
-
-//                IplImage grayImage = IplImage.create(obj.width(),obj.height(),  IPL_DEPTH_8U, 1);
-//                cvCvtColor(obj, grayImage, CV_BGR2GRAY);
-//                cvSaveImage("C:\\Users\\ignas\\OneDrive\\Programming\\University_labs\\ComputerVision\\PatternRecognition\\src\\main\\resources\\img\\" + count/50 + ".jpg", grayImage);
+                cvSaveImage("C:\\Users\\ignas\\OneDrive\\Programming\\University_labs\\ComputerVision\\PatternRecognition\\src\\main\\resources\\img\\" + count/50 + ".jpg", grayImage);
             }
             rectangle(cvarrToMat(image),
                     new Rect(rect.x(), rect.y(), rect.width(), rect.height()),
