@@ -1,14 +1,18 @@
 package main
 
-import "math"
+import "time"
+
+const THREAD_NUM = 1000000
+
+const TIME_TO_SLEEP = 40 * time.Second
 
 func main() {
-	for i :=0 ; i < 2000000; i++ {
-		go test()
+	for i :=0 ; i < THREAD_NUM; i++ {
+		go run()
 	}
-	for { math.Sqrt(1) }
+	run()
 }
 
-func test () {
-	for { math.Sqrt(1) }
+func run () {
+	for { time.Sleep(TIME_TO_SLEEP) }
 }
