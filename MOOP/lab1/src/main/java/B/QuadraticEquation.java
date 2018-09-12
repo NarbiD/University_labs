@@ -6,16 +6,16 @@ import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
 import static java.lang.StrictMath.sqrt;
 
-public class QuadraticEquation {
+class QuadraticEquation {
     private double a, b, c;
 
-    public QuadraticEquation(double a, double b, double c) {
+    QuadraticEquation(double a, double b, double c) {
         this.a = a;
         this.b = b;
         this.c = c;
     }
 
-    public Set<Double> solve() {
+    private Set<Double> solve() {
         Set<Double> roots = new HashSet<>();
         double d = b*b-4*a*c;
         if (d >= 0) {
@@ -25,13 +25,13 @@ public class QuadraticEquation {
         return roots;
     }
 
-    public Point<Double> extremum() {
+    Point<Double> extremum() {
         double x = -b/(2*a);
         double y = a*x*x + b*x + c;
         return new Point<>(x, y);
     }
 
-    public String intervals() {
+    String intervals() {
         Double extremumX = extremum().x;
         if (a > 0) {
             return "Функция спадает на промежутке (-бесконечность; " + extremumX + ") " +
@@ -42,7 +42,7 @@ public class QuadraticEquation {
         }
     }
 
-    public void printMinAndMaxRoots() {
+    void printMinAndMaxRoots() {
         Set<Double> roots = solve();
         System.out.print("В уравнении ");
         if (roots.size() == 0) {
@@ -54,14 +54,6 @@ public class QuadraticEquation {
             System.out.print("наименьший корень=" + min(rootsArray.get(0), rootsArray.get(1)) + ", ");
             System.out.println("наибольший корень=" + max(rootsArray.get(0), rootsArray.get(1)));
         }
-        }
-
-    public static void main(String[] args) {
-        List<QuadraticEquation> equations = new ArrayList<>();
-        equations.add(new QuadraticEquation(2, 5, 2));
-        equations.add(new QuadraticEquation(1, 2, 1));
-        equations.add(new QuadraticEquation(1, 2, 3));
-        equations.forEach(QuadraticEquation::printMinAndMaxRoots);
     }
 
     private class Point<T> {

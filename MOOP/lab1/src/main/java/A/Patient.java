@@ -11,10 +11,10 @@ public class Patient {
     private String phone = "";
     private String diagnosis = "";
 
-    public Patient() {
+    Patient() {
     }
 
-    public Patient(int medicalCardNumber, String name, String surname, String patronymic) {
+    Patient(int medicalCardNumber, String name, String surname, String patronymic) {
         this.medicalCardNumber = medicalCardNumber;
         this.name = name;
         this.surname = surname;
