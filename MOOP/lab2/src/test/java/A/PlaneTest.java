@@ -3,10 +3,10 @@ package A;
 import org.junit.Test;
 
 public class PlaneTest {
-    Plane plane;
+    private Plane plane;
 
     private void initPlane() {
-        plane = new Plane(new Plane.Engine(), new Plane.Wing(), new Plane.Wing(), new Plane.Chassis());
+        plane = new Plane(new Plane.Engine.EngineBuilder().createEngine(), new Plane.Wing(12), new Plane.Wing(12), new Plane.Chassis(2));
 
     }
 
