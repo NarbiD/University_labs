@@ -46,6 +46,10 @@ public class Plane {
         this.route.addAll(Arrays.asList(route));
     }
 
+    public void addDestinationIntoRoute(Location destination) {
+        this.route.add(destination);
+    }
+
     public static class Engine {
         int id;
         double power;
