@@ -7,6 +7,10 @@ public abstract class Appliance {
     String Model;
     Size size;
 
+    public enum Size {
+        XS, S, M, L, XL, UNKNOWN
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,30 +79,5 @@ public abstract class Appliance {
         return size;
     }
 
-    public enum Size {
-        XS, S, M, L, XL, UNKNOWN;
 
-        double length, width, height;
-
-        Size() {
-        }
-
-        Size(double length, double width, double height) {
-            this.length = length;
-            this.width = width;
-            this.height = height;
-        }
-
-        public double getLength() {
-            return length;
-        }
-
-        public double getWidth() {
-            return width;
-        }
-
-        public double getHeight() {
-            return height;
-        }
-    }
 }

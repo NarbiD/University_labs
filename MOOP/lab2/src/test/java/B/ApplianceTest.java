@@ -42,7 +42,7 @@ public class ApplianceTest {
                 sum += appliance.getPower();
             }
         }
-        System.out.println("Суммарная мощьность включенных устройств равна " + sum + " ватт.\n");
+        System.out.println("Суммарная мощность включенных устройств равна " + sum + " ватт.\n");
     }
 
     @Test
