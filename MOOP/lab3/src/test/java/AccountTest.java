@@ -4,6 +4,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AccountTest {
 
     private Account account1;
@@ -81,9 +84,32 @@ public class AccountTest {
         account1.incBalance(10);
         account1.new Payment(10, account2).run();
         Assert.assertEquals(oldB2 + 10, account2.getBalance(), 0.0001);
-
     }
 
+    @Test
+    public void receiptTest() throws TransferException {
+        double oldB1 = account1.getBalance();
+        account2.incBalance(10);
+        account1.new Receipt(10, account2).run();
+        Assert.assertEquals(account1.getBalance(), oldB1 + 10, 0.0001);
+    }
 
+    @Test
+    public void withdrawalTest() throws TransferException {
+        double oldB1 = account1.getBalance();
+        account1.new Withdrawal(10).run();
+        Assert.assertEquals(account1.getBalance(), oldB1 - 10, 0.0001);
+    }
 
+    @Test
+    public void createAndRunFewOperations() throws TransferException {
+        List<Account.Operation> opList = new ArrayList<>();
+        account1.incBalance(10);
+        opList.add(account2.new Receipt(10, account1));
+        opList.add(account2.new Withdrawal(5));
+        opList.add(account2.new Payment(5, account1));
+        for (Account.Operation operation : opList) {
+            operation.run();
+        }
+    }
 }

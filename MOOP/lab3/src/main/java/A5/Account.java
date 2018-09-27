@@ -25,7 +25,7 @@ public class Account {
     }
 
     @FunctionalInterface
-    interface Operation {
+    public interface Operation {
         void run() throws TransferException;
     }
 
@@ -47,7 +47,7 @@ public class Account {
         abstract public void run() throws TransferException;
     }
 
-    class Receipt extends MoneyTransfer {
+    public class Receipt extends MoneyTransfer {
 
         public Receipt(double transferAmount, Account interactiveAccount) {
             super(transferAmount, interactiveAccount);
@@ -82,10 +82,10 @@ public class Account {
         }
     }
 
-    class Withdrawal implements Operation {
+    public class Withdrawal implements Operation {
         final double transferAmount;
 
-        Withdrawal(double transferAmount) {
+        public Withdrawal(double transferAmount) {
             this.transferAmount = transferAmount;
         }
 
