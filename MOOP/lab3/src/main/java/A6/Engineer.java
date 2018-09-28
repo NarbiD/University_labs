@@ -1,4 +1,5 @@
 package A6;
 
-public interface Engineer {
+public interface Engineer extends Employe {
+    void goOnStrike();
 }

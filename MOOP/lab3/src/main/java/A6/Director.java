@@ -1,6 +1,6 @@
 package A6;
 
-public interface Director {
+public interface Director extends Employe {
     void layOff(Employe employe);
-    void raiseWages(Employe employe, double newWage);
+    void changeWages(Employe employe, double newWage);
 }
