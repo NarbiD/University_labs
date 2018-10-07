@@ -1,6 +1,8 @@
 package A;
 
+import java.io.*;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,8 +36,29 @@ public class Plane {
 
     public void printRoute() {
         System.out.println("Текущий маршрут:");
-        route.forEach(loc -> System.out.println("-> " + loc));
-        System.out.println();
+        if (this.route == null) {
+            System.out.println("Маршрут не задан.");
+        } else {
+            route.forEach(loc -> System.out.println("-> " + loc));
+            System.out.println();
+        }
+    }
+
+    public void printRouteToFile(File file) throws IOException {
+        try(FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw)) {
+            out.println("Текущий маршрут(" + new Date() + "):");
+            if (this.route == null) {
+                out.println("Маршрут не задан.");
+            } else {
+                for (Location loc : route) {
+                    out.println("-> " + loc);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Указаного файла не существует.");
+        }
     }
 
     public void setRoute(List<Location> route) {

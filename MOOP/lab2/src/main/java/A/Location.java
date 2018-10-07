@@ -27,6 +27,9 @@ public class Location {
     }
 
     Location(double longitude, double latitude) {
+        if (latitude > 90 || latitude < -90 || longitude > 180 || longitude < -180) {
+            throw new IllegalArgumentException("Заданы некорректные координаты");
+        }
         this.longitude = longitude;
         this.latitude = latitude;
     }
