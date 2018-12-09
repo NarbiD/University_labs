@@ -67,4 +67,28 @@ public class Sentence {
         }
         return false;
     }
+
+    public boolean contains(Word word) {
+        for (Word w : getWords()) {
+            if (w.equals(word)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Sentence sentence = (Sentence) o;
+
+        return partsOfSentence != null ? partsOfSentence.equals(sentence.partsOfSentence) : sentence.partsOfSentence == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return partsOfSentence != null ? partsOfSentence.hashCode() : 0;
+    }
 }

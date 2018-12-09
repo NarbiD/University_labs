@@ -1,3 +1,5 @@
+package A7;
+
 import A7.TextFixer;
 import org.junit.Assert;
 import org.junit.Test;
