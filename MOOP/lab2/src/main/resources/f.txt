@@ -10,3 +10,9 @@
 Текущий маршрут(Sun Oct 07 23:00:17 EEST 2018):
 -> longitude=56.0, latitude=45.5
 -> longitude=50.0, latitude=45.0
+Текущий маршрут(Sun Dec 09 14:32:54 EET 2018):
+-> longitude=56.0, latitude=45.5
+-> longitude=50.0, latitude=45.0
+Текущий маршрут(Sun Dec 09 14:33:16 EET 2018):
+-> longitude=56.0, latitude=45.5
+-> longitude=50.0, latitude=45.0
