@@ -7,15 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-/**
- * 14.03.2018
- * AuthFilter
- *
- * Класс-фильтр, выполняет обработку запроса до того, как он будет обработан сервлетами.
- *
- * @author Sidikov Marsel (First Software Engineering Platform)
- * @version v1.0
- */
 @WebFilter("/home")
 public class AuthFilter implements Filter{
     @Override

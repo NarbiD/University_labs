@@ -1,13 +1,11 @@
 package dao;
 
-import dataset.Room;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class LessonDao extends Dao {
 
-    Connection connection;
+    private Connection connection;
 
     public LessonDao(Connection connection) {
         super(connection);

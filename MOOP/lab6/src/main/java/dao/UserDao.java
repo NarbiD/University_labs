@@ -16,7 +16,7 @@ public class UserDao extends Dao {
 
     public boolean isExist(String name, String pass) throws SQLException {
         return executor.execQuery("select * from user where name='" + name + "' and password='" + pass + "'",
-                resultSet -> resultSet.next());
+                ResultSet::next);
     }
 
 
